@@ -1,0 +1,63 @@
+CC=    clang
+LD=    clang
+
+ifndef PROJ
+PROJ = Ip
+#PROJ = Is
+#PROJ = III
+#PROJ = V
+endif
+
+SRC_DIR  := $(PROJ)
+
+CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer
+INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR)
+LDFLAGS  := $(LDFLAGS)
+LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
+LIBS     = -lcrypto
+
+CFLAGS += -flax-vector-conversions
+
+SRCS           :=  $(wildcard $(SRC_DIR)/*.c)
+SRCS_O         :=  $(SRCS:.c=.o)
+SRCS_O_NOTDIR  :=  $(notdir $(SRCS_O))
+
+OBJ = $(SRCS_O_NOTDIR)
+
+EXE= sign_api-test
+
+ifdef KAT
+	CFLAGS       += -D_NIST_KAT_
+	SRC_EXT_DIRS := nistkat
+	INCPATH      += -I./nistkat
+	OBJ          += rng.o
+	EXE          += PQCgenKAT_sign
+endif
+
+
+.INTERMEDIATE:  $(OBJ)
+.PHONY: all clean
+
+all: $(EXE)
+
+sign_api-test: $(OBJ) sign_api-test.c
+	$(CC) $(CFLAGS) $(INCPATH) $(LDFLAGS) $(LIBPATH) $(LIBS) $^ -o $@
+
+PQCgenKAT_sign: $(OBJ) nistkat/PQCgenKAT_sign.c
+	$(CC) $(CFLAGS) $(INCPATH) $(LDFLAGS) $(LIBPATH) $(LIBS) $^ -o $@
+
+%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) $(INCPATH) -c $<
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCPATH) -c $<
+
+define GEN_O
+%.o: $(1)/%.c
+	$(CC) $(CFLAGS) $(INCPATH) -c $$<
+endef
+$(foreach dir, $(SRC_EXT_DIRS), $(eval $(call GEN_O,$(dir))))
+
+
+clean:
+	-rm -f *.o *.req *.rsp PQCgenKAT_sign $(EXE);

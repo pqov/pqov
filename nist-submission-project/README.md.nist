@@ -1,0 +1,48 @@
+  
+# OV signature
+
+This project contains the implementations of the oil and vinegar (OV) signature system.
+
+## Authors
+
+## Licence
+
+Public domain.  
+
+## Supporting Parameters
+
+| Parameter    | signature size | pk size  | sk size | pkc size | compressed-sk size |  
+|:-----------: |:--------------:|--------- |---------|------------|--------------------|
+|GF(16),160,64 | 96             |412,160   |348,720  |66,576      | 48                 |
+|GF(256),112,44| 128            |278,432   |237,912  |43,576      | 48                 |
+|GF(256),184,72| 200            |1,225,440 |1,044,336|189,232     | 48                 |
+|GF(256),244,96| 260            |2,869,440 |2,436,720|446,992     | 48                 |
+
+
+## Instructions for testing and generating KATs
+
+Type **make**    
+```
+make
+```
+It will generate an executable **sign_api-test** testing API functions (crypto_keygen(), crypto_sign(), and crypto_verify()).  
+
+### **Options for Parameters:**
+
+The source code of all supporting parameters is stored in subdirectories of the parameter names.
+The default setting is compiling **Ip**.  
+We use **PROJ** parameters for compiling other parameters.  
+For example:  
+```
+make PROJ=Is_pkc
+```
+```
+make PROJ=III_pkc_skc
+```
+
+### **Generating KAT:**
+Use the following script:  
+```
+source ./generate_KAT.sh
+```
+
