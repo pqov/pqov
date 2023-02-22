@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.os }}.${{ matrix.compiler.compiler }}
+    name: ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,6 +21,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
 """
 
 def paramToName(p):
