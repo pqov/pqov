@@ -1,9 +1,6 @@
 CC  ?= clang
-CXX ?= g++
-LD  ?= clang
-
-
-
+CXX ?= clang++
+LD  = $(CC)
 
 ifndef PROJ
 PROJ = ref
