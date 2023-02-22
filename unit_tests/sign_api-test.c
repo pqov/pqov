@@ -69,6 +69,6 @@ int main(void) {
     free( sk );
     printf("all (%d,%d) tests passed.\n\n", TEST_RUN, TEST_GENKEY );
 
-    return -1;
+    return 0;
 }
 
