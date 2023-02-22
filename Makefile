@@ -1,6 +1,6 @@
-CC=    clang
-CXX=   g++
-LD=    clang
+CC  ?= clang
+CXX ?= g++
+LD  ?= clang
 
 
 
