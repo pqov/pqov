@@ -1,5 +1,17 @@
 name: Test OV16_160_64_classic
+
 on:
   push:
-	@@ -19,8 +19,33 @@
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: test
       run: make PARAM=1 VARIANT=1 test

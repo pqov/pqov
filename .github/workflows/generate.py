@@ -1,7 +1,21 @@
+
+
 workflow = """name: Test $NAME
+
 on:
   push:
-	@@ -19,8 +19,33 @@
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT test
 """
 
