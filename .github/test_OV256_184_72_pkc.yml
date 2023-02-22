@@ -1,0 +1,5 @@
+name: Test OV256_184_72_pkc
+on:
+  push:
+	@@ -19,8 +19,33 @@
+      run: make PARAM=4 VARIANT=2 test
