@@ -10,9 +10,13 @@ on:
 
 jobs:
   build:
-
+    name: ${{ matrix.os }}.${{ matrix.compiler.compiler }}
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        cc:
+          - gcc
+          - clang
     steps:
     - uses: actions/checkout@v3
     - name: test
