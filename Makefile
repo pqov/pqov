@@ -2,6 +2,7 @@ CC  ?= clang
 CXX ?= clang++
 LD  = $(CC)
 
+
 ifndef PROJ
 PROJ = ref
 #PROJ = amd64
@@ -14,7 +15,7 @@ SRC_DIR  = ./src
 UTIL_DIR = ./utils
 
 
-CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer -Wno-aggressive-loop-optimizations -Wno-unknown-warning-option] #-pg -g -fsanitize=address
+CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer -Wno-aggressive-loop-optimizations -Wno-unknown-warning-option #-pg -g -fsanitize=address
 CXXFLAGS := -O3 $(CPPFLAGS) -Wall -Wextra -fno-exceptions -fno-rtti -nostdinc++
 INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR) -I$(UTIL_DIR) -Iunit_tests -Ibenchmark
 LDFLAGS  := $(LDFLAGS) #-fsanitize=address
@@ -189,8 +190,11 @@ all: $(EXE)
 %-benchmark: $(OBJ) %-benchmark.o
 	$(LD) $(LDFLAGS) $(LIBPATH) -o $@ $^ $(LIBS)
 
-PQCgenKAT_sign: $(OBJ) nist-submission-project/PQCgenKAT_sign.c
-	$(LD) $(LDFLAGS) $(LIBPATH) $(INCPATH) -o $@ $^ $(LIBS)
+PQCgenKAT_sign: $(OBJ) PQCgenKAT_sign.o
+	$(LD) $(LDFLAGS) $(LIBPATH) -o $@ $^ $(LIBS)
+
+PQCgenKAT_sign.o: nist-submission-project/PQCgenKAT_sign.c
+	$(CC) $(CFLAGS) $(INCPATH) -c $<
 
 %.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCPATH) -c $<
