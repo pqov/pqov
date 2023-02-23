@@ -98,7 +98,7 @@ main(void) {
         randombytes_init(seed, NULL, 256);
 
         if ( FindMarker(fp_req, "mlen = ") ) {
-            (void)fscanf(fp_req, "%llu", &mlen);
+            (void) !fscanf(fp_req, "%llu", &mlen);
         } else {
             printf("ERROR: unable to read 'mlen' from <%s>\n", fn_req);
             return KAT_DATA_ERROR;
