@@ -647,7 +647,7 @@ void gf256mat_transpose_32x32_even( uint8_t *mat_8 ) {
     // swap last bytes
     for (size_t i = 0; i < 16; i++) {
         size_t r = 2 * i;
-        __m256i blend_mask = _mm256_set1_epi16(0xFF00);
+        __m256i blend_mask = _mm256_set1_epi16(-256);   // 0xff00
         __m256i tmp = _mm256_blendv_epi8(mat[r], _mm256_bslli_epi128(mat[r + 1], 1), blend_mask);
         mat[r + 1] = _mm256_blendv_epi8(_mm256_bsrli_epi128(mat[r], 1), mat[r + 1], blend_mask);
         mat[r] = tmp;
@@ -674,7 +674,7 @@ void gf16mat_transpose_64x64(uint8_t *mat, const uint8_t *sqmat_a ) {
         gf256mat_transpose_32x32_even( mat );
         gf256mat_transpose_32x32_even( mat + 32 );
         __m256i mask_0f = _mm256_set1_epi8(0xf);
-        __m256i mask_f0 = _mm256_set1_epi8(0xf0);
+        __m256i mask_f0 = _mm256_set1_epi8(-16);  // 0xf0
         // transpose 2x2 4-bit blocks
         for (int i = 0; i < 64; i += 2) {
             __m256i in1 = _mm256_load_si256((__m256i *)(mat + i * 32));

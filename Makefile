@@ -97,10 +97,7 @@ SRCS_O_NOTDIR  :=  $(notdir $(SRCS_O))
 
 
 ifdef PARAM
-ifeq ($(PARAM),2)
-CFLAGS    += -D_OV256_96_64
-CXXFLAGS  += -D_OV256_96_64
-else ifeq ($(PARAM),3)
+ifeq ($(PARAM),3)
 CFLAGS    += -D_OV256_112_44
 CXXFLAGS  += -D_OV256_112_44
 else ifeq ($(PARAM),4)
@@ -113,6 +110,8 @@ else
 CFLAGS    += -D_OV16_160_64
 CXXFLAGS  += -D_OV16_160_64
 endif
+else
+PARAM=3
 endif
 
 
@@ -127,6 +126,8 @@ else
 CFLAGS += -D_OV_CLASSIC
 CXXFLAGS += -D_OV_CLASSIC
 endif
+else
+VARIANT=1
 endif
 
 
@@ -233,6 +234,11 @@ $(foreach dir, $(SRC_EXT_DIRS), $(eval $(call GEN_O,$(dir))))
 
 test: sign_api-test
 	./sign_api-test
+
+
+
+check-NISTKAT: PQCgenKAT_sign
+	./check-vector.sh $(PARAM) $(VARIANT)
 
 tests:
 	cd tests; make

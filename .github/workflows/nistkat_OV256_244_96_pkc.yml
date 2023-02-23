@@ -1,4 +1,4 @@
-name: Test OV256_96_64_classic
+name: NISTKAT OV256_244_96_pkc
 
 on:
   push:
@@ -18,6 +18,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: test
-      run: make PARAM=2 VARIANT=1 test
+      run: make KAT=1 PARAM=5 VARIANT=2 check-NISTKAT
       env:
         CC: ${{ matrix.cc }}

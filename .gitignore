@@ -1,3 +1,6 @@
 rec-sign-benchmark
 sign_api-benchmark
 sign_api-test
+PQCgenKAT_sign*
+*.req
+*.rsp

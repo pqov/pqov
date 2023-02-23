@@ -18,12 +18,20 @@
 #endif
 
 
+#if defined(_VALGRIND_)
+#include "valgrind/memcheck.h"
+#endif
+
 int
 crypto_sign_keypair(unsigned char *pk, unsigned char *sk) {
     unsigned char sk_seed[LEN_SKSEED];
     unsigned char pk_seed[LEN_PKSEED];
     randombytes( sk_seed, LEN_SKSEED );
     randombytes( pk_seed, LEN_PKSEED );
+
+    #if defined(_VALGRIND_)
+    VALGRIND_MAKE_MEM_UNDEFINED(sk_seed, LEN_SKSEED );  // mark secret data as undefined data
+    #endif
 
     #if defined _OV_CLASSIC
     int r = generate_keypair( (pk_t *) pk, (sk_t *) sk, pk_seed, sk_seed );
@@ -33,6 +41,11 @@ crypto_sign_keypair(unsigned char *pk, unsigned char *sk) {
     int r = generate_keypair_pkc_skc( (cpk_t *) pk, (csk_t *) sk, pk_seed, sk_seed );
     #else
     error here
+    #endif
+
+    #if defined(_VALGRIND_)
+    VALGRIND_MAKE_MEM_DEFINED(pk, OV_PUBLICKEYBYTES );  // mark return value as public data
+    VALGRIND_MAKE_MEM_DEFINED(&r, sizeof(int) );  // mark return value as public data
     #endif
     return r;
 }
