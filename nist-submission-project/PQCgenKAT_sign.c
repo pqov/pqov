@@ -82,7 +82,7 @@ main(void) {
     done = 0;
     do {
         if ( FindMarker(fp_req, "count = ") ) {
-            (void)fscanf(fp_req, "%d", &count);
+            (void) !fscanf(fp_req, "%d", &count);
         } else {
             done = 1;
             break;
