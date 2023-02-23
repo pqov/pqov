@@ -97,10 +97,7 @@ SRCS_O_NOTDIR  :=  $(notdir $(SRCS_O))
 
 
 ifdef PARAM
-ifeq ($(PARAM),2)
-CFLAGS    += -D_OV256_96_64
-CXXFLAGS  += -D_OV256_96_64
-else ifeq ($(PARAM),3)
+ifeq ($(PARAM),3)
 CFLAGS    += -D_OV256_112_44
 CXXFLAGS  += -D_OV256_112_44
 else ifeq ($(PARAM),4)

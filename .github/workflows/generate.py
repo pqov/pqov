@@ -53,8 +53,6 @@ jobs:
 def paramToName(p):
     if p == 1:
         return "OV16_160_64"
-    elif p == 2:
-        return "OV256_96_64"
     elif p == 3:
         return "OV256_112_44"
     elif p == 4:
@@ -71,7 +69,7 @@ def variantToName(v):
         return "pkc_skc"
 
 
-for param in [1,2,3,4,5]:
+for param in [1,3,4,5]:
     for variant in [1,2,3]:
 
         p = paramToName(param)
