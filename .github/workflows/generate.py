@@ -1,6 +1,6 @@
 
 
-workflow = """name: Test $NAME
+workflow_test = """name: Test $NAME
 
 on:
   push:
@@ -21,6 +21,31 @@ jobs:
     - uses: actions/checkout@v3
     - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
+"""
+
+workflow_nistkat = """name: NISTKAT $NAME
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: ${{ matrix.cc }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc:
+          - gcc
+          - clang
+    steps:
+    - uses: actions/checkout@v3
+    - name: test
+      run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
 """
@@ -52,6 +77,10 @@ for param in [1,2,3,4,5]:
         p = paramToName(param)
         v = variantToName(variant)
         name = f"{p}_{v}"
-        w = workflow.replace("$PARAM", str(param)).replace("$VARIANT", str(variant)).replace("$NAME", name)
+        w = workflow_test.replace("$PARAM", str(param)).replace("$VARIANT", str(variant)).replace("$NAME", name)
         with open(f"test_{name}.yml", "w") as f:
+            f.write(w)
+
+        w = workflow_nistkat.replace("$PARAM", str(param)).replace("$VARIANT", str(variant)).replace("$NAME", name)
+        with open(f"nistkat_{name}.yml", "w") as f:
             f.write(w)

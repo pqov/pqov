@@ -1,0 +1,23 @@
+name: NISTKAT OV256_96_64_classic
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: ${{ matrix.cc }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc:
+          - gcc
+          - clang
+    steps:
+    - uses: actions/checkout@v3
+    - name: test
+      run: make KAT=1 PARAM=2 VARIANT=1 check-NISTKAT
+      env:
+        CC: ${{ matrix.cc }}
