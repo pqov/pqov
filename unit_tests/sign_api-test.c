@@ -16,12 +16,6 @@
 #endif
 
 int main(void) {
-    char msg[256];
-
-    for (unsigned i = 0; i < 256; i++) {
-        msg[i] = i;
-    }
-
     printf("%s\n", OV_ALGNAME );
     printf("sk size: %d\n", CRYPTO_SECRETKEYBYTES );
     printf("pk size: %d\n", CRYPTO_PUBLICKEYBYTES );

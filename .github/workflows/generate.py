@@ -10,13 +10,19 @@ on:
 
 jobs:
   build:
-
+    name: ${{ matrix.cc }}
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        cc:
+          - gcc
+          - clang
     steps:
     - uses: actions/checkout@v3
     - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
 """
 
 def paramToName(p):
