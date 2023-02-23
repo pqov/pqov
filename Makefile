@@ -15,7 +15,7 @@ SRC_DIR  = ./src
 UTIL_DIR = ./utils
 
 
-CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer -Wno-aggressive-loop-optimizations -Wno-unknown-warning-option #-pg -g -fsanitize=address
+CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer #-pg -g -fsanitize=address
 CXXFLAGS := -O3 $(CPPFLAGS) -Wall -Wextra -fno-exceptions -fno-rtti -nostdinc++
 INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR) -I$(UTIL_DIR) -Iunit_tests -Ibenchmark
 LDFLAGS  := $(LDFLAGS) #-fsanitize=address
@@ -62,7 +62,7 @@ ifeq ($(CC),clang)
 CFLAGS    += -flax-vector-conversions
 CXXFLAGS  += -flax-vector-conversions
 else
-CFLAGS    += march=armv7-a -mfpu=neon -flax-vector-conversions
+CFLAGS    += march=armv7-a -mfpu=neon -flax-vector-conversions -Wno-aggressive-loop-optimizations
 CXXFLAGS  += march=armv7-a -mfpu=neon -flax-vector-conversions
 endif
 
