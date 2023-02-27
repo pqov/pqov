@@ -75,7 +75,7 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigne
 // generate linear system:
         #if !defined(_MUL_WITH_MULTAB_)
 // matrix
-        gfmat_prod( mat_l1, sk->L, _O * _O_BYTE, _V, vinegar );
+        gfmat_prod( mat_l1, sk->S, _O * _O_BYTE, _V, vinegar );
 // constant
         // Given vinegars, evaluate P1 with the vinegars
         batch_quad_trimat_eval( r_l1_F1, sk->P1, vinegar, _V, _O_BYTE );
@@ -83,7 +83,7 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigne
 // generate mul-tables of vinegars
         gfv_generate_multabs( multabs, vinegar, _V );
 // matrix
-        gfmat_prod_multab( mat_l1, sk->L, _O * _O_BYTE, _V, multabs );
+        gfmat_prod_multab( mat_l1, sk->S, _O * _O_BYTE, _V, multabs );
 // constant
         // Given vinegars, evaluate P1 with the vinegars
         batch_quad_trimat_eval_multab( r_l1_F1, sk->P1, multabs, _V, _O_BYTE );
@@ -127,8 +127,8 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigne
     memcpy( w, vinegar, _V_BYTE );
     memcpy( w + _V_BYTE, x_o1, _O_BYTE );
 
-    // Computing the t1 part.
-    gfmat_prod(y, sk->t1, _V_BYTE, _O, x_o1 );
+    // Computing the O part of T.
+    gfmat_prod(y, sk->O, _V_BYTE, _O, x_o1 );
     gf256v_add(w, y, _V_BYTE );
 
     // return: signature <- w || salt.
