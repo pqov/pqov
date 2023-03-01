@@ -65,10 +65,13 @@ jobs:
         cc:
           - gcc
           - clang
+        impl:
+          - ref
+          - avx2
     steps:
     - uses: actions/checkout@v3
     - name: test
-      run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT check-NISTKAT
+      run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
 """
