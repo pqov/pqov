@@ -34,12 +34,12 @@ struct {
 typedef
 struct {
     unsigned char sk_seed[LEN_SKSEED];   ///< seed for generating secret key
-    unsigned char pk_seed[LEN_PKSEED];   ///< seed for generating Q1,Q2 of public key
+    unsigned char pk_seed[LEN_PKSEED];   ///< seed for generating P1,P2 of public key
 
-    unsigned char t1[_V_BYTE * _O]; ///< T map
+    unsigned char O[_V_BYTE * _O]; ///< T map
 
     unsigned char P1[_PK_P1_BYTE];  ///< part of C-map, P1
-    unsigned char L[_PK_P2_BYTE];                 ///< part of C-map, L
+    unsigned char S[_PK_P2_BYTE];                 ///< part of C-map, S
 } sk_t;
 
 
