@@ -8,39 +8,51 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.cc }}
+    name: ${{ matrix.impl }} ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         cc:
           - gcc
           - clang
+        impl:
+          - ref
+          - avx2
+          - ssse3
+          - amd64
     steps:
     - uses: actions/checkout@v3
     - name: test
-      run: make PARAM=3 VARIANT=2 test
+      run: make PARAM=3 VARIANT=2 PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
     - name: asan
       run: |
         make clean
-        make ASAN=1 PARAM=3 VARIANT=2 test
+        make ASAN=1 PARAM=3 VARIANT=2 PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
     - name: ubsan
       run: |
         make clean
-        make UBSAN=1 PARAM=3 VARIANT=2 test
+        make UBSAN=1 PARAM=3 VARIANT=2 PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
   valgrind:
-    name: Valgrind constant-time check
+    name: Valgrind constant-time check ${{ matrix.impl }} 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        impl:
+          - ref
+          - avx2
+          - ssse3
+          - amd64
     steps:
     - uses: actions/checkout@v3
     - name: Install Valgrind
       run: sudo apt install valgrind
     - name: valgrind
       run: |
-        make VALGRIND=1 PARAM=3 VARIANT=2 sign_api-test
+        make VALGRIND=1 PARAM=3 VARIANT=2 PROJ=${{ matrix.impl }} sign_api-test
         valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test

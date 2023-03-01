@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.cc }}
+    name: ${{ matrix.impl }} ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,6 +18,8 @@ jobs:
         impl:
           - ref
           - avx2
+          - ssse3
+          - amd64
     steps:
     - uses: actions/checkout@v3
     - name: test
