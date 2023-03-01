@@ -40,5 +40,5 @@ jobs:
     - uses: actions/checkout@v3
     - name: valgrind
       run: |
-        make VALGRIND=1 PARAM=4 VARIANT=2
+        make VALGRIND=1 PARAM=4 VARIANT=2 sign_api-test
         valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
