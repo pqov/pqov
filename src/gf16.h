@@ -150,7 +150,7 @@ static inline uint8_t gf256_inv(uint8_t a) {
 
     for (int i = 0; i < 15; i++) {
         uint16_t g0 = (g >> 8) & 1;
-        int16_t minus_delta = -delta;
+        uint16_t minus_delta = -delta;
         uint16_t swap = (minus_delta >> 15) & g0; // >>15 -> get sign bit
         //uint16_t f0g0 = g0;  // f0 is always 1
 
