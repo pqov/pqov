@@ -40,6 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Install Valgrind
+      run: sudo apt install valgrind
     - name: valgrind
       run: |
         make VALGRIND=1 PARAM=$PARAM VARIANT=$VARIANT sign_api-test
