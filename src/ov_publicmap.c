@@ -31,7 +31,6 @@ error. _PUB_M_BYTE > 128
 #if 16 == _GFSIZE
 
 
-#if 1
 
 static
 void accu_eval_quad_gf16( unsigned char *accu_res, const unsigned char *trimat, const unsigned char *x_in_byte,
@@ -128,45 +127,6 @@ void accu_eval_quad_gf16( unsigned char *accu_res, const unsigned char *trimat, 
 }
 
 
-#else
-static
-void accu_eval_quad_gf16( unsigned char *accu_res, const unsigned char *trimat, const unsigned char *x_in_byte, unsigned num_gfele_x, unsigned vec_len ) {
-    const unsigned char *_x = x_in_byte;
-    unsigned char _xixj[_MAX_N];
-    unsigned n = num_gfele_x;
-
-    for (unsigned i = 0; i < n; i++) {
-        #if defined( _BLAS_AVX2_ )
-        unsigned i_start = i - (i & 31);
-        #elif defined( _BLAS_SSE_ )||defined( _BLAS_NEON_ )
-        unsigned i_start = i - (i & 15);
-        #elif defined( _BLAS_UINT64_ )
-        unsigned i_start = i - (i & 7);
-        #else
-        unsigned i_start = i - (i & 3);
-        #endif
-        if ( !_x[i] ) {
-            trimat += vec_len * (n - i);
-            continue;
-        }
-        for (unsigned j = i; j < n; j++) {
-            _xixj[j] = _x[j];
-        }
-        gfv_mul_scalar( _xixj + i_start, _x[i], n - i_start );
-        for (unsigned j = i; j < n; j++) {
-            unsigned idx = _xixj[j];
-            #if defined(_BLAS_AVX2_ )
-            gf256v_add( accu_res + TMPVEC_LEN * idx, trimat, vec_len );
-            #else
-            if (idx) {
-                gf256v_add( accu_res + TMPVEC_LEN * idx, trimat, vec_len );
-            }
-            #endif
-            trimat += vec_len;
-        }
-    }
-}
-#endif
 
 
 static

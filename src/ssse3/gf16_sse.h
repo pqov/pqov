@@ -64,7 +64,6 @@ static inline __m128i tbl_gf16_mul_const( unsigned char a, __m128i b ) {
 // generate multiplication table for '4-bit' variable 'b'
 //
 static inline __m128i tbl_gf16_multab( uint8_t b ) {
-    #if 1
     __m128i bx = _mm_set1_epi16( b & 0xf );
     __m128i b1 = _mm_srli_epi16( bx, 1 );
     __m128i tab0 = _mm_load_si128((__m128i const *) (__gf16_mulbase + 32 * 0));
@@ -78,14 +77,6 @@ static inline __m128i tbl_gf16_multab( uint8_t b ) {
            ^ ( tab1 & _mm_cmpgt_epi16( b1 & mask_1, mask_0) )
            ^ ( tab2 & _mm_cmpgt_epi16( bx & mask_4, mask_0) )
            ^ ( tab3 & _mm_cmpgt_epi16( b1 & mask_4, mask_0) );
-    #else
-    __m128i bx1 = _mm_set1_epi8( b & 0xf );
-    __m128i mask = _mm_set1_epi8(1);
-    return (_mm_load_si128((__m128i const *) (__gf16_mulbase + 32 * 0))&_mm_cmpeq_epi8(mask, bx1 & mask))
-           ^ (_mm_load_si128((__m128i const *) (__gf16_mulbase + 32 * 1))&_mm_cmpeq_epi8(mask, _mm_srli_epi16(bx1, 1)&mask))
-           ^ (_mm_load_si128((__m128i const *) (__gf16_mulbase + 32 * 2))&_mm_cmpeq_epi8(mask, _mm_srli_epi16(bx1, 2)&mask))
-           ^ (_mm_load_si128((__m128i const *) (__gf16_mulbase + 32 * 3))&_mm_cmpeq_epi8(mask, _mm_srli_epi16(bx1, 3)&mask));
-    #endif
 }
 
 
@@ -224,7 +215,6 @@ static inline __m128i tbl_gf256_mul( __m128i a, unsigned char b ) {
 
 
 static inline __m128i tbl_gf256_mul_vv( __m128i a, __m128i b ) {
-    #if 1
     __m128i red    = _mm_set1_epi8(0x1b);
     __m128i mask_0x80 = _mm_set1_epi8((char)0x80);
     __m128i mask_0xff = _mm_cmpeq_epi8(red, red);
@@ -251,54 +241,10 @@ static inline __m128i tbl_gf256_mul_vv( __m128i a, __m128i b ) {
     a = _mm_add_epi8(a, a)^ _mm_shuffle_epi8(red, a ^ mask_0x80);
     r ^= a & _mm_shuffle_epi8(mask_0xff, not_b);
     return r;
-    #else
-    __m128i red    = _mm_set1_epi8(0x1b);
-    __m128i mask_0x80 = _mm_set1_epi8((char)0x80);
-    __m128i mask_1 = _mm_srli_epi16(mask_0x80, 7);
-    __m128i r = a & (_mm_cmpeq_epi8(mask_1, b & mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 1)&mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 2)&mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 3)&mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 4)&mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 5)&mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 6)&mask_1));
-
-    a = _mm_add_epi8(a, a) ^ (red & _mm_cmpeq_epi8(mask_0x80, a & mask_0x80));
-    r ^= a & (_mm_cmpeq_epi8(mask_1, _mm_srli_epi16(b, 7)&mask_1));
-    return r;
-    #endif
 }
 
 
 
-
-#if 0
-static inline __m128i tbl_gf256_inv( __m128i a ) {
-    __m128i a2 = tbl_gf256_squ(a);
-    __m128i a3 = tbl_gf256_mul_vv(a2, a);
-    __m128i a6 = tbl_gf256_squ(a3);
-    __m128i a7 = tbl_gf256_mul_vv(a6, a);
-    __m128i ae = tbl_gf256_squ(a7);
-    __m128i af = tbl_gf256_mul_vv(ae, a);
-    __m128i af1 = tbl_gf256_squ(af);
-    __m128i af2 = tbl_gf256_squ(af1);
-    __m128i af3 = tbl_gf256_squ(af2);
-    __m128i a7f = tbl_gf256_mul_vv(af3, a7);
-    return tbl_gf256_squ(a7f);
-}
-#endif
 
 static inline uint8_t gf256_inv_sse(uint8_t a) {
     return gf256_inv(a);

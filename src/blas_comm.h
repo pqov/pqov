@@ -17,14 +17,7 @@
 ///
 static inline uint8_t gf16v_get_ele(const uint8_t *a, unsigned i) {
     uint8_t r = a[i >> 1];
-    #if 1
     return (i & 1) ? (r >> 4) : (r & 0xf);
-    #else
-    uint8_t r0 = r & 0xf;
-    uint8_t r1 = r >> 4;
-    uint8_t m = (uint8_t)(-(i & 1));
-    return (r1 & m) | ((~m)&r0);
-    #endif
 }
 
 /// @brief set an element for a GF(16) vector .
