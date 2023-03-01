@@ -24,8 +24,8 @@ LIBS     = -lcrypto #-lasan
 
 
 ifdef SANITIZERS
-CFLAGS  += -fsanitize=undefined
-LDFLAGS += -fsanitize=undefined
+CFLAGS  += -fsanitize=undefined -fno-sanitize-recover=all
+LDFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
 endif
 
 
