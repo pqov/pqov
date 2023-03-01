@@ -9,7 +9,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     name: ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
@@ -35,6 +35,15 @@ jobs:
         make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT test
       env:
         CC: ${{ matrix.cc }}
+  valgrind:
+    name: Valgrind constant-time check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: valgrind
+      run: |
+        make VALGRIND=1 PARAM=$PARAM VARIANT=$VARIANT
+        valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
 """
 
 workflow_nistkat = """name: NISTKAT $NAME

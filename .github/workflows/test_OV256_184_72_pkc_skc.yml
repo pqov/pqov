@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  test:
     name: ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
@@ -33,3 +33,12 @@ jobs:
         make UBSAN=1 PARAM=4 VARIANT=3 test
       env:
         CC: ${{ matrix.cc }}
+  valgrind:
+    name: Valgrind constant-time check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: valgrind
+      run: |
+        make VALGRIND=1 PARAM=4 VARIANT=3
+        valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
