@@ -57,7 +57,6 @@ static inline __m256i tbl32_gf16_mul_const( unsigned char a, __m256i b ) {
 // generate multiplication table for '4-bit' variable 'b'
 //
 static inline __m256i tbl32_gf16_multab( uint8_t b ) {
-    #if 1
     __m256i bx = _mm256_set1_epi16( b & 0xf );
     __m256i b1 = _mm256_srli_epi16( bx, 1 );
 
@@ -74,18 +73,6 @@ static inline __m256i tbl32_gf16_multab( uint8_t b ) {
            ^ ( tab1 & _mm256_cmpgt_epi16( b1 & mask_1, mask_0) )
            ^ ( tab2 & _mm256_cmpgt_epi16( bx & mask_4, mask_0) )
            ^ ( tab3 & _mm256_cmpgt_epi16( b1 & mask_4, mask_0) );
-    #else
-    __m256i bx1 = _mm256_set1_epi8( b & 0xf );
-    __m256i mask_1 = _mm256_set1_epi8(1);
-    __m256i mask_2 = _mm256_set1_epi8(2);
-    __m256i mask_4 = _mm256_set1_epi8(4);
-    __m256i mask_8 = _mm256_set1_epi8(8);
-
-    return (_mm256_load_si256((__m256i const *) (__gf16_mulbase + 32 * 0)) &_mm256_cmpeq_epi8(mask_1, bx1 & mask_1))
-           ^ ( _mm256_load_si256((__m256i const *) (__gf16_mulbase + 32 * 1)) & _mm256_cmpeq_epi8(mask_2, bx1 & mask_2) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf16_mulbase + 32 * 2)) & _mm256_cmpeq_epi8(mask_4, bx1 & mask_4) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf16_mulbase + 32 * 3)) & _mm256_cmpeq_epi8(mask_8, bx1 & mask_8) );
-    #endif
 }
 
 
@@ -171,8 +158,6 @@ static inline __m256i tbl32_gf256_squ( __m256i a ) {
 // generate multiplication table
 //
 static inline __m256i tbl32_gf256_multab( uint8_t b ) {
-    #if 1
-// faster
     __m256i bx = _mm256_set1_epi16( b );
     __m256i b1 = _mm256_srli_epi16( bx, 1 );
 
@@ -199,19 +184,6 @@ static inline __m256i tbl32_gf256_multab( uint8_t b ) {
            ^ ( tab5 & _mm256_cmpgt_epi16( b1 & mask_16, mask_0) )
            ^ ( tab6 & _mm256_cmpgt_epi16( bx & mask_64, mask_0) )
            ^ ( tab7 & _mm256_cmpgt_epi16( b1 & mask_64, mask_0) );
-    #else
-    __m256i bx = _mm256_set1_epi8( b );
-    __m256i mask = _mm256_set1_epi8(1);
-
-    return ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 0)) & _mm256_cmpeq_epi8(mask, bx & mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 1)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 1)&mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 2)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 2)&mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 3)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 3)&mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 4)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 4)&mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 5)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 5)&mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 6)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 6)&mask) )
-           ^ ( _mm256_load_si256((__m256i const *) (__gf256_mulbase + 32 * 7)) & _mm256_cmpeq_epi8(mask, _mm256_srli_epi16(bx, 7)&mask) );
-    #endif
 }
 
 

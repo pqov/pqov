@@ -382,20 +382,19 @@ void byte_transpose_16x16_neon( uint8_t *dest, unsigned dest_vec_len, const uint
     vst1q_u8( dest + 15 * dest_vec_len, vtrn2q_u8( r14, r15 ) );
 }
 
+
+// nainv code:
+//for (unsigned i = 0; i < 32; i++) {
+//    for (unsigned j = 0; j < 32; j++) {
+//        mat[i * vec_len + j] = src_mat[j * src_vec_len + i];
+//    }
+//}
 static
 void gf256mat_transpose_32x32_neon( uint8_t *mat, unsigned vec_len, const uint8_t *src_mat, unsigned src_vec_len ) {
-    #if 1
     byte_transpose_16x16_neon( mat, vec_len, src_mat, src_vec_len );
     byte_transpose_16x16_neon( mat + 16, vec_len, src_mat + 16 * src_vec_len, src_vec_len );
     byte_transpose_16x16_neon( mat + 16 * vec_len, vec_len, src_mat + 16, src_vec_len );
     byte_transpose_16x16_neon( mat + 16 * vec_len + 16, vec_len, src_mat + 16 * src_vec_len + 16, src_vec_len );
-    #else
-    for (unsigned i = 0; i < 32; i++) {
-        for (unsigned j = 0; j < 32; j++) {
-            mat[i * vec_len + j] = src_mat[j * src_vec_len + i];
-        }
-    }
-    #endif
 }
 
 static
@@ -753,7 +752,7 @@ void gf256mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned matA_v
 #undef BLOCK_LEN
 
 
-
+#define _PMULL_INLINEASM_
 
 #define _GF256_LAZY_REDUCE_
 
@@ -777,7 +776,7 @@ void gf256mat_block1_prod_lazy(uint8_t *c, const uint8_t *mat, unsigned mat_vec_
         register uint8x16_t cc0 __asm__ ("v10") = vld1q_u8(ptr);
         ptr += mat_vec_len;
         register uint8x16_t bb  __asm__ ("v9") = vld1q_dup_u8(b+j);
-        #if 1
+        #ifdef  _PMULL_INLINEASM_
         register uint8x16_t tmp0 __asm__("v13");
         //rl0 ^= vmull_p8( vget_low_p8(cc0) , vget_low_p8(bb) );
         __asm__ volatile ( "pmull   v13.8h, v10.8b , v9.8b"   : "=w"(tmp0) : "w"(cc0), "w"(bb) );
@@ -832,7 +831,7 @@ void gf256mat_block2_prod_lazy(uint8_t *c, const uint8_t *mat, unsigned mat_vec_
         register uint8x16_t cc1 __asm__ ("v11") = vld1q_u8(ptr+16);
         ptr += mat_vec_len;
         register uint8x16_t bb  __asm__ ("v9") = vld1q_dup_u8(b+j);
-        #if 1
+        #ifdef  _PMULL_INLINEASM_
         register uint8x16_t tmp0 __asm__("v13");
         //rl0 ^= vmull_p8( vget_low_p8(cc0) , vget_low_p8(bb) );
         __asm__ volatile ( "pmull   v13.8h, v10.8b , v9.8b"   : "=w"(tmp0) : "w"(cc0), "w"(bb) );
@@ -902,7 +901,7 @@ void gf256mat_block3_prod_lazy(uint8_t *c, const uint8_t *mat, unsigned mat_vec_
         register uint8x16_t cc2 __asm__ ("v12") = vld1q_u8(ptr+32);
         ptr += mat_vec_len;
         register uint8x16_t bb  __asm__ ("v9") = vld1q_dup_u8(b+j);
-        #if 1
+        #ifdef   _PMULL_INLINEASM_
         register uint8x16_t tmp0 __asm__("v13");
         //rl0 ^= vmull_p8( vget_low_p8(cc0) , vget_low_p8(bb) );
         __asm__ volatile ( "pmull   v13.8h, v10.8b , v9.8b"   : "=w"(tmp0) : "w"(cc0), "w"(bb) );

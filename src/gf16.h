@@ -77,7 +77,6 @@ static inline uint8_t gf256_is_nonzero(uint8_t a) {
 
 // gf256 := gf2[X]/ (x^8+x^4+x^3+x+1)   // 0x11b , AES field
 static inline uint8_t gf256_mul(uint8_t a, uint8_t b) {
-    #if 1
     uint8_t r = a * (b & 1);
 
     a = (a << 1) ^ ((a >> 7) * 0x1b);
@@ -95,29 +94,6 @@ static inline uint8_t gf256_mul(uint8_t a, uint8_t b) {
     a = (a << 1) ^ ((a >> 7) * 0x1b);
     r ^= a * ((b >> 7) & 1);
     return r;
-    #else
-    uint32_t a32 = a;
-    uint32_t b32 = b;
-    uint32_t r32 = a32 * (b32 & 1);
-    r32 ^= (a32) * (b32 & 2);
-    r32 ^= (a32) * (b32 & 4);
-    r32 ^= (a32) * (b32 & 8);
-    r32 ^= (a32) * (b32 & 16);
-    r32 ^= (a32) * (b32 & 32);
-    r32 ^= (a32) * (b32 & 64);
-    r32 ^= (a32) * (b32 & 128);
-
-    // reduction
-    r32 ^= ((r32 >> 8) & 64) * (0x1b); // x^14
-    r32 ^= ((r32 >> 8) & 32) * (0x1b); // x^13
-    r32 ^= ((r32 >> 8) & 16) * (0x1b); // x^12
-    r32 ^= ((r32 >> 8) & 8) * (0x1b); // x^11
-    r32 ^= ((r32 >> 8) & 4) * (0x1b); // x^10
-    r32 ^= ((r32 >> 8) & 2) * (0x1b); // x^9
-    r32 ^= ((r32 >> 8) & 1) * (0x1b); // x^8
-
-    return r32 & 0xff;
-    #endif
 }
 
 
@@ -135,10 +111,10 @@ static inline uint8_t gf256_squ(uint8_t a) {
     return r8;
 }
 
-
+#define _GFINV_EXTGCD_
 
 static inline uint8_t gf256_inv(uint8_t a) {
-    #if 1
+    #ifdef _GFINV_EXTGCD_
     // faster
     // extended GCD
     uint16_t f = 0x11b;
@@ -171,7 +147,7 @@ static inline uint8_t gf256_inv(uint8_t a) {
     }
     return v & 0xff;
 
-    #else
+    #else  //     #ifdef _GFINV_EXTGCD_
     // fermat inversion
     // 128+64+32+16+8+4+2 = 254
     uint8_t a2 = gf256_squ(a);
@@ -185,7 +161,7 @@ static inline uint8_t gf256_inv(uint8_t a) {
     uint8_t a64_2 = gf256_mul(a64_, a8_4_2);
     uint8_t a128_ = gf256_squ(a64_2);
     return gf256_mul(a2, a128_);
-    #endif
+    #endif  //     #ifdef _GFINV_EXTGCD_
 }
 
 
@@ -340,23 +316,10 @@ static inline uint32_t gf256v_squ_u32(uint32_t a) {
 
 //  return v[0]^v[1]^v[2]^v[3]
 static inline uint8_t gf256v_reduce_u32(uint32_t a) {
-// https://godbolt.org/z/7hirMb
-    #if 1
     uint16_t *aa = (uint16_t *) (&a);
     uint16_t r = aa[0] ^ aa[1];
     uint8_t *rr = (uint8_t *) (&r);
     return rr[0] ^ rr[1];
-    #else
-    const union {
-        uint32_t merge;
-        uint16_t split[2];
-    } _aa = {.merge = a};
-    const union {
-        uint16_t merge;
-        uint8_t split[2];
-    } _bb = {.merge = _aa.split[0] ^ _aa.split[1]};
-    return _bb.split[0] ^ _bb.split[1];
-    #endif
 }
 
 

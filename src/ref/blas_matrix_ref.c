@@ -53,7 +53,6 @@ void gf256mat_transpose_32x32( uint8_t *mat, unsigned vec_len, const uint8_t *sr
 
 static
 void gf16mat_64x64_sqmat_transpose(uint8_t *dest_mat, unsigned dest_vec_len, const uint8_t *src_sqmat ) {
-    #if 1
     gf256mat_transpose_32x32( dest_mat, dest_vec_len * 2, src_sqmat, 64 );                   // transpose even rows
     gf256mat_transpose_32x32( dest_mat + dest_vec_len, dest_vec_len * 2, src_sqmat + 32, 64 ); // transpose odd rows
     // transpose 2x2 4-bit blocks
@@ -67,14 +66,6 @@ void gf16mat_64x64_sqmat_transpose(uint8_t *dest_mat, unsigned dest_vec_len, con
             row2[j] = (in2 & 0xf0f0f0f0) ^ ((in1 & 0xf0f0f0f0) >> 4);
         }
     }
-    #else
-    for (unsigned i = 0; i < 64; i++) {
-        uint8_t *ai = dest_mat + i * dest_vec_len;
-        for (unsigned j = 0; j < 64; j++) {
-            gf16v_set_ele( ai, j, gf16v_get_ele(src_sqmat + j * 32, i) );
-        }
-    }
-    #endif
 }
 
 static

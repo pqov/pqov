@@ -480,8 +480,6 @@ static void gf256mat_prod_multab_3ymm_avx2( uint8_t *c, const uint8_t *matA, uns
 }
 static void gf256mat_prod_multab_small_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const __m256i *multabs ) {
     // XXX: if(matA_vec_byte <16 ) exit(-1);
-    #if 1
-// faster
     if     (matA_vec_byte <= 32) {
         gf256mat_prod_multab_1ymm_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs);
         return;
@@ -492,18 +490,6 @@ static void gf256mat_prod_multab_small_avx2( uint8_t *c, const uint8_t *matA, un
         gf256mat_prod_multab_3ymm_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs);
         return;
     }
-    #else
-    if     (matA_vec_byte > 64) {
-        gf256mat_prod_multab_3ymm_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs);
-        return;
-    } else if (matA_vec_byte > 32) {
-        gf256mat_prod_multab_2ymm_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs);
-        return;
-    } else {
-        gf256mat_prod_multab_1ymm_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs);
-        return;
-    }
-    #endif
 }
 
 void gf256mat_prod_multab_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *multab_b ) {
@@ -537,7 +523,7 @@ void gf256mat_prod_multab_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_v
     }
 }
 
-#if 1
+
 static
 void gf256mat_prod_small_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
     __m256i multabs[96];
@@ -550,7 +536,7 @@ void gf256mat_prod_small_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_ve
 
     gf256mat_prod_multab_small_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs );
 }
-#endif
+
 
 void gf256mat_prod_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
     if ( (96 >= matA_vec_byte) && (96 >= matA_n_vec) ) {
@@ -603,9 +589,16 @@ void gf256mat_prod_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte
 ////////////////  matrix tranpose  ///////////////////////////////
 
 
+// nainv code
+//for (unsigned i = 0; i < 32; i++) {
+//    for (unsigned j = i + 1; j < 32; j++) {
+//        uint8_t tmp = mat[j * 64 + i];
+//        mat[j * 64 + i] = mat[i * 64 + j];
+//        mat[i * 64 + j] = tmp;
+//    }
+//}
 static
 void gf256mat_transpose_32x32_even( uint8_t *mat_8 ) {
-    #if 1
     __m256i mat[32];
     // load
     for (size_t i = 0; i < 32; i++) {
@@ -656,15 +649,6 @@ void gf256mat_transpose_32x32_even( uint8_t *mat_8 ) {
     for (size_t i = 0; i < 32; i++) {
         _mm256_store_si256( (__m256i *)(mat_8 + i * 64), mat[i]);
     }
-    #else
-    for (unsigned i = 0; i < 32; i++) {
-        for (unsigned j = i + 1; j < 32; j++) {
-            uint8_t tmp = mat[j * 64 + i];
-            mat[j * 64 + i] = mat[i * 64 + j];
-            mat[i * 64 + j] = tmp;
-        }
-    }
-    #endif
 }
 
 static
