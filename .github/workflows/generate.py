@@ -23,10 +23,22 @@ jobs:
       run: make PARAM=$PARAM VARIANT=$VARIANT test
       env:
         CC: ${{ matrix.cc }}
-    - name: sanitizers
+    - name: asan
       run: |
         make clean
-        make SANITIZERS=1 PARAM=$PARAM VARIANT=$VARIANT test
+        make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: ubsan
+      run: |
+        make clean
+        make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: memsan
+      run: |
+        make clean
+        make MEMSAN=1 PARAM=$PARAM VARIANT=$VARIANT test
       env:
         CC: ${{ matrix.cc }}
 """
