@@ -23,6 +23,11 @@ LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
 LIBS     = -lcrypto #-lasan
 
 
+ifdef SANITIZERS
+CFLAGS  += -fsanitize=undefined
+LDFLAGS += -fsanitize=undefined
+endif
+
 
 OS := $(shell uname -s)
 ifeq  ($(OS), Darwin)
