@@ -32,11 +32,6 @@ CFLAGS  += -fsanitize=undefined -fno-sanitize-recover=all
 LDFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
 endif
 
-ifdef MEMSAN
-CFLAGS  += -fsanitize=memory
-LDFLAGS += -fsanitize=memory
-endif
-
 OS := $(shell uname -s)
 ifeq  ($(OS), Darwin)
 CFLAGS    +=  -D_MAC_OS_

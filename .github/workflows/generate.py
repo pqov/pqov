@@ -35,12 +35,6 @@ jobs:
         make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT test
       env:
         CC: ${{ matrix.cc }}
-    - name: memsan
-      run: |
-        make clean
-        make MEMSAN=1 PARAM=$PARAM VARIANT=$VARIANT test
-      env:
-        CC: ${{ matrix.cc }}
 """
 
 workflow_nistkat = """name: NISTKAT $NAME

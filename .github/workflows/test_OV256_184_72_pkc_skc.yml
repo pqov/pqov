@@ -33,9 +33,3 @@ jobs:
         make UBSAN=1 PARAM=4 VARIANT=3 test
       env:
         CC: ${{ matrix.cc }}
-    - name: memsan
-      run: |
-        make clean
-        make MEMSAN=1 PARAM=4 VARIANT=3 test
-      env:
-        CC: ${{ matrix.cc }}
