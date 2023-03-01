@@ -22,6 +22,8 @@ jobs:
       env:
         CC: ${{ matrix.cc }}
     - name: sanitizers
-      run: make SANITIZERS=1 PARAM=4 VARIANT=2 test
+      run: |
+        make clean
+        make SANITIZERS=1 PARAM=4 VARIANT=2 test
       env:
         CC: ${{ matrix.cc }}
