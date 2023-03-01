@@ -23,6 +23,18 @@ jobs:
       run: make PARAM=$PARAM VARIANT=$VARIANT test
       env:
         CC: ${{ matrix.cc }}
+    - name: asan
+      run: |
+        make clean
+        make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: ubsan
+      run: |
+        make clean
+        make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT test
+      env:
+        CC: ${{ matrix.cc }}
 """
 
 workflow_nistkat = """name: NISTKAT $NAME

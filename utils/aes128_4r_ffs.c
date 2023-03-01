@@ -137,7 +137,7 @@ void aes128_keyschedule_ffs_lut(uint32_t *rkeys_ffs, const unsigned char *key) {
     rkeys[3] = LE_LOAD_32(key + 12);
     for (int i = 4; i < 44; i += 4) {
         rkeys[i] = rkeys[i - 4] ^ rcon[i / 4];
-        rkeys[i] ^= (sbox_lut[rkeys[i - 1] & 0xff] << 24);
+        rkeys[i] ^= ((uint32_t)sbox_lut[rkeys[i - 1] & 0xff] << 24);
         rkeys[i] ^= sbox_lut[(rkeys[i - 1] >> 8) & 0xff];
         rkeys[i] ^= (sbox_lut[rkeys[i - 1] >> 24] << 16);
         rkeys[i] ^= (sbox_lut[(rkeys[i - 1] >> 16) & 0xff] << 8);

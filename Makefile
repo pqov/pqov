@@ -15,14 +15,22 @@ SRC_DIR  = ./src
 UTIL_DIR = ./utils
 
 
-CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer -Wno-aggressive-loop-optimizations -Wno-unknown-warning-option #-pg -g -fsanitize=address
+CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer -Wno-aggressive-loop-optimizations -Wno-unknown-warning-option #-pg -g
 CXXFLAGS := -O3 $(CPPFLAGS) -Wall -Wextra -fno-exceptions -fno-rtti -nostdinc++
 INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR) -I$(UTIL_DIR) -Iunit_tests -Ibenchmark
-LDFLAGS  := $(LDFLAGS) #-fsanitize=address
 LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
-LIBS     = -lcrypto #-lasan
+LIBS     = -lcrypto
 
 
+ifdef ASAN
+CFLAGS  += -fsanitize=address -fno-sanitize-recover=all
+LDFLAGS += -fsanitize=address -fno-sanitize-recover=all
+endif
+
+ifdef UBSAN
+CFLAGS  += -fsanitize=undefined -fno-sanitize-recover=all
+LDFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
+endif
 
 OS := $(shell uname -s)
 ifeq  ($(OS), Darwin)
