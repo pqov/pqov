@@ -80,22 +80,18 @@ void AES256_Key_Expansion (unsigned char *key, const unsigned char *userkey) {
 
 #define _AES256_NUM_ROUNDS  14
 
-void AES256_CTR_Encrypt ( unsigned char *out, unsigned long n_16B, const unsigned char *key, const unsigned char nonce[12], uint32_t ctr ) {
-    __m128i ctr_block, tmp, ONE, BSWAP_EPI64;
+void AES256_CTR_Encrypt ( unsigned char *out, unsigned long n_16B, const unsigned char *key, const unsigned char nonce[16], uint32_t ctr ) {
+    __m128i ctr_block, tmp, ONE, BSWAP;
     int i, j;
     int length = n_16B;
-    ONE = _mm_set_epi32(0, 1, 0, 0);
-    BSWAP_EPI64 = _mm_setr_epi8(7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
-    ctr_block = ONE;  // for resolving uninitialized ctr_block
-    ctr_block = _mm_insert_epi64(ctr_block, *(uint64_t *)(nonce + 4), 0);
-    ctr_block = _mm_insert_epi32(ctr_block, ctr, 2);
-    ctr_block = _mm_insert_epi32(ctr_block, *(uint32_t *)nonce, 3);
-//ctr_block = _mm_srli_si128(ctr_block, 4);
-//ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
-//ctr_block = _mm_add_epi64(ctr_block, ONE);
+    ONE   = _mm_set_epi32(0, 0, 0, 1);
+    BSWAP = _mm_setr_epi8(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+    ctr_block = _mm_loadu_si128( (__m128i const *)nonce ); // nonce is a 128-bit number in big endian
+    ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP);        // change endian:  big -> small
+    ctr_block = _mm_insert_epi32(ctr_block, ctr, 0);       // ctr is a small endia number
     for (i = 0; i < length; i++) {
-        tmp = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
-        ctr_block = _mm_add_epi64(ctr_block, ONE);
+        tmp = _mm_shuffle_epi8(ctr_block, BSWAP);    // change endian:  small -> big
+        ctr_block = _mm_add_epi64(ctr_block, ONE);   // the addition only work for small endian data
         tmp = _mm_xor_si128(tmp, ((__m128i *)key)[0]);
         for (j = 1; j < _AES256_NUM_ROUNDS; j++) {
             tmp = _mm_aesenc_si128 (tmp, ((__m128i *)key)[j]);
@@ -169,22 +165,18 @@ void AES128_Key_Expansion (unsigned char *key, const unsigned char *userkey) {
 
 #define _AES128_NUM_ROUNDS  10
 
-void AES128_CTR_Encrypt ( unsigned char *out, unsigned long n_16B, const unsigned char *key, const unsigned char nonce[12], uint32_t ctr ) {
-    __m128i ctr_block, tmp, ONE, BSWAP_EPI64;
+void AES128_CTR_Encrypt ( unsigned char *out, unsigned long n_16B, const unsigned char *key, const unsigned char nonce[16], uint32_t ctr ) {
+    __m128i ctr_block, tmp, ONE, BSWAP;
     int i, j;
     int length = n_16B;
-    ONE = _mm_set_epi32(0, 1, 0, 0);
-    BSWAP_EPI64 = _mm_setr_epi8(7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
-    ctr_block = ONE;  // for resolving uninitialized ctr_block
-    ctr_block = _mm_insert_epi64(ctr_block, *(uint64_t *)(nonce + 4), 0);
-    ctr_block = _mm_insert_epi32(ctr_block, ctr, 2);
-    ctr_block = _mm_insert_epi32(ctr_block, *(uint32_t *)nonce, 3);
-//ctr_block = _mm_srli_si128(ctr_block, 4);
-//ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
-//ctr_block = _mm_add_epi64(ctr_block, ONE);
+    ONE   = _mm_set_epi32(0, 0, 0, 1);
+    BSWAP = _mm_setr_epi8(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+    ctr_block = _mm_loadu_si128( (__m128i const *)nonce ); // nonce is a 128-bit number in big endian
+    ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP);        // change endian:  big -> small
+    ctr_block = _mm_insert_epi32(ctr_block, ctr, 0);       // ctr is a small endia number
     for (i = 0; i < length; i++) {
-        tmp = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
-        ctr_block = _mm_add_epi64(ctr_block, ONE);
+        tmp = _mm_shuffle_epi8(ctr_block, BSWAP);    // change endian:  small -> big
+        ctr_block = _mm_add_epi64(ctr_block, ONE);   // the addition only work for small endian data
         tmp = _mm_xor_si128(tmp, ((__m128i *)key)[0]);
         for (j = 1; j < _AES128_NUM_ROUNDS; j++) {
             tmp = _mm_aesenc_si128 (tmp, ((__m128i *)key)[j]);
@@ -229,22 +221,18 @@ void AES128_4R_Key_Expansion (unsigned char *key, const unsigned char *userkey) 
 
 #define _AES128_4R_NUM_ROUNDS  4
 
-void AES128_4R_CTR_Encrypt ( unsigned char *out, unsigned long n_16B, const unsigned char *key, const unsigned char nonce[12], uint32_t ctr ) {
-    __m128i ctr_block, tmp, ONE, BSWAP_EPI64;
+void AES128_4R_CTR_Encrypt ( unsigned char *out, unsigned long n_16B, const unsigned char *key, const unsigned char nonce[16], uint32_t ctr ) {
+    __m128i ctr_block, tmp, ONE, BSWAP;
     int i, j;
     int length = n_16B;
-    ONE = _mm_set_epi32(0, 1, 0, 0);
-    BSWAP_EPI64 = _mm_setr_epi8(7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
-    ctr_block = ONE;  // for resolving uninitialized ctr_block
-    ctr_block = _mm_insert_epi64(ctr_block, *(uint64_t *)(nonce + 4), 0);
-    ctr_block = _mm_insert_epi32(ctr_block, ctr, 2);
-    ctr_block = _mm_insert_epi32(ctr_block, *(uint32_t *)nonce, 3);
-//ctr_block = _mm_srli_si128(ctr_block, 4);
-//ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
-//ctr_block = _mm_add_epi64(ctr_block, ONE);
+    ONE   = _mm_set_epi32(0, 0, 0, 1);
+    BSWAP = _mm_setr_epi8(15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+    ctr_block = _mm_loadu_si128( (__m128i const *)nonce ); // nonce is a 128-bit number in big endian
+    ctr_block = _mm_shuffle_epi8(ctr_block, BSWAP);        // change endian:  big -> small
+    ctr_block = _mm_insert_epi32(ctr_block, ctr, 0);       // ctr is a small endia number
     for (i = 0; i < length; i++) {
-        tmp = _mm_shuffle_epi8(ctr_block, BSWAP_EPI64);
-        ctr_block = _mm_add_epi64(ctr_block, ONE);
+        tmp = _mm_shuffle_epi8(ctr_block, BSWAP);    // change endian:  small -> big
+        ctr_block = _mm_add_epi64(ctr_block, ONE);   // the addition only work for small endian data
         tmp = _mm_xor_si128(tmp, ((__m128i *)key)[0]);
         for (j = 1; j < _AES128_4R_NUM_ROUNDS; j++) {
             tmp = _mm_aesenc_si128 (tmp, ((__m128i *)key)[j]);

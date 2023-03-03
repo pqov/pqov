@@ -191,8 +191,8 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
         #endif
         out += 32;
 
-        uint32_t c2 = ctr + 2;
-        uint32_t c3 = ctr + 3;
+        uint32_t c2 = ctr + 2;    // XXX: ctr might overflow 32-bit boundary
+        uint32_t c3 = ctr + 3;    // For the usage in OV, this is ok for expanding pk only.
         ptext0[3] = br_swap32(c2);
         ptext1[3] = br_swap32(c3);
         #ifdef _4ROUND_AES_
