@@ -8,16 +8,21 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.cc }}
+    name: ${{ matrix.impl }} ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         cc:
           - gcc
           - clang
+        impl:
+          - ref
+          - avx2
+          - ssse3
+          - amd64
     steps:
     - uses: actions/checkout@v3
     - name: test
-      run: make KAT=1 PARAM=5 VARIANT=2 check-NISTKAT
+      run: make KAT=1 PARAM=5 VARIANT=2 PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}

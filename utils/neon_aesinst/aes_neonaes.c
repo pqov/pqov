@@ -7,16 +7,16 @@
 
 
 void aes256ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, const uint8_t *rk ) {
-    uint32_t mask[4] = {0, 1, 2, 3};
+    static const uint32_t mask[4] = {0, 1, 2, 3};
     uint32x4_t idx   = vld1q_u32( mask );
     uint32x4_t ctrx4 = vdupq_n_u32( ctr );
     uint32x4_t ctrx4_be = vrev32q_u8( vaddq_u32(ctrx4, idx) ); // to big endian numbers
 
     uint8x16_t iv = vld1q_u8(nonce);
-    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );;
-    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );;
-    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );;
-    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );;
+    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );
+    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );
+    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );
+    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );
 
     uint8x16_t rki;
     for (int i = 0; i < 13; i++) {
@@ -49,16 +49,16 @@ void aes256ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, c
 }
 
 void aes128ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, const uint8_t *rk ) {
-    uint32_t mask[4] = {0, 1, 2, 3};
+    static const uint32_t mask[4] = {0, 1, 2, 3};
     uint32x4_t idx   = vld1q_u32( mask );
     uint32x4_t ctrx4 = vdupq_n_u32( ctr );
     uint32x4_t ctrx4_be = vrev32q_u8( vaddq_u32(ctrx4, idx) ); // to big endian numbers
 
     uint8x16_t iv = vld1q_u8(nonce);
-    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );;
-    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );;
-    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );;
-    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );;
+    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );
+    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );
+    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );
+    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );
 
     uint8x16_t rki;
     for (int i = 0; i < 9; i++) {
@@ -104,16 +104,16 @@ void aes128ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, c
 */
 
 void aes128ctrx4_4r_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, const uint8_t *rk ) {
-    uint32_t mask[4] = {0, 1, 2, 3};
+    static const uint32_t mask[4] = {0, 1, 2, 3};
     uint32x4_t idx   = vld1q_u32( mask );
     uint32x4_t ctrx4 = vdupq_n_u32( ctr );
     uint32x4_t ctrx4_be = vrev32q_u8( vaddq_u32(ctrx4, idx) ); // to big endian numbers
 
     uint8x16_t iv = vld1q_u8(nonce);
-    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );;
-    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );;
-    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );;
-    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );;
+    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );
+    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );
+    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );
+    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );
 
     uint8x16_t rki;
     for (int i = 0; i < 3; i++) {
