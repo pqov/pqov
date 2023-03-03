@@ -49,10 +49,11 @@ void generate_secretkey( sk_t *sk, const unsigned char *pk_seed, const unsigned 
 /// @brief Convert secret key to public key for classic ov.
 ///
 /// @param[out] pk        - the public key.
-/// @param[in] sk         - the secret key.
+/// @param[in]  sk        - the secret key.
+/// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
-int sk_to_pk( pk_t *pk, const sk_t *sk );
+int sk_to_pk( pk_t *pk, const sk_t *sk, const unsigned char *pk_seed );
 
 
 

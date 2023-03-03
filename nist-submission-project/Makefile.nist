@@ -1,5 +1,5 @@
-CC=    clang
-LD=    clang
+CC ?=    clang
+LD ?=    clang
 
 ifndef PROJ
 PROJ = Ip
@@ -43,8 +43,11 @@ all: $(EXE)
 sign_api-test: $(OBJ) sign_api-test.c
 	$(CC) $(CFLAGS) $(INCPATH) $(LDFLAGS) $(LIBPATH) $(LIBS) $^ -o $@
 
-PQCgenKAT_sign: $(OBJ) nistkat/PQCgenKAT_sign.c
-	$(CC) $(CFLAGS) $(INCPATH) $(LDFLAGS) $(LIBPATH) $(LIBS) $^ -o $@
+PQCgenKAT_sign: $(OBJ) PQCgenKAT_sign.o
+	$(LD) $(LDFLAGS) $(LIBPATH) -o $@ $^ $(LIBS)
+
+PQCgenKAT_sign.o: nistkat/PQCgenKAT_sign.c
+	$(CC) $(CFLAGS) $(INCPATH) -c $<
 
 %.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) $(INCPATH) -c $<

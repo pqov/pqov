@@ -30,9 +30,9 @@ void generate_secretkey( sk_t *sk, const unsigned char *pk_seed, const unsigned 
 }
 
 
-int sk_to_pk( pk_t *rpk, const sk_t *sk ) {
+int sk_to_pk( pk_t *rpk, const sk_t *sk, const unsigned char *pk_seed ) {
     prng_publicinputs_t prng1;
-    prng_set_publicinputs(&prng1, sk->pk_seed );
+    prng_set_publicinputs(&prng1, pk_seed );
 
     // P1
     memcpy( rpk->pk, sk->P1, sizeof(sk->P1) );
@@ -52,7 +52,6 @@ int sk_to_pk( pk_t *rpk, const sk_t *sk ) {
 
 int generate_keypair( pk_t *rpk, sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
     memcpy( sk->sk_seed, sk_seed, LEN_SKSEED );
-    memcpy( sk->pk_seed, pk_seed, LEN_PKSEED );
 
     // prng for sk
     hash_ctx hctx;
@@ -119,7 +118,6 @@ int expand_pk_predicate( pk_t *rpk, const cpk_t *cpk, const unsigned char *predi
 
 int expand_sk( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
     memcpy( sk->sk_seed, sk_seed, LEN_SKSEED );
-    memcpy( sk->pk_seed, pk_seed, LEN_PKSEED );
 
     // prng for sk
     hash_ctx hctx;
@@ -154,7 +152,6 @@ int expand_sk( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_s
 int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
     memcpy( pk->pk_seed, pk_seed, LEN_PKSEED );
     memcpy( sk->sk_seed, sk_seed, LEN_SKSEED );
-    memcpy( sk->pk_seed, pk_seed, LEN_PKSEED );
 
     // prng for sk
     hash_ctx hctx;
