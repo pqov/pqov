@@ -1,13 +1,11 @@
   
 # OV signature
 
-This project contains the implementations of the oil and vinegar (OV) signature system.
-
-## Authors
+This project contains the reference and optimized implementations of the oil and vinegar (OV) signature system.
 
 ## Licence
 
-Public domain.
+Public domain unless stated differently at the top of each file.
 
 ## Supporting Parameters
 
