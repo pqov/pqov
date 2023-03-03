@@ -7,7 +7,7 @@ This project contains the reference and optimized implementations of the oil and
 
 Public domain unless stated differently at the top of each file.
 
-## Supporting Parameters
+## Parameters
 
 | Parameter    | signature size | pk size  | sk size | pkc size | compressed-sk size |  
 |:-----------: |:--------------:|--------- |---------|------------|--------------------|
