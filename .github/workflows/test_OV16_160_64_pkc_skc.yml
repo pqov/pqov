@@ -62,16 +62,16 @@ jobs:
       matrix:
         compiler:
           - clang  # XCode (Apple LLVM/Clang)
-          - gcc   # GNU (Homebrew)
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
     - uses: actions/checkout@v3
-    - name: Set up GCC compiler
-      run: 'export PATH="/usr/local/bin:$PATH" && export CC=gcc'
-      if: matrix.compiler == 'gcc'
+    - name: Set up compiler
+      run: 'export CC=${{ matrix.cc }}'
+    - name: Install OpenSSL
+      run: 'brew install openssl'
     - name: test
       run: make PARAM=1 VARIANT=3 PROJ=${{ matrix.impl }} test
       env:
