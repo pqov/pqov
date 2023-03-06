@@ -32,9 +32,12 @@ LDFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
 endif
 
 OS := $(shell uname -s)
+ARCH := $(shell uname -s)
 ifeq  ($(OS), Darwin)
+ifeq  ($(ARCH), arm64)
 CFLAGS    +=  -D_MAC_OS_
 CXXFLAGS  +=  -D_MAC_OS_
+endif
 endif
 
 
