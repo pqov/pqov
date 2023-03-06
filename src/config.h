@@ -48,7 +48,7 @@
 
 #if defined(_BLAS_AVX2_)
 #define _UTILS_AESNI_
-#elif defined(_BLAS_NEON_)&&defined(_MAC_OS_)
+#elif defined(_BLAS_NEON_)&&defined(_APPLE_SILICON_)
 #define _UTILS_NEONAES_
 #elif defined(_BLAS_NEON_)
 #define _UTILS_NEONBSAES_

@@ -173,9 +173,14 @@ Notes for **Apple Mac M1**:
 ```
 uname -s
 ```
-to detect if running on Mac OS.
-If **uname** returns string containing **Darwin**,
-the makefile will define **_MAC_OS\_** macro for enabling some optimization settings in the source code .  
+to detect if running on Mac OS and 
+```
+uname -m
+```
+to detect if is an Arm-based Mac.
+If `uname -s` returns **Darwin** and `uname -m` returns **arm64, we are running
+on an Arm-based Mac (e.g., Apple M1).
+The Makefile will then define the **_APPLE_SILICON\_** macro for enabling some optimization settings in the source code .  
 2. The program needs **sudo** to benchmark on Mac OS correctly.
 
 

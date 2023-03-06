@@ -18,7 +18,6 @@ UTIL_DIR = ./utils
 CFLAGS   := -O3 $(CFLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer
 CXXFLAGS := -O3 $(CPPFLAGS) -Wall -Wextra -fno-exceptions -fno-rtti -nostdinc++
 INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR) -I$(UTIL_DIR) -Iunit_tests -Ibenchmark
-LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
 LIBS     = -lcrypto
 
 
@@ -33,9 +32,12 @@ LDFLAGS += -fsanitize=undefined -fno-sanitize-recover=all
 endif
 
 OS := $(shell uname -s)
+ARCH := $(shell uname -m)
 ifeq  ($(OS), Darwin)
-CFLAGS    +=  -D_MAC_OS_
-CXXFLAGS  +=  -D_MAC_OS_
+ifeq  ($(ARCH), arm64)
+CFLAGS    +=  -D_APPLE_SILICON_
+CXXFLAGS  +=  -D_APPLE_SILICON_
+endif
 endif
 
 
@@ -142,7 +144,9 @@ endif
 OBJ = $(SRCS_O_NOTDIR)
 
 ifeq  ($(OS), Darwin)
+ifeq  ($(ARCH), arm64)
   OBJ += m1cycles.o
+endif
 endif
 
 
