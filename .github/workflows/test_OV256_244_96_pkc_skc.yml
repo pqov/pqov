@@ -56,3 +56,35 @@ jobs:
       run: |
         make VALGRIND=1 PARAM=5 VARIANT=3 PROJ=${{ matrix.impl }} sign_api-test
         valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
+  test-macos:
+    strategy:
+      matrix:
+        compiler:
+          - clang  # XCode (Apple LLVM/Clang)
+          - gcc   # GNU (Homebrew)
+    runs-on: macos-latest
+    steps:
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: actions/checkout@v3
+      - name: Set up GCC compiler
+        run: 'export PATH="/usr/local/bin:$PATH" && export CC=gcc'
+        if: matrix.compiler == 'gcc'
+    - name: test
+      run: make PARAM=5 VARIANT=3 PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: asan
+      run: |
+        make clean
+        make ASAN=1 PARAM=5 VARIANT=3 PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: ubsan
+      run: |
+        make clean
+        make UBSAN=1 PARAM=5 VARIANT=3 PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+
