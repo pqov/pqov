@@ -81,8 +81,8 @@ jobs:
       run: make PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
-        LDFLAGS: "-L/usr/local/opt/openssl@1.1/lib"
-        CFLAGS: "-I/usr/local/opt/openssl@1.1/include"
+        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
+        CFLAGS: "-I/usr/local/opt/openssl@3/include"
 
 """
 
