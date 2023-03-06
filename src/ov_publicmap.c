@@ -186,13 +186,14 @@ void madd_reduce_gf16( unsigned char *y, const unsigned char *tmp_res, unsigned 
 
 
 static
-void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, const unsigned char *trimat, const unsigned char *x_in_byte,
-                           unsigned num_gfele_x, unsigned num_vinegar, unsigned vec_len ) {
+void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, const unsigned char *trimat, const unsigned char *x_in_byte) {
+    unsigned vec_len = _PUB_M_BYTE;
+
     const unsigned char *_x = x_in_byte;
     unsigned char _xixj[_MAX_N];
-    unsigned v = num_vinegar;
-    unsigned o = num_gfele_x - num_vinegar;
-    unsigned n = num_gfele_x;
+    unsigned v = _V;
+    unsigned o = _PUB_N - _V;
+    unsigned n = _PUB_N;
 
     #if defined( _BLAS_AVX2_ )
     unsigned tmpvec_len = ((vec_len + 31) >> 5) << 5;
@@ -345,13 +346,14 @@ void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, co
 #else
 
 static
-void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, const unsigned char *trimat, const unsigned char *x_in_byte,
-                           unsigned num_gfele_x, unsigned num_vinegar, unsigned vec_len ) {
+void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, const unsigned char *trimat, const unsigned char *x_in_byte) {
+    unsigned vec_len = _PUB_M_BYTE;
+
     const unsigned char *_x = x_in_byte;
     unsigned char _xixj[_MAX_N];
-    unsigned v = num_vinegar;
-    unsigned o = num_gfele_x - num_vinegar;
-    unsigned n = num_gfele_x;
+    unsigned v = _V;
+    unsigned o = _PUB_N - _V;
+    unsigned n = _PUB_N;
 
     #if defined( _BLAS_AVX2_ )
     unsigned tmpvec_len = ((vec_len + 31) >> 5) << 5;
@@ -563,7 +565,7 @@ void ov_publicmap( unsigned char *y, const unsigned char *trimat, const unsigned
 
     unsigned char tmp_l[TMPVEC_LEN * 16] = {0};
     unsigned char tmp_h[TMPVEC_LEN * 16] = {0};
-    accu_eval_quad_gf256( tmp_l, tmp_h, trimat, _x, _PUB_N, _V, _PUB_M_BYTE );
+    accu_eval_quad_gf256( tmp_l, tmp_h, trimat, _x );
     madd_reduce_gf256( y, tmp_l, tmp_h, _PUB_M_BYTE );
 
     #else
