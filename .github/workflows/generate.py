@@ -10,7 +10,7 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.impl }} ${{ matrix.cc }}
+    name: Ubuntu ${{ matrix.impl }} ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -59,6 +59,7 @@ jobs:
         make VALGRIND=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} sign_api-test
         valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
   test-macos:
+    name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
     strategy:
       matrix:
         compiler:
