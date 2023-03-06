@@ -152,7 +152,9 @@ jobs:
     - name: Set up compiler
       run: 'export CC=${{ matrix.cc }}'
     - name: test
-      run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
+      run: |
+        function sha256sum() { shasum -a 256 "$@" ; } && export -f sha256sum
+        make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
         LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
