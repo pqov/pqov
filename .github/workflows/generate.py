@@ -62,7 +62,7 @@ jobs:
     name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
     strategy:
       matrix:
-        compiler:
+        cc:
           - clang  # XCode (Apple LLVM/Clang)
     runs-on: macos-latest
     steps:
@@ -72,8 +72,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set up compiler
       run: 'export CC=${{ matrix.cc }}'
-    - name: Install OpenSSL
-      run: 'brew install openssl'
     - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
       env:
