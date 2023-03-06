@@ -65,7 +65,7 @@ jobs:
         cc:
           - clang
           - gcc-12
-        impl:
+        impl: # there is no AVX2 available on the MacOS runners
           - ref
           - ssse3
           - amd64
@@ -141,6 +141,8 @@ jobs:
           - gcc-12
         impl:
           - ref
+          - ssse3
+          - amd64
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
