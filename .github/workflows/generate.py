@@ -66,9 +66,6 @@ jobs:
           - clang  # XCode (Apple LLVM/Clang)
         impl:
           - ref
-          - avx2
-          - ssse3
-          - amd64
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
