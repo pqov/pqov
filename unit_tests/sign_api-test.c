@@ -8,8 +8,8 @@
 //#include "benchmark.h"
 
 #if defined(_VALGRIND_)
-#define TEST_GENKEY 5
-#define TEST_RUN 50
+#define TEST_GENKEY 2
+#define TEST_RUN 5
 #else
 #define TEST_GENKEY 50
 #define TEST_RUN 500

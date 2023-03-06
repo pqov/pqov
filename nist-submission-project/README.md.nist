@@ -1,22 +1,20 @@
   
 # OV signature
 
-This project contains the implementations of the oil and vinegar (OV) signature system.
-
-## Authors
+This project contains the reference and optimized implementations of the oil and vinegar (OV) signature system.
 
 ## Licence
 
-Public domain.  
+Public domain unless stated differently at the top of each file.
 
-## Supporting Parameters
+## Parameters
 
 | Parameter    | signature size | pk size  | sk size | pkc size | compressed-sk size |  
 |:-----------: |:--------------:|--------- |---------|------------|--------------------|
-|GF(16),160,64 | 96             |412,160   |348,720  |66,576      | 48                 |
-|GF(256),112,44| 128            |278,432   |237,912  |43,576      | 48                 |
-|GF(256),184,72| 200            |1,225,440 |1,044,336|189,232     | 48                 |
-|GF(256),244,96| 260            |2,869,440 |2,436,720|446,992     | 48                 |
+|GF(16),160,64 | 96             |412,160   |348,704  |66,576      | 48                 |
+|GF(256),112,44| 128            |278,432   |237,896  |43,576      | 48                 |
+|GF(256),184,72| 200            |1,225,440 |1,044,320|189,232     | 48                 |
+|GF(256),244,96| 260            |2,869,440 |2,436,704|446,992     | 48                 |
 
 
 ## Instructions for testing and generating KATs

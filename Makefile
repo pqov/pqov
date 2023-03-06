@@ -64,14 +64,13 @@ SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesffs
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesffs
 CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONBSAES_
 CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONBSAES_
-endif
-
 ifeq ($(CC),clang)
 CFLAGS    += -flax-vector-conversions
 CXXFLAGS  += -flax-vector-conversions
 else
 CFLAGS    += march=armv7-a -mfpu=neon -flax-vector-conversions
 CXXFLAGS  += march=armv7-a -mfpu=neon -flax-vector-conversions
+endif
 endif
 
 ifeq ($(PARAM),1)
@@ -182,8 +181,8 @@ endif
 ifdef VALGRIND
 	CFLAGS   += -D_VALGRIND_ #-g
 	CXXFLAGS += -D_VALGRIND_ #-g
-	CFLAGS   := $(CFLAGS:-O%=-O0)
-	CXXFLAGS := $(CXXFLAGS:-O%=-O0)
+	CFLAGS   := $(CFLAGS:-O%=-O1)
+	CXXFLAGS := $(CXXFLAGS:-O%=-O1)
 endif
 
 

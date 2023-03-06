@@ -104,7 +104,6 @@
 
 
 #define OV_SK_UNCOMPRESSED_BYTES (LEN_SKSEED                     + \
-                                  LEN_PKSEED                     + \
                                   _V_BYTE*_O                     + \
                                   _O_BYTE * N_TRIANGLE_TERMS(_V) + \
                                   _O_BYTE * _V*_O)
