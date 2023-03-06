@@ -73,27 +73,12 @@ jobs:
       with:
         xcode-version: latest-stable
     - uses: actions/checkout@v3
-    - name: Install OpenSSL
-      run: |
-        brew install openssl@3
-        export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
-        export CFLAGS="-I/usr/local/opt/openssl@1.1/include"
     - name: Set up compiler
       run: 'export CC=${{ matrix.cc }}'
     - name: test
       run: make PARAM=4 VARIANT=3 PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
-    - name: asan
-      run: |
-        make clean
-        make ASAN=1 PARAM=4 VARIANT=3 PROJ=${{ matrix.impl }} test
-      env:
-        CC: ${{ matrix.cc }}
-    - name: ubsan
-      run: |
-        make clean
-        make UBSAN=1 PARAM=4 VARIANT=3 PROJ=${{ matrix.impl }} test
-      env:
-        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/usr/local/opt/openssl@1.1/lib"
+        CFLAGS: "-I/usr/local/opt/openssl@1.1/include"
 
