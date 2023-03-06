@@ -144,7 +144,9 @@ endif
 OBJ = $(SRCS_O_NOTDIR)
 
 ifeq  ($(OS), Darwin)
+ifeq  ($(ARCH), arm64)
   OBJ += m1cycles.o
+endif
 endif
 
 
