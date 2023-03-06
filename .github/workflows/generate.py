@@ -75,7 +75,7 @@ jobs:
       with:
         xcode-version: latest-stable
     - uses: actions/checkout@v3
-    - Install OpenSSL
+    - name: Install OpenSSL
       run: 'brew install openssl@3'
     - name: Set up compiler
       run: 'export CC=${{ matrix.cc }}'
