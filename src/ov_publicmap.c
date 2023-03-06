@@ -565,7 +565,6 @@ void ov_publicmap( unsigned char *y, const unsigned char *trimat, const unsigned
 
     unsigned char tmp_l[TMPVEC_LEN * 16] = {0};
     unsigned char tmp_h[TMPVEC_LEN * 16] = {0};
-    // accu_eval_quad_gf256( tmp_l, tmp_h, trimat, _x, _PUB_N, _V, _PUB_M_BYTE );
     accu_eval_quad_gf256( tmp_l, tmp_h, trimat, _x );
     madd_reduce_gf256( y, tmp_l, tmp_h, _PUB_M_BYTE );
 
