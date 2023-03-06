@@ -75,7 +75,9 @@ jobs:
         xcode-version: latest-stable
     - uses: actions/checkout@v3
     - name: Set up compiler
-      run: 'export CC=${{ matrix.cc }}'
+      run: |
+        export CC=${{ matrix.cc }}
+        sysctl -a machdep.cpu
     - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
       env:
