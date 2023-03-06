@@ -67,6 +67,7 @@ jobs:
           - gcc-12
         impl:
           - ref
+          - avx2
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
