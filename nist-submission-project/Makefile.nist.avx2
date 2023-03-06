@@ -10,7 +10,7 @@ endif
 
 SRC_DIR  := $(PROJ)
 
-CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer
+CFLAGS   := -O3 $(CFLAGS) -std=c99 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer
 INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR)
 LDFLAGS  := $(LDFLAGS)
 LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
