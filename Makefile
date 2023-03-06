@@ -18,7 +18,6 @@ UTIL_DIR = ./utils
 CFLAGS   := -O3 $(CFLAGS) -std=c11 -Wall -Wextra -Wpedantic -Werror -fno-omit-frame-pointer -Wno-aggressive-loop-optimizations -Wno-unknown-warning-option #-pg -g
 CXXFLAGS := -O3 $(CPPFLAGS) -Wall -Wextra -fno-exceptions -fno-rtti -nostdinc++
 INCPATH  := -I/usr/local/include -I/opt/local/include -I/usr/include -I$(SRC_DIR) -I$(UTIL_DIR) -Iunit_tests -Ibenchmark
-LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
 LIBS     = -lcrypto
 
 
@@ -36,6 +35,8 @@ OS := $(shell uname -s)
 ifeq  ($(OS), Darwin)
 CFLAGS    +=  -D_MAC_OS_
 CXXFLAGS  +=  -D_MAC_OS_
+LDFLAGS  +=-L/opt/homebrew/opt/openssl@3/lib
+CFLAGS +=-I/opt/homebrew/opt/openssl@3/include
 endif
 
 
