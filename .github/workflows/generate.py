@@ -109,8 +109,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-    name: ${{ matrix.impl }} ${{ matrix.cc }}
+  test-ubuntu:
+    name: Ubuntu ${{ matrix.impl }} ${{ matrix.cc }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -128,6 +128,29 @@ jobs:
       run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
+  test-macos:
+    name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
+    strategy:
+      matrix:
+        cc:
+          - clang
+          - gcc-12
+        impl:
+          - ref
+    runs-on: macos-latest
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - uses: actions/checkout@v3
+    - name: Set up compiler
+      run: 'export CC=${{ matrix.cc }}'
+    - name: test
+      run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
+        CFLAGS: "-I/usr/local/opt/openssl@3/include"
 """
 
 def paramToName(p):
