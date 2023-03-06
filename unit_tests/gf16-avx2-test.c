@@ -137,30 +137,6 @@ int main() {
         printf("PASS\n\n");
     }
 
-    #if 0
-    // function removed
-    printf("testing inverse: ");
-    for (unsigned i = 0; i < 256; i++) {
-        a = i;
-        b = gf256_inv( a );
-        a_vec = _mm256_set1_epi8( a );
-        b_vec = tbl32_gf256_inv( a_vec );
-        _mm256_storeu_si256( (__m256i *) v32, b_vec );
-
-        if ( b != v32[0] ) {
-            printf("a^-1 : %x ^-1->  %x : %x\n", a, b, v32[0] );
-            fail = 1;
-            break;
-        }
-    }
-    if ( fail ) {
-        printf("FAIL!\n\n");
-        return -1;
-    } else {
-        printf("PASS\n\n");
-    }
-    #endif
-
     printf("testing multiplication: ");
     for (unsigned i = 0; i < 256; i++) {
         for (unsigned j = 0; j < 256; j++) {

@@ -659,56 +659,6 @@ void gf256mat_prod_multab_33_48_neon( uint8_t *c, const uint8_t *matA, unsigned 
     vst1q_u8(c + 16, c1);
     _store_Qreg( c + 32, rem, c2 );
 }
-#if 0
-static
-void gf256mat_prod_multab_96_neon( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *multab_b ) {
-    uint8x16_t mask_f = vdupq_n_u8(0xf);
-    uint8x16_t cc[6];
-    unsigned n_16 = (matA_vec_byte + 15) >> 4;
-    unsigned rem  = matA_vec_byte & 15;
-    cc[0] = vdupq_n_u8(0);
-    for (unsigned i = 1; i < n_16; i++) {
-        cc[i] = cc[0];
-    }
-
-    int counter = (rem) ? (int)matA_n_vec - 1 : matA_n_vec;
-    while (counter--) {
-        uint8x16_t ml = vld1q_u8(multab_b);
-        multab_b += 16;
-        uint8x16_t mh = vld1q_u8(multab_b);
-        multab_b += 16;
-        for (unsigned i = 0; i < n_16; i++) {
-            uint8x16_t ai = vld1q_u8(matA);
-            matA += 16;
-            cc[i] ^= _gf256_tbl( ai, ml, mh, mask_f );
-        }
-        if (rem) {
-            matA -= (16 - rem);
-        }
-    }
-    if (rem) {
-        uint8x16_t ml = vld1q_u8(multab_b);
-        multab_b += 16;
-        uint8x16_t mh = vld1q_u8(multab_b);
-        multab_b += 16;
-        uint8x16_t ai;
-        for (unsigned i = 0; i < n_16 - 1; i++) {
-            ai = vld1q_u8(matA);
-            matA += 16;
-            cc[i] ^= _gf256_tbl( ai, ml, mh, mask_f );
-        }
-        ai = _load_Qreg( matA, rem );
-        cc[n_16 - 1] ^= _gf256_tbl( ai, ml, mh, mask_f );
-    }
-    for (unsigned i = 0; i < (matA_vec_byte >> 4); i++) {
-        vst1q_u8(c, cc[i]);
-        c += 16;
-    }
-    if ( rem ) {
-        _store_Qreg(c, rem, cc[n_16 - 1]);
-    }
-}
-#endif
 
 #define BLOCK_LEN 8
 
