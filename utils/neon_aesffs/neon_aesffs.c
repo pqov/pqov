@@ -492,37 +492,6 @@ static void mixcolumns_3(uint32x4_t *state) {
 * can refer to the same block. Moreover ctext parameters can be the same as
 * ptext parameters.
 ******************************************************************************/
-#if 0
-void neon_aes256ctrx8_encrypt_ffs(unsigned char *ctext0, const uint8_t *iv, uint32_t ctr, const uint32_t *rkeys_ffs) {
-    uint32x4_t state[8];               // 256-bit internal state
-    _packing(state, iv, ctr);       // packs into bitsliced representation
-
-    for (int i = 0; i < 96; i += 32) {  // loop over quadruple rounds
-        ark(state, rkeys_ffs + i);
-        _sbox(state);
-        mixcolumns_0(state);
-        ark(state, rkeys_ffs + i + 8);
-        _sbox(state);
-        mixcolumns_1(state);
-        ark(state, rkeys_ffs + i + 16);
-        _sbox(state);
-        mixcolumns_2(state);
-        ark(state, rkeys_ffs + i + 24);
-        _sbox(state);
-        mixcolumns_3(state);
-    }
-    ark(state, rkeys_ffs + 96);
-    _sbox(state);
-    mixcolumns_0(state);
-    ark(state, rkeys_ffs + 104);
-    _sbox(state);
-    double_shiftrows(state);            // resynchronization
-    ark(state, rkeys_ffs + 112);
-
-    unpacking(ctext0, state);   // unpacks the state to the output
-}
-#endif
-
 
 void neon_aes128ctrx8_encrypt_ffs(unsigned char *ctext0, const uint8_t *iv, uint32_t ctr, const uint32_t *rkeys_ffs) {
     uint32x4_t state[8];               // 256-bit internal state

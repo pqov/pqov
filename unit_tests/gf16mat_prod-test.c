@@ -28,14 +28,8 @@ int main(void) {
 
 #else // !defined(_USE_GF16)
 
-
-#if 0
-#define VEC_LEN  16
-#define N_VEC    32
-#else
 #define VEC_LEN  8
 #define N_VEC    16
-#endif
 
 #define TEST_RUN 100
 

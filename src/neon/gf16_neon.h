@@ -247,32 +247,5 @@ uint8x16x2_t gf256v_get_multab_neon( uint8_t v ) {
     #endif
 }
 
-
-#if 0
-// use gf256_inv().
-static inline
-uint8x16_t gf256v_inv_neon( uint8x16_t a ) {
-    uint8x16_t a2 = gf256v_squ_neon(a);
-    uint8x16_t a3 = _gf256v_mul_neon(a2, a);
-    uint8x16_t a6 = gf256v_squ_neon(a3);
-    uint8x16_t a7 = _gf256v_mul_neon(a6, a);
-    uint8x16_t ae = gf256v_squ_neon(a7);
-    uint8x16_t af = _gf256v_mul_neon(ae, a);
-    uint8x16_t af1 = gf256v_squ_neon(af);
-    uint8x16_t af2 = gf256v_squ_neon(af1);
-    uint8x16_t af3 = gf256v_squ_neon(af2);
-    uint8x16_t a7f = _gf256v_mul_neon(af3, a7);
-    return gf256v_squ_neon(a7f);
-}
-#endif
-
-
-
-
-
-
-
-
-
 #endif // _GF16_NEON_H_
 

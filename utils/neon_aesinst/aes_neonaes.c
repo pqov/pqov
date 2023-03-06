@@ -89,19 +89,6 @@ void aes128ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, c
     vst1q_u8( ct + 32, p2 );
     vst1q_u8( ct + 48, p3 );
 }
-/*
-( uint8_t *ct, uint32_t ctr, const uint8_t * aes128_rk )
-{
-  uint8x16_t state = vld1q_u8(pk);
-  for(int i=0;i<9;i++) {
-    state = vaeseq_u8( state , vld1q_u8(rk) );  rk += 16;
-    state = vaesmcq_u8( state );
-  }
-  state = vaeseq_u8( state , vld1q_u8(rk) );  rk += 16;
-  state ^= vld1q_u8(rk);
-  vst1q_u8( ct , state );
-}
-*/
 
 void aes128ctrx4_4r_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, const uint8_t *rk ) {
     static const uint32_t mask[4] = {0, 1, 2, 3};
@@ -144,19 +131,6 @@ void aes128ctrx4_4r_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr
     vst1q_u8( ct + 32, p2 );
     vst1q_u8( ct + 48, p3 );
 }
-/*
-( uint8_t *ct, uint32_t ctr, const uint8_t * aes128_rk )
-{
-  uint8x16_t state = vld1q_u8(pk);
-  for(int i=0;i<3;i++) {
-    state = vaeseq_u8( state , vld1q_u8(rk) );  rk += 16;
-    state = vaesmcq_u8( state );
-  }
-  state = vaeseq_u8( state , vld1q_u8(rk) );  rk += 16;
-  state ^= vld1q_u8(rk);
-  vst1q_u8( ct , state );
-}
-*/
 
 /////////////////////////////
 
