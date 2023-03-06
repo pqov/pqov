@@ -35,8 +35,6 @@ OS := $(shell uname -s)
 ifeq  ($(OS), Darwin)
 CFLAGS    +=  -D_MAC_OS_
 CXXFLAGS  +=  -D_MAC_OS_
-LDFLAGS  +=-L/opt/homebrew/opt/openssl@3/lib
-CFLAGS +=-I/opt/homebrew/opt/openssl@3/include
 endif
 
 
