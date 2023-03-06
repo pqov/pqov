@@ -63,7 +63,8 @@ jobs:
     strategy:
       matrix:
         cc:
-          - clang  # XCode (Apple LLVM/Clang)
+          - clang
+          - gcc-12
         impl:
           - ref
     runs-on: macos-latest
@@ -80,21 +81,24 @@ jobs:
         CC: ${{ matrix.cc }}
         LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
         CFLAGS: "-I/usr/local/opt/openssl@3/include"
-
+    - name: asan
+      run: |
+        make clean
+        make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
+        CFLAGS: "-I/usr/local/opt/openssl@3/include"
+    - name: ubsan
+      run: |
+        make clean
+        make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
+        CFLAGS: "-I/usr/local/opt/openssl@3/include"
 """
 
-    # - name: asan
-    #   run: |
-    #     make clean
-    #     make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
-    #   env:
-    #     CC: ${{ matrix.cc }}
-    # - name: ubsan
-    #   run: |
-    #     make clean
-    #     make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
-    #   env:
-    #     CC: ${{ matrix.cc }}
 
 workflow_nistkat = """name: NISTKAT $NAME
 
