@@ -17,7 +17,7 @@ uint64_t rec_sign[TEST_RUN];
 uint64_t rec_open[TEST_RUN];
 
 int main(void) {
-    #if defined(_MAC_OS_)&&defined(_M1CYCLES_)
+    #if defined(_APPLE_SILICON_)&&defined(_M1CYCLES_)
     // rdtsc() in m1cycles.c needs initialization.
     struct benchmark bm0;
     bm_init(&bm0);

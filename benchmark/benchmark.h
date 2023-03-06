@@ -56,7 +56,7 @@ struct benchmark {
 
 #define _M1CYCLES_
 
-#if defined(_MAC_OS_)&&defined(_M1CYCLES_)
+#if defined(_APPLE_SILICON_)&&defined(_M1CYCLES_)
 #include "m1cycles.h"
 #endif
 
@@ -64,7 +64,7 @@ struct benchmark {
 #if defined(__aarch64__)
 static inline uint64_t rdtsc(void) {
     uint64_t val;
-    #if defined(_MAC_OS_)
+    #if defined(_APPLE_SILICON_)
     #if defined(_M1CYCLES_)
     return __m1_rdtsc();
     #else
@@ -76,7 +76,7 @@ static inline uint64_t rdtsc(void) {
     // performance monitors cycle count register. likely to be banned in user space.
     // see https://github.com/mupq/pqax/tree/main/enable_ccr
     __asm__ __volatile__ ("mrs %0, PMCCNTR_EL0" : "=r" (val));
-    #endif  // _MAC_OS_
+    #endif  // _APPLE_SILICON_
     return val;
 }
 #else
@@ -95,7 +95,7 @@ static inline uint64_t rdtsc(void) {
 static inline void
 bm_init(struct benchmark *bm) {
     memset(bm, 0, sizeof(*bm));
-    #if defined(_MAC_OS_)&&defined(_M1CYCLES_)
+    #if defined(_APPLE_SILICON_)&&defined(_M1CYCLES_)
     __m1_setup_rdtsc();
     #endif
 }

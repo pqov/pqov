@@ -83,7 +83,7 @@ void accu_eval_quad_gf16( unsigned char *accu_res, const unsigned char *trimat, 
         gfv_mul_scalar( _xixj, _x[i], o );
         for (unsigned j = 0; j < o; j++) {
             unsigned idx = _xixj[j];
-            #if defined(_BLAS_AVX2_ ) || (defined( _BLAS_NEON_ )&&!defined(_MAC_OS_))
+            #if defined(_BLAS_AVX2_ ) || (defined( _BLAS_NEON_ )&&!defined(_APPLE_SILICON_))
             gf256v_add( accu_res + TMPVEC_LEN * idx, trimat, vec_len );
             #else
             if (idx) {

@@ -199,7 +199,7 @@ uint8x16_t _gf256v_mul_h4bits_neon( uint8x16_t a, uint8x16_t b_4bits, uint8x16_t
 }
 
 
-#ifdef _MAC_OS_
+#ifdef _APPLE_SILICON_
 static inline
 uint8x16x2_t _gf256v_get_multab_neon( uint8_t v, uint8x16_t mask_f, uint8x16_t mask_0_f, uint8x16_t tab_rd0 ) {
     uint8x16_t a = vdupq_n_u8(v);
@@ -231,7 +231,7 @@ uint8x16x2_t _gf256v_get_multab_neon( uint8_t v, uint8x16_t mask_f, uint8x16_t m
 
 static inline
 uint8x16x2_t gf256v_get_multab_neon( uint8_t v ) {
-    #ifdef _MAC_OS_
+    #ifdef _APPLE_SILICON_
     uint8x16_t mask_f   = vdupq_n_u8(0xf);
     uint8x16_t mask_0_f = vld1q_u8(__0_f);
     uint8x16_t tab_rd0  = vld1q_u8(__gf256_bit8_11_reduce);

@@ -35,8 +35,8 @@ OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 ifeq  ($(OS), Darwin)
 ifeq  ($(ARCH), arm64)
-CFLAGS    +=  -D_MAC_OS_
-CXXFLAGS  +=  -D_MAC_OS_
+CFLAGS    +=  -D_APPLE_SILICON_
+CXXFLAGS  +=  -D_APPLE_SILICON_
 endif
 endif
 

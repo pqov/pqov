@@ -453,12 +453,12 @@ void gf256v_generate_multabs_neon( uint8_t *multabs, const uint8_t *v, unsigned 
     uint8x16_t tab_0_f = vld1q_u8(__0_f);
     uint8x16_t tab_rd0 = vld1q_u8(__gf256_bit8_11_reduce);
     uint8x16_t mask_f  = vdupq_n_u8(0xf);
-    #if !defined(_MAC_OS_)
+    #if !defined(_APPLE_SILICON_)
     uint8x16_t tab_rd1 = vld1q_u8(__gf256_bit12_15_reduce);
     #endif
 
     while (n_ele) {
-        #ifdef _MAC_OS_
+        #ifdef _APPLE_SILICON_
         uint8x16x2_t tab = _gf256v_get_multab_neon( v[0], mask_f, tab_0_f, tab_rd0 );
         #else
         uint8x16x2_t tab = _gf256v_get_multab_neon( v[0], mask_f, tab_0_f, tab_rd0, tab_rd1 );
