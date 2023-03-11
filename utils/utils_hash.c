@@ -25,7 +25,7 @@ int hash_init( hash_ctx *ctx ) {
     return (ok) ? 0 : -1;
 }
 
-int hash_update( hash_ctx *ctx, const unsigned char *mesg, unsigned mlen ) {
+int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen ) {
     int ok = EVP_DigestUpdate(ctx->x, mesg, mlen);
     return (ok) ? 0 : -1;
 }
@@ -40,7 +40,7 @@ int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx ) {
     return (ok) ? 0 : -1;
 }
 
-int hash_final_digest( unsigned char *out, unsigned outlen, hash_ctx *ctx ) {
+int hash_final_digest( unsigned char *out, size_t outlen, hash_ctx *ctx ) {
     int ok = EVP_DigestFinalXOF(ctx->x, out, outlen);
     EVP_MD_CTX_destroy(ctx->x);
     return (ok) ? 0 : -1;
@@ -57,7 +57,7 @@ int hash_init( hash_ctx *ctx ) {
     return 0;
 }
 
-int hash_update( hash_ctx *ctx, const unsigned char *mesg, unsigned mlen ) {
+int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen ) {
     #if defined(_HASH_SHAKE128_)
     shake128_inc_absorb( ctx, mesg, mlen );
     #else
@@ -75,7 +75,7 @@ int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx ) {
     return 0;
 }
 
-int hash_final_digest( unsigned char *out, unsigned outlen, hash_ctx *ctx ) {
+int hash_final_digest( unsigned char *out, size_t outlen, hash_ctx *ctx ) {
     #if defined(_HASH_SHAKE128_)
     shake128_inc_finalize(ctx);
     shake128_inc_squeeze(out, outlen, ctx);
@@ -105,7 +105,7 @@ int hash_init( hash_ctx *ctx ) {
     return 0;
 }
 
-int hash_update( hash_ctx *ctx, const unsigned char *mesg, unsigned mlen ) {
+int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen ) {
     #if defined(_HASH_SHAKE128_)
     shake128_absorb( ctx, mesg, mlen );
     #else
@@ -121,7 +121,7 @@ int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx ) {
     return 0;
 }
 
-int hash_final_digest( unsigned char *out, unsigned outlen, hash_ctx *ctx ) {
+int hash_final_digest( unsigned char *out, size_t outlen, hash_ctx *ctx ) {
     #if defined(_HASH_SHAKE128_)
     shake128_finalize( ctx );
 
