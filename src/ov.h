@@ -9,6 +9,7 @@
 #include "ov_keypair.h"
 
 #include <stdint.h>
+#include <stdio.h>  // for size_t
 
 #ifdef  __cplusplus
 extern  "C" {
@@ -158,7 +159,7 @@ void ov_publicmap_pkc( unsigned char *z, const cpk_t *pk, const unsigned char *w
 /// @param[in]  mlen      - the length of the message.
 /// @return 0 for success. -1 otherwise.
 ///
-int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigned mlen );
+int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, size_t mlen );
 
 ///
 /// @brief Verifying function.
@@ -169,7 +170,7 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigne
 /// @param[in]  pk        - the public key.
 /// @return 0 for successful verified. -1 for failed verification.
 ///
-int ov_verify( const uint8_t *message, unsigned mlen, const uint8_t *signature, const pk_t *pk );
+int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const pk_t *pk );
 
 
 
@@ -184,7 +185,7 @@ int ov_verify( const uint8_t *message, unsigned mlen, const uint8_t *signature, 
 /// @param[in]  mlen      - the length of the message.
 /// @return 0 for success. -1 otherwise.
 ///
-int ov_expand_and_sign( uint8_t *signature, const csk_t *sk, const uint8_t *message, unsigned mlen );
+int ov_expand_and_sign( uint8_t *signature, const csk_t *sk, const uint8_t *message, size_t mlen );
 
 ///
 /// @brief Verifying function for compressed public keys.
@@ -195,7 +196,7 @@ int ov_expand_and_sign( uint8_t *signature, const csk_t *sk, const uint8_t *mess
 /// @param[in]  pk        - the public key of cyclic OV.
 /// @return 0 for successful verified. -1 for failed verification.
 ///
-int ov_expand_and_verify( const uint8_t *message, unsigned mlen, const uint8_t *signature, const cpk_t *pk );
+int ov_expand_and_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const cpk_t *pk );
 
 
 

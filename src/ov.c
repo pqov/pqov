@@ -29,7 +29,7 @@
 #endif
 
 
-int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigned mlen ) {
+int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, size_t mlen ) {
     // allocate temporary storage.
     uint8_t mat_l1[_O * _O_BYTE];
     uint8_t salt[_SALT_BYTE];
@@ -139,7 +139,7 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, unsigne
 
 
 static
-int _ov_verify( const uint8_t *message, unsigned mlen, const uint8_t *salt, const unsigned char *digest_ck ) {
+int _ov_verify( const uint8_t *message, size_t mlen, const uint8_t *salt, const unsigned char *digest_ck ) {
     unsigned char correct[_PUB_M_BYTE];
     hash_ctx hctx;
     hash_init(&hctx);
@@ -159,7 +159,7 @@ int _ov_verify( const uint8_t *message, unsigned mlen, const uint8_t *salt, cons
 
 
 #if !(defined(_OV_PKC) || defined(_OV_PKC_SKC)) || !defined(_SAVE_MEMORY_)
-int ov_verify( const uint8_t *message, unsigned mlen, const uint8_t *signature, const pk_t *pk ) {
+int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const pk_t *pk ) {
     #if defined(_VALGRIND_)
     VALGRIND_MAKE_MEM_DEFINED(signature, OV_SIGNATUREBYTES );  // mark signature as public data
     #endif
@@ -171,7 +171,7 @@ int ov_verify( const uint8_t *message, unsigned mlen, const uint8_t *signature, 
 #endif
 
 #if defined(_OV_PKC_SKC)
-int ov_expand_and_sign( uint8_t *signature, const csk_t *csk, const uint8_t *message, unsigned mlen ) {
+int ov_expand_and_sign( uint8_t *signature, const csk_t *csk, const uint8_t *message, size_t mlen ) {
     sk_t _sk;
     sk_t *sk = &_sk;
     expand_sk( sk, csk->pk_seed, csk->sk_seed );    // generating classic secret key.
@@ -182,7 +182,7 @@ int ov_expand_and_sign( uint8_t *signature, const csk_t *csk, const uint8_t *mes
 #endif
 
 #if defined(_OV_PKC) || defined(_OV_PKC_SKC)
-int ov_expand_and_verify( const uint8_t *message, unsigned mlen, const uint8_t *signature, const cpk_t *cpk ) {
+int ov_expand_and_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const cpk_t *cpk ) {
 
     #ifdef _SAVE_MEMORY_
     unsigned char digest_ck[_PUB_M_BYTE];

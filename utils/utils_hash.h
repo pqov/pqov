@@ -46,11 +46,11 @@ typedef keccak_state  hash_ctx;
 
 int hash_init( hash_ctx *ctx );
 
-int hash_update( hash_ctx *ctx, const unsigned char *mesg, unsigned mlen );
+int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen );
 
 int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx );     // nctx needs no hash_init()
 
-int hash_final_digest( unsigned char *digest, unsigned dlen, hash_ctx *ctx );     // free ctx
+int hash_final_digest( unsigned char *digest, size_t dlen, hash_ctx *ctx );     // free ctx
 
 
 #ifdef  __cplusplus
