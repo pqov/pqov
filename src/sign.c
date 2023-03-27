@@ -77,7 +77,7 @@ crypto_sign(unsigned char *sm, unsigned long long *smlen, const unsigned char *m
     #else
     error here
     #endif
-    memcpy( sm, m, mlen );
+    memmove( sm, m, mlen );
     smlen[0] = mlen + OV_SIGNATUREBYTES;
 
     return r;
@@ -117,7 +117,7 @@ crypto_sign_open(unsigned char *m, unsigned long long *mlen, const unsigned char
     error here
     #endif
 
-    memcpy( m, sm, mesg_len );
+    memmove( m, sm, mesg_len );
     mlen[0] = mesg_len;
 
     return r;
