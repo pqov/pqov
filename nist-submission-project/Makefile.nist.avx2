@@ -1,5 +1,5 @@
-CC=    clang
-LD=    clang
+CC ?=  clang
+LD =   $(CC)
 
 ifndef PROJ
 PROJ = Ip

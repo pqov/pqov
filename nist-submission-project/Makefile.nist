@@ -1,5 +1,5 @@
 CC ?=    clang
-LD ?=    clang
+LD =    $(CC)
 
 ifndef PROJ
 PROJ = Ip
@@ -41,7 +41,7 @@ endif
 all: $(EXE)
 
 sign_api-test: $(OBJ) sign_api-test.c
-	$(CC) $(CFLAGS) $(INCPATH) $(LDFLAGS) $(LIBPATH) $(LIBS) $^ -o $@
+	$(CC) $(CFLAGS) $(INCPATH) $(LDFLAGS) $(LIBPATH) $^ -o $@ $(LIBS) 
 
 PQCgenKAT_sign: $(OBJ) PQCgenKAT_sign.o
 	$(LD) $(LDFLAGS) $(LIBPATH) -o $@ $^ $(LIBS)
