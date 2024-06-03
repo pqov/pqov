@@ -61,8 +61,8 @@ struct {
 ///
 typedef
 struct {
-    unsigned char sk_seed[LEN_SKSEED];   ///< seed for generating a part of secret key.
     unsigned char pk_seed[LEN_PKSEED];   ///< seed for generating a part of public key.
+    unsigned char sk_seed[LEN_SKSEED];   ///< seed for generating a part of secret key.
 } csk_t;
 
 
