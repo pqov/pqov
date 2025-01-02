@@ -67,40 +67,42 @@ jobs:
           - gcc-12
         impl: # there is no AVX2 available on the MacOS runners
           - ref
-          - ssse3
-          - amd64
+          - neon
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
+    - name: Setup openssl
+      run: | 
+        brew install openssl
     - uses: actions/checkout@v3
     - name: Set up compiler
       run: |
         export CC=${{ matrix.cc }}
-        sysctl -a machdep.cpu
+        sysctl -a machdep.cpu  
     - name: test
       run: make PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
-        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
-        CFLAGS: "-I/usr/local/opt/openssl@3/include"
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
     - name: asan
       run: |
         make clean
         make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
-        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
-        CFLAGS: "-I/usr/local/opt/openssl@3/include"
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
     - name: ubsan
       run: |
         make clean
         make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
       env:
         CC: ${{ matrix.cc }}
-        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
-        CFLAGS: "-I/usr/local/opt/openssl@3/include"
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
 """
 
 
@@ -108,9 +110,9 @@ workflow_nistkat = """name: NISTKAT $NAME
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
 
 jobs:
   test-ubuntu:
@@ -148,6 +150,9 @@ jobs:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
+    - name: Setup openssl
+      run: | 
+        brew install openssl
     - uses: actions/checkout@v3
     - name: Set up compiler
       run: 'export CC=${{ matrix.cc }}'
@@ -157,8 +162,8 @@ jobs:
         make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
-        LDFLAGS: "-L/usr/local/opt/openssl@3/lib"
-        CFLAGS: "-I/usr/local/opt/openssl@3/include"
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
 """
 
 def paramToName(p):
