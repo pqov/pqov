@@ -59,8 +59,8 @@ else ifeq ($(PROJ),neon)
 ifeq ($(OS), Darwin)
 SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesinst
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesinst
-CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions
-CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions
+CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions -march=armv8-a+aes
+CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions -march=armv8-a+aes
 else
 SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesffs
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesffs
