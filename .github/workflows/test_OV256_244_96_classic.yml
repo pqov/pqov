@@ -2,9 +2,9 @@ name: Test OV256_244_96_classic
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
 
 jobs:
   test:

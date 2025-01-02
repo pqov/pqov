@@ -4,9 +4,9 @@ workflow_test = """name: Test $NAME
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
 
 jobs:
   test:
@@ -143,8 +143,7 @@ jobs:
           - gcc-12
         impl:
           - ref
-          - ssse3
-          - amd64
+          - neon
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1

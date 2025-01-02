@@ -2,9 +2,9 @@ name: Test OV256_184_72_pkc
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "r2"]
 
 jobs:
   test:

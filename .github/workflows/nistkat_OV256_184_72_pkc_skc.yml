@@ -35,8 +35,7 @@ jobs:
           - gcc-12
         impl:
           - ref
-          - ssse3
-          - amd64
+          - neon
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
