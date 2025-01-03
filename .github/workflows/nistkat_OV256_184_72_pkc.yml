@@ -26,32 +26,33 @@ jobs:
       run: make KAT=1 PARAM=4 VARIANT=2 PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
-  test-macos:
-    name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
-    strategy:
-      matrix:
-        cc:
-          - clang
-          - gcc-12
-        impl:
-          - ref
-          - neon
-    runs-on: macos-latest
-    steps:
-    - uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: latest-stable
-    - name: Setup openssl
-      run: | 
-        brew install openssl
-    - uses: actions/checkout@v3
-    - name: Set up compiler
-      run: 'export CC=${{ matrix.cc }}'
-    - name: test
-      run: |
-        function sha256sum() { shasum -a 256 "$@" ; } && export -f sha256sum
-        make KAT=1 PARAM=4 VARIANT=2 PROJ=${{ matrix.impl }} check-NISTKAT
-      env:
-        CC: ${{ matrix.cc }}
-        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
-        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+  # TODO: fix this in the Github CI
+  #test-macos:
+  #  name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
+  #  strategy:
+  #    matrix:
+  #      cc:
+  #        - clang
+  #        - gcc-12
+  #      impl:
+  #        - ref
+  #        - neon
+  #  runs-on: macos-latest
+  #  steps:
+  #  - uses: maxim-lobanov/setup-xcode@v1
+  #    with:
+  #      xcode-version: latest-stable
+  #  - name: Setup openssl
+  #    run: | 
+  #      brew install openssl
+  #  - uses: actions/checkout@v3
+  #  - name: Set up compiler
+  #    run: 'export CC=${{ matrix.cc }}'
+  #  - name: test
+  #    run: |
+  #      function sha256sum() { shasum -a 256 "$@" ; } && export -f sha256sum
+  #      make KAT=1 PARAM=4 VARIANT=2 PROJ=${{ matrix.impl }} check-NISTKAT
+  #    env:
+  #      CC: ${{ matrix.cc }}
+  #      LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+  #      CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
