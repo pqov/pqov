@@ -62,7 +62,7 @@ KPERF_LIST
 uint64_t g_counters[COUNTERS_COUNT];
 uint64_t g_config[COUNTERS_COUNT];
 
-static void configure_rdtsc() {
+static void configure_rdtsc(void) {
     if (kpc_set_config(KPC_MASK, g_config)) {
         printf("kpc_set_config failed (root?)\n");
         return;
@@ -84,7 +84,7 @@ static void configure_rdtsc() {
     }
 }
 
-static void init_rdtsc() {
+static void init_rdtsc(void) {
     void *kperf = dlopen(
                       "/System/Library/PrivateFrameworks/kperf.framework/Versions/A/kperf",
                       RTLD_LAZY);
@@ -92,6 +92,11 @@ static void init_rdtsc() {
         printf("kperf = %p\n", kperf);
         return;
     }
+/* Temporarily disable -Wpedantic here to allow conversion
+ * from (void *) to function-pointer.
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #define F(ret, name, ...)                         \
     name = (name##proc *)(dlsym(kperf, #name));   \
     if (!name)                                    \
@@ -101,6 +106,7 @@ static void init_rdtsc() {
     }
     KPERF_LIST
 #undef F
+#pragma GCC diagnostic pop
 
     // TODO: KPC_CLASS_RAWPMU_MASK
 
