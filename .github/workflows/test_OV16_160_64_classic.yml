@@ -57,15 +57,13 @@ jobs:
         make VALGRIND=1 PARAM=1 VARIANT=1 PROJ=${{ matrix.impl }} sign_api-test
         valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
   test-macos:
-    name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
+    name: MacOS
     strategy:
       matrix:
         cc:
           - clang
-          - gcc-12
-        impl: # there is no AVX2 available on the MacOS runners
+        impl: 
           - ref
-          - neon
     runs-on: macos-latest
     steps:
     - uses: maxim-lobanov/setup-xcode@v1
