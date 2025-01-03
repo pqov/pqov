@@ -147,8 +147,6 @@ static inline
 void gf16mat_blockmat_madd_avx2( __m256i *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_st_idx, unsigned blk_vec_byte,
                                  const __m256i *multab_vec_ele, unsigned n_vec_ele ) {
     unsigned n_full_ymm = blk_vec_byte >> 5;
-    //unsigned n_rem_byte = blk_vec_byte & 31;
-    //assert ( 0 == (n_rem_byte) );
     __m256i mask_f = _mm256_set1_epi8(0xf);
 
     org_mat += blk_st_idx;
@@ -317,8 +315,6 @@ static
 void gf256mat_blockmat_madd_avx2( __m256i *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_st_idx, unsigned blk_vec_byte,
                                   const __m256i *multab_vec_ele, unsigned n_vec_ele ) {
     unsigned n_full_ymm = blk_vec_byte >> 5;
-    //unsigned n_rem_byte = blk_vec_byte & 31;
-    //assert(0==n_rem_byte);
     __m256i mask_f = _mm256_set1_epi8(0xf);
 
     org_mat += blk_st_idx;
