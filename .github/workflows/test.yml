@@ -1,0 +1,12 @@
+name: Test
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+jobs:
+  test-macos:
+    name: MacOS
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v3
