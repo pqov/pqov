@@ -150,7 +150,7 @@ endif
 endif
 
 
-EXE= format sign_api-test sign_api-benchmark rec-sign-benchmark
+EXE= sign_api-test sign_api-benchmark rec-sign-benchmark
 
 ifdef DEBUG
         CFLAGS+=  -D_DEBUG_ -g
