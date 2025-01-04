@@ -41,6 +41,11 @@ int generate_keypair( pk_t *rpk, sk_t *sk, const unsigned char *sk_seed ) {
     hash_final_digest( buf, sizeof(buf), &hctx );
     memcpy(sk->O, O, sizeof(sk->O));
 
+    #if defined(_VALGRIND_)
+    // mark pk_seed as public
+    VALGRIND_MAKE_MEM_DEFINED(pk_seed, LEN_PKSEED );
+    #endif
+
     // prng for pk
     prng_publicinputs_t prng1;
     prng_set_publicinputs(&prng1, pk_seed );
@@ -113,6 +118,11 @@ int expand_sk( sk_t *sk, const unsigned char *sk_seed ) {
     hash_final_digest( buf, sizeof(buf), &hctx );
     memcpy(sk->O, O, sizeof(sk->O));
 
+    #if defined(_VALGRIND_)
+    // mark pk_seed as public
+    VALGRIND_MAKE_MEM_DEFINED(pk_seed, LEN_PKSEED );
+    #endif
+
     // prng for pk
     prng_publicinputs_t prng1;
     prng_set_publicinputs(&prng1, pk_seed );
@@ -151,6 +161,11 @@ int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *sk_seed ) {
     hash_update(&hctx, sk_seed, LEN_SKSEED );
     hash_final_digest( buf, sizeof(buf), &hctx );
     memcpy(sk->O, O, sizeof(sk->O));
+
+    #if defined(_VALGRIND_)
+    // mark pk_seed as public
+    VALGRIND_MAKE_MEM_DEFINED(pk_seed, LEN_PKSEED );
+    #endif
 
     memcpy( pk->pk_seed, pk_seed, LEN_PKSEED );
 
