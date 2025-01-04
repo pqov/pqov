@@ -27,35 +27,14 @@ extern  "C" {
 ///
 /// @param[out] pk        - the public key.
 /// @param[out] sk        - the secret key.
-/// @param[in]  pk_seed   - seed for generating P1,P2 of the public key.
 /// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
-int generate_keypair( pk_t *pk, sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed);
+int generate_keypair( pk_t *pk, sk_t *sk, const unsigned char *sk_seed);
 
 
 
 ////////////////////////////////////
-
-///
-/// @brief Secret key Generation for classic ov.
-///
-/// @param[out] sk        - the secret key.
-/// @param[in]  pk_seed   - seed for generating P1,P2 of the public key.
-/// @param[in]  sk_seed   - seed for generating the secret key.
-///
-void generate_secretkey( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed);
-
-///
-/// @brief Convert secret key to public key for classic ov.
-///
-/// @param[out] pk        - the public key.
-/// @param[in]  sk        - the secret key.
-/// @param[in]  sk_seed   - seed for generating the secret key.
-/// @return 0 for success. -1 otherwise.
-///
-int sk_to_pk( pk_t *pk, const sk_t *sk, const unsigned char *pk_seed );
-
 
 
 ///
@@ -63,22 +42,20 @@ int sk_to_pk( pk_t *pk, const sk_t *sk, const unsigned char *pk_seed );
 ///
 /// @param[out] pk        - the compressed public key.
 /// @param[out] sk        - the secret key.
-/// @param[in]  pk_seed   - seed for generating parts of public key.
 /// @param[in]  sk_seed   - seed for generating secret key.
 /// @return 0 for success. -1 otherwise.
 ///
-int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed );
+int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *sk_seed );
 
 ///
 /// @brief Generate key pair for pkc+skc
 ///
 /// @param[out] pk        - the compressed public key.
 /// @param[out] sk        - the compressed secret key.
-/// @param[in]  pk_seed   - seed for generating parts of the public key.
 /// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
-int generate_keypair_pkc_skc( cpk_t *pk, csk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed );
+int generate_keypair_pkc_skc( cpk_t *pk, csk_t *sk, const unsigned char *sk_seed );
 
 
 
@@ -109,11 +86,10 @@ int expand_pk_predicate( pk_t *pk, const cpk_t *cpk, const unsigned char *predic
 /// @brief Generate secret key
 ///
 /// @param[out] sk        - the secret key.
-/// @param[in]  pk_seed   - seed for generating parts of the public key.
 /// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
-int expand_sk( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed );
+int expand_sk( sk_t *sk, const unsigned char *sk_seed );
 
 
 ////////////////////////  Public map  ///////////////////////////////////
