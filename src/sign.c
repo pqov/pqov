@@ -25,20 +25,18 @@
 int
 crypto_sign_keypair(unsigned char *pk, unsigned char *sk) {
     unsigned char sk_seed[LEN_SKSEED];
-    unsigned char pk_seed[LEN_PKSEED];
     randombytes( sk_seed, LEN_SKSEED );
-    randombytes( pk_seed, LEN_PKSEED );
 
     #if defined(_VALGRIND_)
     VALGRIND_MAKE_MEM_UNDEFINED(sk_seed, LEN_SKSEED );  // mark secret data as undefined data
     #endif
 
     #if defined _OV_CLASSIC
-    int r = generate_keypair( (pk_t *) pk, (sk_t *) sk, pk_seed, sk_seed );
+    int r = generate_keypair( (pk_t *) pk, (sk_t *) sk, sk_seed );
     #elif defined _OV_PKC
-    int r = generate_keypair_pkc( (cpk_t *) pk, (sk_t *) sk, pk_seed, sk_seed );
+    int r = generate_keypair_pkc( (cpk_t *) pk, (sk_t *) sk, sk_seed );
     #elif defined _OV_PKC_SKC
-    int r = generate_keypair_pkc_skc( (cpk_t *) pk, (csk_t *) sk, pk_seed, sk_seed );
+    int r = generate_keypair_pkc_skc( (cpk_t *) pk, (csk_t *) sk, sk_seed );
     #else
     error here
     #endif

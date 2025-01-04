@@ -25,39 +25,21 @@
 
 
 ///////////////////  Classic ov  //////////////////////////////////
-void generate_secretkey( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
-    expand_sk( sk, pk_seed, sk_seed );
-}
 
-
-int sk_to_pk( pk_t *rpk, const sk_t *sk, const unsigned char *pk_seed ) {
-    prng_publicinputs_t prng1;
-    prng_set_publicinputs(&prng1, pk_seed );
-
-    // P1
-    memcpy( rpk->pk, sk->P1, sizeof(sk->P1) );
-    prng_skip_publicinputs(&prng1, sizeof(sk->P1));
-
-    // P2
-    unsigned char *rpk_P2 = rpk->pk + sizeof(sk->P1);
-    prng_gen_publicinputs(&prng1, rpk_P2, sizeof(sk->S) );
-
-    // P3
-    unsigned char *rpk_P3 = rpk_P2 + sizeof(sk->S);
-    calculate_P3( rpk_P3, sk->P1, rpk_P2, sk->O );
-
-    return 0;
-}
-
-
-int generate_keypair( pk_t *rpk, sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
+int generate_keypair( pk_t *rpk, sk_t *sk, const unsigned char *sk_seed ) {
     memcpy( sk->sk_seed, sk_seed, LEN_SKSEED );
+
+    // pk_seed || O
+    unsigned char buf[LEN_PKSEED + sizeof(sk->O)];
+    unsigned char *pk_seed = buf;
+    unsigned char *O = buf + LEN_PKSEED;
 
     // prng for sk
     hash_ctx hctx;
     hash_init(&hctx);
     hash_update(&hctx, sk_seed, LEN_SKSEED );
-    hash_final_digest( sk->O, sizeof(sk->O), &hctx );
+    hash_final_digest( buf, sizeof(buf), &hctx );
+    memcpy(sk->O, O, sizeof(sk->O));
 
     // prng for pk
     prng_publicinputs_t prng1;
@@ -116,14 +98,20 @@ int expand_pk_predicate( pk_t *rpk, const cpk_t *cpk, const unsigned char *predi
 }
 
 
-int expand_sk( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
+int expand_sk( sk_t *sk, const unsigned char *sk_seed ) {
     memcpy( sk->sk_seed, sk_seed, LEN_SKSEED );
+
+    // pk_seed || O
+    unsigned char buf[LEN_PKSEED + sizeof(sk->O)];
+    unsigned char *pk_seed = buf;
+    unsigned char *O = buf + LEN_PKSEED;
 
     // prng for sk
     hash_ctx hctx;
     hash_init(&hctx);
     hash_update(&hctx, sk_seed, LEN_SKSEED );
-    hash_final_digest( sk->O, sizeof(sk->O), &hctx );
+    hash_final_digest( buf, sizeof(buf), &hctx );
+    memcpy(sk->O, O, sizeof(sk->O));
 
     // prng for pk
     prng_publicinputs_t prng1;
@@ -149,15 +137,22 @@ int expand_sk( sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_s
 
 
 
-int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
-    memcpy( pk->pk_seed, pk_seed, LEN_PKSEED );
+int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *sk_seed ) {
     memcpy( sk->sk_seed, sk_seed, LEN_SKSEED );
+
+    // pk_seed || O
+    unsigned char buf[LEN_PKSEED + sizeof(sk->O)];
+    unsigned char *pk_seed = buf;
+    unsigned char *O = buf + LEN_PKSEED;
 
     // prng for sk
     hash_ctx hctx;
     hash_init(&hctx);
     hash_update(&hctx, sk_seed, LEN_SKSEED );
-    hash_final_digest( sk->O, sizeof(sk->O), &hctx );
+    hash_final_digest( buf, sizeof(buf), &hctx );
+    memcpy(sk->O, O, sizeof(sk->O));
+
+    memcpy( pk->pk_seed, pk_seed, LEN_PKSEED );
 
     // prng for pk
     prng_publicinputs_t prng1;
@@ -178,8 +173,7 @@ int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *pk_seed, con
 
 
 
-int generate_keypair_pkc_skc( cpk_t *pk, csk_t *rsk, const unsigned char *pk_seed, const unsigned char *sk_seed ) {
-    memcpy( rsk->pk_seed, pk_seed, LEN_PKSEED );
+int generate_keypair_pkc_skc( cpk_t *pk, csk_t *rsk, const unsigned char *sk_seed ) {
     memcpy( rsk->sk_seed, sk_seed, LEN_SKSEED );
 
     #if defined(_MALLOC_)
@@ -191,7 +185,7 @@ int generate_keypair_pkc_skc( cpk_t *pk, csk_t *rsk, const unsigned char *pk_see
     sk_t _sk;
     sk_t *sk = &_sk;
     #endif
-    int r = generate_keypair_pkc( pk, sk, pk_seed, sk_seed );
+    int r = generate_keypair_pkc( pk, sk, sk_seed );
 
     #if defined(_MALLOC_)
     free(sk);

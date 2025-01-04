@@ -108,7 +108,7 @@
                                   _O_BYTE * N_TRIANGLE_TERMS(_V) + \
                                   _O_BYTE * _V*_O)
 #define OV_PK_UNCOMPRESSED_BYTES (_PUB_M_BYTE * N_TRIANGLE_TERMS(_PUB_N))
-#define OV_SK_COMPRESSED_BYTES   (LEN_SKSEED + LEN_PKSEED)
+#define OV_SK_COMPRESSED_BYTES   (LEN_SKSEED)
 #define OV_PK_COMPRESSED_BYTES   (LEN_PKSEED + _O_BYTE * N_TRIANGLE_TERMS(_O))
 
 
