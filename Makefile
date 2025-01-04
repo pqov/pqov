@@ -100,8 +100,8 @@ else ifeq ($(PROJ),gfni)
 
 SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/ssse3 ./src/avx2 ./src/gfni ./utils/x86aesni
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/ssse3 -I./src/avx2 -I./src/gfni -I./utils/x86aesni
-CFLAGS       += -mavx2 -mavx512vl -mavx512bw -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
-CXXFLAGS     += -mavx2 -mavx512vl -mavx512bw -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
+CFLAGS       += -mavx2 -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
+CXXFLAGS     += -mavx2 -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
 
 endif
 

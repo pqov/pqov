@@ -33,27 +33,70 @@
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-
-// process bytes < 32
-static void _gf256mat_prod_small( uint8_t *c, const uint8_t *matA, unsigned _num_byte, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
-    __mmask32 mask = (1 << _num_byte) - 1;
+// process bytes < 16.
+// XXX: This function uses very slow load/store operations. I do not expect this will be called.
+static void _gf256mat_prod_smaller_than_16( uint8_t *c, const uint8_t *matA, unsigned _num_byte, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
     __m256i c0;
     {
         __m256i bb = _mm256_set1_epi8(b[0]);
-        __m256i a0 = _mm256_maskz_loadu_epi8(mask, (__m256i *)(matA + 0));
+        __m256i a0 = _load_ymm((matA + 0), _num_byte);
         c0 = _mm256_gf2p8mul_epi8( a0, bb );
         matA += matA_vec_byte;
         b++;
     }
     for (unsigned i = 1; i < matA_n_vec; i++) {
         __m256i bb = _mm256_set1_epi8(b[0]);
-        __m256i a0 = _mm256_maskz_loadu_epi8(mask, (__m256i *)(matA + 0));
+        __m256i a0 = _load_ymm((matA + 0), _num_byte);
         c0 ^= _mm256_gf2p8mul_epi8( a0, bb );
         matA += matA_vec_byte;
         b++;
     }
-    _mm256_mask_storeu_epi8((__m256i *)(c + 0), mask, c0);
+    _store_ymm(c, _num_byte, c0);
+}
+
+// process bytes < 32
+static void _gf256mat_prod_smaller( uint8_t *c, const uint8_t *matA, unsigned _num_byte, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
+    __m256i c0;
+    {
+        __m256i bb = _mm256_set1_epi8(b[0]);
+        __m256i a0 = _mm256_loadu_si256((__m256i *)(matA + 0));
+        c0 = _mm256_gf2p8mul_epi8( a0, bb );
+        matA += matA_vec_byte;
+        b++;
+    }
+    for (unsigned i = 1; i < matA_n_vec - 1; i++) {
+        __m256i bb = _mm256_set1_epi8(b[0]);
+        __m256i a0 = _mm256_loadu_si256((__m256i *)(matA + 0));
+        c0 ^= _mm256_gf2p8mul_epi8( a0, bb );
+        matA += matA_vec_byte;
+        b++;
+    }
+    {
+        __m256i bb = _mm256_set1_epi8(b[0]);
+        __m256i a0 = _load_ymm((matA + 0), _num_byte);
+        c0 ^= _mm256_gf2p8mul_epi8( a0, bb );
+    }
+    _store_ymm(c, _num_byte, c0);
+}
+
+// process bytes < 32
+static void _gf256mat_prod_small( uint8_t *c, const uint8_t *matA, unsigned _num_byte, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
+    __m256i c0;
+    {
+        __m256i bb = _mm256_set1_epi8(b[0]);
+        __m256i a0 = _mm256_loadu_si256((__m256i *)(matA + 0));
+        c0 = _mm256_gf2p8mul_epi8( a0, bb );
+        matA += matA_vec_byte;
+        b++;
+    }
+    for (unsigned i = 1; i < matA_n_vec; i++) {
+        __m256i bb = _mm256_set1_epi8(b[0]);
+        __m256i a0 = _mm256_loadu_si256((__m256i *)(matA + 0));
+        c0 ^= _mm256_gf2p8mul_epi8( a0, bb );
+        matA += matA_vec_byte;
+        b++;
+    }
+    _store_ymm(c, _num_byte, c0);
 }
 
 static void _gf256mat_prod_32byte( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
@@ -166,6 +209,21 @@ static void _gf256mat_prod_128byte( uint8_t *c, const uint8_t *matA, unsigned ma
 void gf256mat_prod_avx2_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
 
     unsigned num_byte = matA_vec_byte;
+    if ( num_byte & 31 ) {
+        unsigned rem = num_byte & 31;
+        if ( num_byte < 32 ) {
+            if ( num_byte < 16 ) {
+                _gf256mat_prod_smaller_than_16( c, matA, rem, matA_vec_byte, matA_n_vec, b );
+            } else {
+                _gf256mat_prod_smaller( c, matA, rem, matA_vec_byte, matA_n_vec, b );
+            }
+        } else {
+            _gf256mat_prod_small( c, matA, rem, matA_vec_byte, matA_n_vec, b );
+        }
+        matA += rem;
+        c += rem;
+        num_byte -= rem;
+    }
     while ( num_byte >= 128 ) {
         _gf256mat_prod_128byte( c, matA, matA_vec_byte, matA_n_vec, b );
         matA += 128;
@@ -187,9 +245,6 @@ void gf256mat_prod_avx2_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_vec
         matA += 32;
         c += 32;
         num_byte -= 32;
-    }
-    if ( num_byte ) {
-        _gf256mat_prod_small( c, matA, num_byte, matA_vec_byte, matA_n_vec, b );
     }
 }
 

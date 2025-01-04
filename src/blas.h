@@ -24,7 +24,7 @@
 
 #include "blas_avx2_gfni.h"
 
-#define gf256v_add          gf256v_add_avx2_gfni
+#define gf256v_add          gf256v_add_avx2
 #define gf256v_mul_scalar   gf256v_mul_scalar_avx2_gfni
 #define gf256v_madd         gf256v_madd_avx2_gfni
 
