@@ -174,7 +174,7 @@ int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, co
 int ov_expand_and_sign( uint8_t *signature, const csk_t *csk, const uint8_t *message, size_t mlen ) {
     sk_t _sk;
     sk_t *sk = &_sk;
-    expand_sk( sk, csk->pk_seed, csk->sk_seed );    // generating classic secret key.
+    expand_sk( sk, csk->sk_seed );    // generating classic secret key.
 
     int r = ov_sign( signature, sk, message, mlen );
     return r;
