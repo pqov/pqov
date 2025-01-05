@@ -103,6 +103,11 @@ INCPATH      += -I./src/ref -I./src/amd64 -I./src/ssse3 -I./src/avx2 -I./src/gfn
 CFLAGS       += -mavx2 -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
 CXXFLAGS     += -mavx2 -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
 
+ifeq ($(PARAM),1)
+CFLAGS    += -D_MUL_WITH_MULTAB_
+CXXFLAGS  += -D_MUL_WITH_MULTAB_
+endif
+
 endif
 
 
