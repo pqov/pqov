@@ -17,7 +17,22 @@
 //
 
 
-#if defined( _BLAS_AVX2_ )
+#if defined( _BLAS_AVX2_ ) && defined( _BLAS_GFNI_ )
+
+#include "blas_matrix_avx2_gfni.h"
+#include "blas_matrix_avx2.h"
+
+#define gf16mat_prod_impl             gf16mat_prod_avx2
+#define gf256mat_prod_impl            gf256mat_prod_avx2_gfni
+
+#define gf16mat_prod_multab_impl      gf16mat_prod_multab_avx2
+
+#define gf256mat_gaussian_elim_impl   gf256mat_gaussian_elim_avx2_gfni
+#define gf256mat_back_substitute_impl gf256mat_back_substitute_avx2_gfni
+#define gf16mat_gaussian_elim_impl   gf16mat_gaussian_elim_avx2
+#define gf16mat_back_substitute_impl gf16mat_back_substitute_avx2
+
+#elif defined( _BLAS_AVX2_ )
 
 #include "blas_matrix_avx2.h"
 
@@ -31,7 +46,6 @@
 #define gf256mat_back_substitute_impl gf256mat_back_substitute_avx2
 #define gf16mat_gaussian_elim_impl   gf16mat_gaussian_elim_avx2
 #define gf16mat_back_substitute_impl gf16mat_back_substitute_avx2
-
 
 #elif defined( _BLAS_SSE_ )
 
