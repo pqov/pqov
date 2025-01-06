@@ -1088,7 +1088,7 @@ void gf256mat_back_substitute_neon( uint8_t *constant, const uint8_t *sq_row_mat
             column[j] = sq_row_mat_a[j * len + i];    // row-major -> column-major, i.e., transpose
         }
         column[i] = 0;
-        gf256v_madd_neon( constant, column, constant[i], ((i + 15) >> 4) << 4 );
+        gf256v_madd_neon( constant, column, constant[i], len);
     }
 }
 
