@@ -184,7 +184,7 @@ void gf16v_madd_neon( uint8_t *accu_c, const uint8_t *a, uint8_t gf16_b, unsigne
         accu_c += 16;
     }
     if (_num_byte) {
-        uint8_t temp[16];
+        uint8_t temp[16] = {0};
         for (unsigned j = 0; j < _num_byte; j++) {
             temp[j] = a[j];
         }
