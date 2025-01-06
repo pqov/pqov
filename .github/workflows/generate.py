@@ -129,6 +129,7 @@ jobs:
           - avx2
           - ssse3
           - amd64
+          - gfni
     steps:
     - uses: actions/checkout@v3
     - name: test
