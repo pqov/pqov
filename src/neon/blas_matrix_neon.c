@@ -14,12 +14,7 @@
 
 #include "blas_matrix_neon.h"
 
-
 #include "string.h"
-
-
-#define _GE_CADD_EARLY_STOP_
-
 
 //////////// specialized functions  /////////////////////
 
@@ -456,12 +451,12 @@ unsigned gf16mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w_by
             pivots[j] = gf16v_get_ele( mat + w_2 * j, idx );
         }
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 16 < h) ? i + 16 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF16_ < h) ? i + _GE_EARLY_STOP_STEPS_GF16_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             uint8_t m8 = !gf16_is_nonzero( pivots[i] );
             m8 = -m8;
             uint8x16_t m128 = vdupq_n_u8( m8 );
@@ -1031,12 +1026,12 @@ unsigned gf256mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w, 
             pivots[j] = mat[ w * j + idx ];
         }
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 8 < h) ? i + 8 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF256_ < h) ? i + _GE_EARLY_STOP_STEPS_GF256_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             uint8_t m8 = !gf256_is_nonzero( pivots[i] );
             m8 = -m8;
             pivots[i] ^= m8 & pivots[j];

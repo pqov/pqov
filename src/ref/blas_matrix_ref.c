@@ -7,11 +7,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "config.h"   /// for the macro: _GE_CONST_TIME_CADD_EARLY_STOP_
+
 #include "params.h"   /// for macro  _USE_GF16
-
-
-#define _GE_CADD_EARLY_STOP_
-
 
 /// This implementation depends on these vector functions :
 ///   0.  gf16v_mul_scalar
@@ -92,12 +90,12 @@ unsigned gf16mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w_by
         uint8_t *ai = mat + w_byte * i;
         //unsigned i_start = i-(i&(_BLAS_UNIT_LEN_-1));
         unsigned i_start = i >> 1;
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 16 < h) ? i + 16 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF16_ < h) ? i + _GE_EARLY_STOP_STEPS_GF16_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             uint8_t *aj = mat + w_byte * j;
             gf256v_conditional_add( ai + i_start, !gf16_is_nonzero(gf16v_get_ele(ai, i)), aj + i_start, w_byte - i_start );
         }
@@ -203,12 +201,12 @@ unsigned gf256mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w )
         //unsigned i_start = i-(i&(_BLAS_UNIT_LEN_-1));
         unsigned i_start = i;
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 8 < h) ? i + 8 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF256_ < h) ? i + _GE_EARLY_STOP_STEPS_GF256_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             uint8_t *aj = mat + w * j;
             gf256v_conditional_add( ai + i_start, !gf256_is_nonzero(ai[i]), aj + i_start, w - i_start );
         }
