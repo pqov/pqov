@@ -19,12 +19,7 @@
 
 #include "string.h"
 
-
 #include "params.h"  // for macro _USE_GF16
-
-
-#define _GE_CADD_EARLY_STOP_
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////  matrix-vector multiplication, GF( 16 ) ////////////////////
@@ -712,12 +707,12 @@ unsigned _gf16mat_sol_64x64_avx2( uint8_t *mat, __m256i *vec) {
 
         __m256i rowi = _mm256_load_si256( (__m256i *)(mat + i * w_byte) );
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 16 < h) ? i + 16 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF16_ < h) ? i + _GE_EARLY_STOP_STEPS_GF16_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             uint8_t mask = _if_zero_then_0xff( pivots[i] );
             pivots[i] ^= mask & pivots[j];
 
@@ -776,12 +771,12 @@ unsigned _gf16mat_sol_64x64_avx2( uint8_t *mat, __m256i *vec) {
 
         __m256i rowi = _mm256_load_si256( (__m256i *)(mat + i * w_byte) );
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 16 < h) ? i + 16 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF16_ < h) ? i + _GE_EARLY_STOP_STEPS_GF16_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             uint8_t mask = _if_zero_then_0xff( pivots[i] );
             pivots[i] ^= mask & pivots[j];
             __m256i mask_zero = _mm256_set1_epi8( mask );
@@ -919,12 +914,12 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2( uint8_t *mat, unsigned h, unsign
 
         uint8_t *mi = mat + i * w;
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 8 < h) ? i + 8 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF256_ < h) ? i + _GE_EARLY_STOP_STEPS_GF256_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             __m128i piv_i   = _mm_load_si128( (__m128i *)( mi + i_d16 * 16 ) );
             __m128i is_zero = _mm_cmpeq_epi8( piv_i, mask_0 );
             __m128i add_mask = _mm_shuffle_epi8( is_zero, _mm_set1_epi8(i_r16) );

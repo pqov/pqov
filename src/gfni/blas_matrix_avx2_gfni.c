@@ -23,11 +23,6 @@
 
 #include "params.h"  // for macro _USE_GF16
 
-
-#define _GE_CADD_EARLY_STOP_
-
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////  matrix-vector multiplication, GF( 256 ) ///////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -279,12 +274,12 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2_gfni( uint8_t *mat, unsigned h, u
 
         uint8_t *mi = mat + i * w;
 
-        #if defined( _GE_CADD_EARLY_STOP_ )
-        unsigned stop = (i + 8 < h) ? i + 8 : h;
+#if defined( _GE_CONST_TIME_CADD_EARLY_STOP_ )   // defined in config.h
+        unsigned stop = (i + _GE_EARLY_STOP_STEPS_GF256_ < h) ? i + _GE_EARLY_STOP_STEPS_GF256_ : h;
         for (unsigned j = i + 1; j < stop; j++) {
-        #else
+#else
         for (unsigned j = i + 1; j < h; j++) {
-        #endif
+#endif
             __m128i piv_i   = _mm_load_si128( (__m128i *)( mi + i_d16 * 16 ) );
             __m128i is_zero = _mm_cmpeq_epi8( piv_i, mask_0 );
             __m128i add_mask = _mm_shuffle_epi8( is_zero, _mm_set1_epi8(i_r16) );
