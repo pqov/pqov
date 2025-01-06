@@ -88,6 +88,7 @@ jobs:
         LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
         CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
     - name: asan
+      if: ${{ matrix.cc == 'clang' }}
       run: |
         make clean
         make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
@@ -96,6 +97,7 @@ jobs:
         LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
         CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
     - name: ubsan
+      if: ${{ matrix.cc == 'clang' }}
       run: |
         make clean
         make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
