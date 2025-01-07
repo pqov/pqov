@@ -58,52 +58,53 @@ jobs:
       run: |
         make VALGRIND=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} sign_api-test
         valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
-  # TODO: fix this in the Github CI
-  #test-macos:
-  #  name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
-  #  strategy:
-  #    matrix:
-  #      cc:
-  #        - clang
-  #        - gcc-12
-  #      impl: # there is no AVX2 available on the MacOS runners
-  #        - ref
-  #        - neon
-  #  runs-on: macos-latest
-  #  steps:
-  #  - uses: maxim-lobanov/setup-xcode@v1
-  #    with:
-  #      xcode-version: latest-stable
-  #  - name: Setup openssl
-  #    run: | 
-  #      brew install openssl
-  #  - uses: actions/checkout@v3
-  #  - name: Set up compiler
-  #    run: |
-  #      export CC=${{ matrix.cc }}
-  #      sysctl -a machdep.cpu  
-  #  - name: test
-  #    run: make PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
-  #    env:
-  #      CC: ${{ matrix.cc }}
-  #      LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
-  #      CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
-  #  - name: asan
-  #    run: |
-  #      make clean
-  #      make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
-  #    env:
-  #      CC: ${{ matrix.cc }}
-  #      LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
-  #      CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
-  #  - name: ubsan
-  #    run: |
-  #      make clean
-  #      make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
-  #    env:
-  #      CC: ${{ matrix.cc }}
-  #      LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
-  #      CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+  test-macos:
+    name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
+    strategy:
+      matrix:
+        cc:
+          - clang
+          - gcc-12
+        impl: # there is no AVX2 available on the MacOS runners
+          - ref
+          - neon
+    runs-on: macos-latest
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - name: Setup openssl
+      run: | 
+        brew install openssl
+    - uses: actions/checkout@v3
+    - name: Set up compiler
+      run: |
+        export CC=${{ matrix.cc }}
+        sysctl -a machdep.cpu  
+    - name: test
+      run: make PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+    - name: asan
+      if: ${{ matrix.cc == 'clang' }}
+      run: |
+        make clean
+        make ASAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+    - name: ubsan
+      if: ${{ matrix.cc == 'clang' }}
+      run: |
+        make clean
+        make UBSAN=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
 """
 
 
@@ -135,36 +136,35 @@ jobs:
       run: make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
       env:
         CC: ${{ matrix.cc }}
-  # TODO: fix this in the Github CI
-  #test-macos:
-  #  name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
-  #  strategy:
-  #    matrix:
-  #      cc:
-  #        - clang
-  #        - gcc-12
-  #      impl:
-  #        - ref
-  #        - neon
-  #  runs-on: macos-latest
-  #  steps:
-  #  - uses: maxim-lobanov/setup-xcode@v1
-  #    with:
-  #      xcode-version: latest-stable
-  #  - name: Setup openssl
-  #    run: | 
-  #      brew install openssl
-  #  - uses: actions/checkout@v3
-  #  - name: Set up compiler
-  #    run: 'export CC=${{ matrix.cc }}'
-  #  - name: test
-  #    run: |
-  #      function sha256sum() { shasum -a 256 "$@" ; } && export -f sha256sum
-  #      make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
-  #    env:
-  #      CC: ${{ matrix.cc }}
-  #      LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
-  #      CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+  test-macos:
+    name: MacOS ${{ matrix.impl }} ${{ matrix.cc }}
+    strategy:
+      matrix:
+        cc:
+          - clang
+          - gcc-12
+        impl:
+          - ref
+          - neon
+    runs-on: macos-latest
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - name: Setup openssl
+      run: | 
+        brew install openssl
+    - uses: actions/checkout@v3
+    - name: Set up compiler
+      run: 'export CC=${{ matrix.cc }}'
+    - name: test
+      run: |
+        function sha256sum() { shasum -a 256 "$@" ; } && export -f sha256sum
+        make KAT=1 PARAM=$PARAM VARIANT=$VARIANT PROJ=${{ matrix.impl }} check-NISTKAT
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
 """
 
 def paramToName(p):
