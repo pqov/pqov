@@ -88,27 +88,11 @@
 
 #ifdef _USE_GF16
 #define gf16mat_prod_impl             gf16mat_prod_m4f
-//#define gf16mat_inv_impl              gf16mat_inv_m4f
-//#define gf16mat_rowmat_mul_impl       gf16mat_rowmat_mul_ref
-//#define gf16mat_colmat_mul_impl       gf16mat_colmat_mul_ref
-
-//#define gf16mat_LDUinv_impl           gf16mat_LDUinv_m4f
-//TODO: check how this is implemented
-//#define gf16mat_LDUinv_prod_impl      gf16mat_LDUinv_prod_ref
-
 #define gf16mat_gaussian_elim_impl   gf16mat_gaussian_elim_m4f
 #define gf16mat_back_substitute_impl gf16mat_back_substitute_ref
 
 #else
 #define gf256mat_prod_impl            gf256mat_prod_m4f
-//#define gf256mat_inv_impl             gf256mat_inv_m4f
-//#define gf256mat_rowmat_mul_impl      gf256mat_rowmat_mul_ref
-//#define gf256mat_colmat_mul_impl      gf256mat_colmat_mul_ref
-
-//#define gf256mat_LDUinv_impl          gf256mat_LDUinv_m4f
-//TODO: check how this is implemented
-//#define gf256mat_LDUinv_prod_impl     gf256mat_LDUinv_prod_ref
-
 #define gf256mat_gaussian_elim_impl   gf256mat_gaussian_elim_m4f
 #define gf256mat_back_substitute_impl gf256mat_back_substitute_ref
 

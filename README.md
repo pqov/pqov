@@ -183,14 +183,6 @@ on an Arm-based Mac (e.g., Apple M1).
 The Makefile will then define the **_APPLE_SILICON\_** macro for enabling some optimization settings in the source code .  
 2. The program needs **sudo** to benchmark on Mac OS correctly.
 
-
-### **Options for Algorithm of Solving Linear Equation while Signing:**
-1. Default setting: Gaussian Elimination and backward substitution.
-2. Choose the algorithm of calculating inversion matrix with block matrix compution:  
-  (a) Define the **_LDU_DECOMPOSE\_** macro in **src/parms.h**.  
-  (b) Remove the **_BACK_SUBSTITUTION\_** macro in **src/ov.c**.  
-
-
 ## Benchmarks
 
 1. AVX2 implementations on Intel(R) Xeon(R) CPU E3-1275 v5 @ 3.60GHz (Skylake), turbo boost off
