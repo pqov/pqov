@@ -32,6 +32,7 @@ int main(void) {
     unsigned char *pk = (unsigned char *)malloc( CRYPTO_PUBLICKEYBYTES );
     unsigned char *sk = (unsigned char *)malloc( CRYPTO_SECRETKEYBYTES );
 
+    int ret = 0;
 
     printf("===========  test crypto_sign_keypair(), crypto_sign(), and crypto_sign_open()  ================\n\n");
     for (unsigned i = 0; i < TEST_RUN; i++) {
@@ -40,7 +41,8 @@ int main(void) {
             r0 = crypto_sign_keypair( pk, sk);
             if ( 0 != r0 ) {
                 printf("generating key return %d.\n", r0);
-                return -1;
+                ret = -1;
+                goto clean_exit;
             }
         }
 
@@ -51,18 +53,21 @@ int main(void) {
         r1 = crypto_sign( sm, &smlen, m, mlen, sk );
         if ( 0 != r1 ) {
             printf("crypto_sign() return %d.\n", r1);
-            return -1;
+            ret = -1;
+            goto clean_exit;
         }
         r2 = crypto_sign_open( m, &mlen, sm, smlen, pk );
         if ( 0 != r2 ) {
             printf("crypto_sign_open() return %d.\n", r2);
-            return -1;
+            ret = -1;
+            goto clean_exit;
         }
     }
-    free( pk );
-    free( sk );
     printf("all (%d,%d) tests passed.\n\n", TEST_RUN, TEST_GENKEY );
 
-    return 0;
+clean_exit:
+    free( pk );
+    free( sk );
+    return ret;
 }
 
