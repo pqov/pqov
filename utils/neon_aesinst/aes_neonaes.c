@@ -10,13 +10,13 @@ void aes256ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, c
     static const uint32_t mask[4] = {0, 1, 2, 3};
     uint32x4_t idx   = vld1q_u32( mask );
     uint32x4_t ctrx4 = vdupq_n_u32( ctr );
-    uint32x4_t ctrx4_be = vrev32q_u8( vaddq_u32(ctrx4, idx) ); // to big endian numbers
+    uint32x4_t ctrx4_be = vreinterpretq_u32_u8(vrev32q_u8( vreinterpretq_u8_u32(vaddq_u32(ctrx4, idx)) )); // to big endian numbers
 
-    uint8x16_t iv = vld1q_u8(nonce);
-    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );
-    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );
-    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );
-    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );
+    uint32x4_t iv = vreinterpretq_u32_u8(vld1q_u8(nonce));
+    uint8x16_t p0 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 ));
+    uint8x16_t p1 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 ));
+    uint8x16_t p2 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 ));
+    uint8x16_t p3 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 ));
 
     uint8x16_t rki;
     for (int i = 0; i < 13; i++) {
@@ -52,13 +52,13 @@ void aes128ctrx4_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr, c
     static const uint32_t mask[4] = {0, 1, 2, 3};
     uint32x4_t idx   = vld1q_u32( mask );
     uint32x4_t ctrx4 = vdupq_n_u32( ctr );
-    uint32x4_t ctrx4_be = vrev32q_u8( vaddq_u32(ctrx4, idx) ); // to big endian numbers
+    uint32x4_t ctrx4_be = vreinterpretq_u32_u8(vrev32q_u8( vreinterpretq_u8_u32(vaddq_u32(ctrx4, idx)) )); // to big endian numbers
 
-    uint8x16_t iv = vld1q_u8(nonce);
-    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );
-    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );
-    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );
-    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );
+    uint32x4_t iv = vreinterpretq_u32_u8(vld1q_u8(nonce));
+    uint8x16_t p0 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 ));
+    uint8x16_t p1 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 ));
+    uint8x16_t p2 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 ));
+    uint8x16_t p3 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 ));
 
     uint8x16_t rki;
     for (int i = 0; i < 9; i++) {
@@ -94,13 +94,13 @@ void aes128ctrx4_4r_enc_neonaes( uint8_t *ct, const uint8_t *nonce, uint32_t ctr
     static const uint32_t mask[4] = {0, 1, 2, 3};
     uint32x4_t idx   = vld1q_u32( mask );
     uint32x4_t ctrx4 = vdupq_n_u32( ctr );
-    uint32x4_t ctrx4_be = vrev32q_u8( vaddq_u32(ctrx4, idx) ); // to big endian numbers
+    uint32x4_t ctrx4_be = vreinterpretq_u32_u8(vrev32q_u8( vreinterpretq_u8_u32(vaddq_u32(ctrx4, idx)) )); // to big endian numbers
 
-    uint8x16_t iv = vld1q_u8(nonce);
-    uint8x16_t p0 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 );
-    uint8x16_t p1 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 );
-    uint8x16_t p2 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 );
-    uint8x16_t p3 = vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 );
+    uint32x4_t iv = vreinterpretq_u32_u8(vld1q_u8(nonce));
+    uint8x16_t p0 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 0 ));
+    uint8x16_t p1 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 1 ));
+    uint8x16_t p2 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 2 ));
+    uint8x16_t p3 = vreinterpretq_u8_u32(vcopyq_laneq_u32( iv, 3, ctrx4_be, 3 ));
 
     uint8x16_t rki;
     for (int i = 0; i < 3; i++) {
@@ -198,7 +198,7 @@ static uint8_t rcon[11] = {
 static inline
 uint32_t sbox( uint32_t w ) {
     uint32x4_t ww = vdupq_n_u32( w );
-    uint32x4_t w1 = vaeseq_u8( ww, vdupq_n_u8(0) );
+    uint32x4_t w1 = vreinterpretq_u32_u8(vaeseq_u8( vreinterpretq_u8_u32(ww), vdupq_n_u8(0) ));
     return vgetq_lane_u32( w1, 0 );
 }
 
@@ -206,7 +206,7 @@ uint32_t sbox( uint32_t w ) {
 static inline
 uint32_t sbox_ror( uint32_t w ) {
     uint32x4_t ww = vdupq_n_u32( w );
-    uint32x4_t w1 = vaeseq_u8( ww, vdupq_n_u8(0) );
+    uint32x4_t w1 = vreinterpretq_u32_u8(vaeseq_u8( vreinterpretq_u8_u32(ww), vdupq_n_u8(0) ));
     uint32x4_t w2 = vsliq_n_u32( vshrq_n_u32(w1, 8), w1, 24 );
     return vgetq_lane_u32( w2, 0 );
 }

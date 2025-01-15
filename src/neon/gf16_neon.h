@@ -14,7 +14,7 @@
 #include <arm_neon.h>
 
 
-
+static inline uint8x16_t clmul_8x8( uint8x16_t a , uint8x16_t b ) { return vreinterpretq_u8_p8( vmulq_p8( vreinterpretq_p8_u8(a) , vreinterpretq_p8_u8(b) ) ); }
 
 //////////////  GF(16)  /////////////////////////////
 
@@ -30,8 +30,8 @@ uint8_t gf16_inv_neon(uint8_t a) {
 // gf16 := gf2[x]/(x^4+x+1)
 static inline
 uint8x16_t _gf16v_reduce_tbl_neon( uint8x16_t abl, uint8x16_t abh, uint8x16_t tab_reduce ) {
-    poly8x16_t rl = abl ^ vqtbl1q_u8( tab_reduce, vshrq_n_u8(abl, 4) );
-    poly8x16_t rh = abh ^ vqtbl1q_u8( tab_reduce, vshrq_n_u8(abh, 4) );
+    uint8x16_t rl = abl ^ vqtbl1q_u8( tab_reduce, vshrq_n_u8(abl, 4) );
+    uint8x16_t rh = abh ^ vqtbl1q_u8( tab_reduce, vshrq_n_u8(abh, 4) );
 
     return vsliq_n_u8( rl, rh, 4 );
 }
@@ -39,8 +39,8 @@ uint8x16_t _gf16v_reduce_tbl_neon( uint8x16_t abl, uint8x16_t abh, uint8x16_t ta
 // gf16 := gf2[x]/(x^4+x+1)
 static inline
 uint8x16_t _gf16v_reduce_pmul_neon( uint8x16_t abl, uint8x16_t abh, uint8x16_t mask_3 ) {
-    poly8x16_t rl = abl ^ vmulq_p8( vshrq_n_u8(abl, 4), mask_3 );
-    poly8x16_t rh = abh ^ vmulq_p8( vshrq_n_u8(abh, 4), mask_3 );
+    uint8x16_t rl = abl ^ clmul_8x8( vshrq_n_u8(abl, 4), mask_3 );
+    uint8x16_t rh = abh ^ clmul_8x8( vshrq_n_u8(abh, 4), mask_3 );
 
     return vsliq_n_u8( rl, rh, 4 );
 }
@@ -56,8 +56,8 @@ uint8x16_t _gf16v_mul_neon( uint8x16_t a, uint8x16_t bp, uint8x16_t mask_f, uint
     uint8x16_t al0 = a & mask_f;
     uint8x16_t ah0 = vshrq_n_u8( a, 4 );
 // mul
-    poly8x16_t abl = vmulq_p8( al0, bp );
-    poly8x16_t abh = vmulq_p8( ah0, bp );
+    uint8x16_t abl = clmul_8x8( al0, bp );
+    uint8x16_t abh = clmul_8x8( ah0, bp );
 // reduce
     #if defined(_GF16_REDUCE_WITH_TBL_)
     return _gf16v_reduce_tbl_neon( abl, abh, mask_3 );
@@ -81,7 +81,7 @@ uint8x16_t gf16v_mul_neon( uint8x16_t a, uint8_t b ) {
 
 static inline
 uint8x16_t _gf16v_mul_unpack_neon( uint8x16_t a0, uint8x16_t b0, uint8x16_t tab_reduce ) {
-    uint8x16_t ab = vreinterpretq_u8_p8(vmulq_p8( a0, b0 ));
+    uint8x16_t ab = clmul_8x8( a0, b0 );
     return ab ^ vqtbl1q_u8( tab_reduce, vshrq_n_u8(ab, 4) );
 }
 
@@ -111,21 +111,21 @@ uint8x16_t _gf16_tbl_x2( uint8x16_t a, uint8x16_t tbl, uint8x16_t mask_f ) {
 
 // 0x11b GF(256).  0x1b = 3 + (3<<3)
 static inline
-uint8x16_t _gf256v_reduce_pmul_neon( uint16x8_t ab0, uint16x8_t ab1, uint8x16_t mask_3, uint8x16_t mask_0x1b ) {
-    poly8x16_t abl = vuzp1q_p8(ab0, ab1);
-    poly8x16_t abh = vuzp2q_p8(ab0, ab1);
+uint8x16_t _gf256v_reduce_pmul_neon( uint8x16_t ab0, uint8x16_t ab1, uint8x16_t mask_3, uint8x16_t mask_0x1b ) {
+    uint8x16_t abl = vuzp1q_u8(ab0, ab1);
+    uint8x16_t abh = vuzp2q_u8(ab0, ab1);
 // reduce
-    poly8x16_t abhx3 = vmulq_p8( abh, mask_3 );
-    poly8x16_t r = abl ^ abhx3 ^ vshlq_n_u8( abhx3, 3 ) ^ vmulq_p8( mask_0x1b, vshrq_n_u8( abhx3, 5 ) );
+    uint8x16_t abhx3 = clmul_8x8( abh, mask_3 );
+    uint8x16_t r = abl ^ abhx3 ^ vshlq_n_u8( abhx3, 3 ) ^ clmul_8x8( mask_0x1b, vshrq_n_u8( abhx3, 5 ) );
 
     return r;
 }
 
 
 static inline
-uint8x16_t _gf256v_reduce_tbl_neon( uint16x8_t ab0, uint16x8_t ab1, uint8x16_t mask_f, uint8x16_t tab_rd0, uint8x16_t tab_rd1 ) {
-    uint8x16_t abl = vreinterpretq_u8_p8( vuzp1q_p8(ab0, ab1) );
-    uint8x16_t abh = vreinterpretq_u8_p8( vuzp2q_p8(ab0, ab1) );
+uint8x16_t _gf256v_reduce_tbl_neon( uint8x16_t ab0, uint8x16_t ab1, uint8x16_t mask_f, uint8x16_t tab_rd0, uint8x16_t tab_rd1 ) {
+    uint8x16_t abl = vuzp1q_u8(ab0, ab1);
+    uint8x16_t abh = vuzp2q_u8(ab0, ab1);
 // reduce
     return abl ^ vqtbl1q_u8( tab_rd0, abh & mask_f ) ^ vqtbl1q_u8( tab_rd1, vshrq_n_u8(abh, 4) );
 }
@@ -138,11 +138,12 @@ uint8x16_t _gf256v_reduce_tbl_neon( uint16x8_t ab0, uint16x8_t ab1, uint8x16_t m
 
 // 0x11b GF(256).  0x1b = 3 + (3<<3)
 static inline
-uint8x16_t _gf256v_mul_neon( uint8x16_t a, uint8x16_t b, uint8x16_t mask_f, uint8x16_t tab_rd0, uint8x16_t tab_rd1 ) {
+uint8x16_t _gf256v_mul_neon( uint8x16_t _a, uint8x16_t _b, uint8x16_t mask_f, uint8x16_t tab_rd0, uint8x16_t tab_rd1 ) {
+    poly8x16_t a = vreinterpretq_p8_u8(_a);
+    poly8x16_t b = vreinterpretq_p8_u8(_b);
     poly16x8_t ab0 = vmull_p8( vget_low_p8(a), vget_low_p8(b) );
     poly16x8_t ab1 = vmull_high_p8( a, b );
-
-    return _gf256v_reduce_tbl_neon( ab0, ab1, mask_f, tab_rd0, tab_rd1 );
+    return _gf256v_reduce_tbl_neon( vreinterpretq_u8_p16(ab0), vreinterpretq_u8_p16(ab1), mask_f, tab_rd0, tab_rd1 );
 }
 
 static inline
@@ -182,16 +183,16 @@ uint8x16_t gf256v_mul_neon( uint8x16_t a, uint8_t b ) {
 
 static inline
 uint8x16_t _gf256v_mul_4bits_neon( uint8x16_t a, uint8x16_t b_4bits, uint8x16_t mask_f, uint8x16_t tab_rd0 ) {
-    uint8x16_t abl = vmulq_p8( a & mask_f, b_4bits );
-    uint8x16_t abh = vmulq_p8( vshrq_n_u8(a, 4), b_4bits );
+    uint8x16_t abl = clmul_8x8( a & mask_f, b_4bits );
+    uint8x16_t abh = clmul_8x8( vshrq_n_u8(a, 4), b_4bits );
     uint8x16_t abr = vqtbl1q_u8( tab_rd0, vshrq_n_u8(abh, 4) );
     return abl ^ abr ^ vshlq_n_u8(abh, 4);
 }
 
 static inline
 uint8x16_t _gf256v_mul_h4bits_neon( uint8x16_t a, uint8x16_t b_4bits, uint8x16_t mask_f, uint8x16_t tab_rd0, uint8x16_t tab_rd1 ) {
-    uint8x16_t abl = vmulq_p8( a & mask_f, b_4bits );
-    uint8x16_t abh = vmulq_p8( vshrq_n_u8(a, 4), b_4bits );
+    uint8x16_t abl = clmul_8x8( a & mask_f, b_4bits );
+    uint8x16_t abh = clmul_8x8( vshrq_n_u8(a, 4), b_4bits );
     uint8x16_t abr0 = vqtbl1q_u8( tab_rd0, vshrq_n_u8(abl, 4) ^ (abh & mask_f) );
     uint8x16_t abr1 = vqtbl1q_u8( tab_rd1, vshrq_n_u8(abh, 4 ));
 
@@ -205,8 +206,8 @@ uint8x16x2_t _gf256v_get_multab_neon( uint8_t v, uint8x16_t mask_f, uint8x16_t m
     uint8x16_t a = vdupq_n_u8(v);
 
     uint8x16x2_t r;
-    uint8x16_t abl = vmulq_p8( a & mask_f, mask_0_f );
-    uint8x16_t abh = vmulq_p8( vshrq_n_u8(a, 4), mask_0_f );
+    uint8x16_t abl = clmul_8x8( a & mask_f, mask_0_f );
+    uint8x16_t abh = clmul_8x8( vshrq_n_u8(a, 4), mask_0_f );
     uint8x16_t abr = vqtbl1q_u8( tab_rd0, vshrq_n_u8(abh, 4) );
     r.val[0] = abl ^ abr ^ vshlq_n_u8(abh, 4);
     r.val[1] = vqtbl1q_u8( tab_rd0, vshrq_n_u8(r.val[0], 4) ) ^ vshlq_n_u8(r.val[0], 4);
@@ -217,8 +218,8 @@ static inline
 uint8x16x2_t _gf256v_get_multab_neon( uint8_t v, uint8x16_t mask_f, uint8x16_t mask_0_f, uint8x16_t tab_rd0, uint8x16_t tab_rd1 ) {
     uint8x16_t a = vdupq_n_u8(v);
     uint8x16x2_t r;
-    uint8x16_t abl = vmulq_p8( a & mask_f, mask_0_f );
-    uint8x16_t abh = vmulq_p8( vshrq_n_u8(a, 4), mask_0_f );
+    uint8x16_t abl = clmul_8x8( a & mask_f, mask_0_f );
+    uint8x16_t abh = clmul_8x8( vshrq_n_u8(a, 4), mask_0_f );
     uint8x16_t abr = vqtbl1q_u8( tab_rd0, vshrq_n_u8(abh, 4) );
     uint8x16_t abr0 = vqtbl1q_u8( tab_rd0, vshrq_n_u8(abl, 4) ^ (abh & mask_f) );
     uint8x16_t abr1 = vqtbl1q_u8( tab_rd1, vshrq_n_u8(abh, 4 ));

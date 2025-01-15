@@ -11,7 +11,7 @@
 
 #include "gf16_neon.h"
 
-
+#include <arm_neon.h>
 //#include "assert.h"
 
 
