@@ -297,7 +297,6 @@ static void gf256mat_prod_multab_1ymm_avx2( uint8_t *c, const uint8_t *matA, uns
         tmp ^= linear_transform_8x8_256b( ml, mh, mj, mask_f );
     }
     _store_ymm( c, matA_vec_byte, tmp );
-    //storeu_ymm( c , matA_vec_byte , blockmat_vec );
 }
 static void gf256mat_prod_multab_2ymm_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const __m256i *multabs ) {
     __m256i tmp0 = _mm256_setzero_si256();
@@ -361,6 +360,7 @@ static void gf256mat_prod_multab_3ymm_avx2( uint8_t *c, const uint8_t *matA, uns
     _mm256_storeu_si256( (__m256i *)(c + 32), tmp1 );
     _store_ymm( c + 64, matA_vec_byte - 64, tmp2 );
 }
+
 static void gf256mat_prod_multab_small_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const __m256i *multabs ) {
     // XXX: if(matA_vec_byte <16 ) exit(-1);
     if     (matA_vec_byte <= 32) {
@@ -375,81 +375,66 @@ static void gf256mat_prod_multab_small_avx2( uint8_t *c, const uint8_t *matA, un
     }
 }
 
-void gf256mat_prod_multab_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *multab_b ) {
-    const __m256i *multabs = (const __m256i *)multab_b;
-    if ( 96 >= matA_vec_byte ) {
-        gf256mat_prod_multab_small_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs);
-        return;
-    }
+// presuming matA_vec_byte >= 32
+static void gf256mat_madd_multab_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const __m256i *multabs ) {
+    __m256i blockmat_vec[8];
+    unsigned vec_len_to_go = matA_vec_byte;
+    while ( vec_len_to_go ) {
+        unsigned block_len = (vec_len_to_go >= 8 * 32) ? 8 * 32 : vec_len_to_go;
+        unsigned block_st_idx = matA_vec_byte - vec_len_to_go;
 
-    while (matA_n_vec) {
-        unsigned n_ele = matA_n_vec;
+        loadu_ymm( blockmat_vec , c + block_st_idx , block_len );
+        gf256mat_blockmat_madd_avx2( blockmat_vec, matA, matA_vec_byte, block_st_idx, block_len, multabs, matA_n_vec );
+        storeu_ymm( c + block_st_idx, block_len, blockmat_vec );
 
-        unsigned vec_len_to_go = matA_vec_byte;
-        while ( vec_len_to_go ) {
-            unsigned block_len = (vec_len_to_go >= 8 * 32) ? 8 * 32 : vec_len_to_go;
-            unsigned block_st_idx = matA_vec_byte - vec_len_to_go;
-
-            __m256i blockmat_vec[8];
-            for (int i = 0; i < 8; i++) {
-                blockmat_vec[i] = _mm256_setzero_si256();
-            }
-            gf256mat_blockmat_madd_avx2( blockmat_vec, matA, matA_vec_byte, block_st_idx, block_len, multabs, n_ele );
-            storeu_ymm( c + block_st_idx, block_len, blockmat_vec );
-
-            vec_len_to_go -= block_len;
-        }
-
-        matA_n_vec -= n_ele;
-        multabs += n_ele;
-        matA += n_ele * matA_vec_byte;
+        vec_len_to_go -= block_len;
     }
 }
 
 
+void gf256mat_prod_multab_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *multab_b ) {
+    if ( 96 >= matA_vec_byte ) {
+        gf256mat_prod_multab_small_avx2(c, matA, matA_vec_byte, matA_n_vec, (const __m256i*) multab_b);
+    } else {
+        gf256v_set_zero( c, matA_vec_byte );
+        gf256mat_madd_multab_avx2( c, matA, matA_vec_byte, matA_n_vec, (const __m256i *)multab_b );
+    }
+}
+
 static
 void gf256mat_prod_small_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
-    __m256i multabs[96];
-    for (unsigned i = 0; i < matA_n_vec; i += 16) {
-        unsigned rem = matA_n_vec - i;
-        unsigned n_ele = (rem >= 16) ? 16 : rem;
-        __m128i x = (rem >= 16) ? _mm_loadu_si128( (const __m128i *)(b + i) ) : _load_xmm( (b + i), rem );
-        gf256v_generate_multab_16_avx2( multabs + i, x, n_ele );
-    }
+    __m256i multabs[32];
+    __m256i cc0[3];
+    __m256i cc1[3];
+    unsigned n_ymm = matA_vec_byte >>5;
+    n_ymm += ((matA_vec_byte&31) + 31)>>5;
 
-    gf256mat_prod_multab_small_avx2(c, matA, matA_vec_byte, matA_n_vec, multabs );
+    for(unsigned i=0;i<n_ymm;i++) cc0[i] = _mm256_setzero_si256();
+    while (matA_n_vec) {
+        unsigned n_ele = (matA_n_vec >= 32) ? 32 : matA_n_vec;
+        gf256v_generate_multabs_avx2( (uint8_t *)multabs, b, n_ele );
+        gf256mat_prod_multab_small_avx2( (uint8_t *)cc1, matA, matA_vec_byte, n_ele, multabs );
+        for(unsigned i=0;i<n_ymm;i++) cc0[i] ^= cc1[i];
+        matA_n_vec -= n_ele;
+        b += n_ele;
+        matA += n_ele * matA_vec_byte;
+    }
+    storeu_ymm( c, matA_vec_byte, cc0 );
 }
 
 
 void gf256mat_prod_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
-    if ( (96 >= matA_vec_byte) && (96 >= matA_n_vec) ) {
+    if ( 96 >= matA_vec_byte ) {
         gf256mat_prod_small_avx2(c, matA, matA_vec_byte, matA_n_vec, b);
         return;
     }
 
-    __m256i multabs[16];
+    __m256i multabs[32];
     gf256v_set_zero( c, matA_vec_byte );
-
-    __m256i blockmat_vec[8];
-
     while (matA_n_vec) {
-
-        unsigned n_ele = (matA_n_vec >= 16) ? 16 : matA_n_vec;
-        __m128i x = (matA_n_vec >= 16) ? _mm_loadu_si128( (const __m128i *)b ) : _load_xmm( b, matA_n_vec );
-        gf256v_generate_multab_16_avx2( multabs, x, n_ele );
-
-        unsigned vec_len_to_go = matA_vec_byte;
-        while ( vec_len_to_go ) {
-            unsigned block_len = (vec_len_to_go >= 8 * 32) ? 8 * 32 : vec_len_to_go;
-            unsigned block_st_idx = matA_vec_byte - vec_len_to_go;
-
-            loadu_ymm( blockmat_vec, c + block_st_idx, block_len );
-            gf256mat_blockmat_madd_avx2( blockmat_vec, matA, matA_vec_byte, block_st_idx, block_len, multabs, n_ele );
-            storeu_ymm( c + block_st_idx, block_len, blockmat_vec );
-
-            vec_len_to_go -= block_len;
-        }
-
+        unsigned n_ele = (matA_n_vec >= 32) ? 32 : matA_n_vec;
+        gf256v_generate_multabs_avx2( (uint8_t *)multabs, b, n_ele );
+        gf256mat_madd_multab_avx2( c, matA, matA_vec_byte, n_ele, multabs );
         matA_n_vec -= n_ele;
         b += n_ele;
         matA += n_ele * matA_vec_byte;
