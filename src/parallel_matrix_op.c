@@ -134,6 +134,19 @@ void batch_upper_matTr_x_mat_gf16( unsigned char *bC, const unsigned char *A_to_
 
 ////////////////////  Section: "quadratric" matrix evaluation  ///////////////////////////////
 
+#if defined(_MUL_WITH_MULTAB_)
+static void batch_quad_trimat_eval_multab_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *multabs_x, unsigned dim, unsigned size_batch );
+
+void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
+    #define MAX_V      (96)
+    uint8_t multabs[(MAX_V) * 32] __attribute__((aligned(32)));
+    #undef MAX_V
+    gf16v_generate_multabs( multabs, x, dim );
+    batch_quad_trimat_eval_multab_gf16( y , trimat , multabs , dim , size_batch );
+}
+
+#else
+
 void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
 #define MAX_O_BYTE      (64/2)
 #define MAX_V_BYTE      (96/2)
@@ -157,6 +170,8 @@ void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat,
         trimat += (dim - i - 1) * size_batch;
     }
 }
+
+#endif
 
 
 #if defined(_MUL_WITH_MULTAB_)
@@ -288,7 +303,7 @@ void batch_upper_matTr_x_mat_multab_gf16( unsigned char *bC, const unsigned char
 }
 
 
-
+static
 void batch_quad_trimat_eval_multab_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *multab_x, unsigned dim, unsigned size_batch ) {
 ///    assert( dim <= 128 );
 ///    assert( size_batch <= 128 );
@@ -417,6 +432,19 @@ void batch_upper_matTr_x_mat_gf256( unsigned char *bC, const unsigned char *A_to
 
 ////////////////////  Section: "quadratric" matrix evaluation  ///////////////////////////////
 
+#if defined(_MUL_WITH_MULTAB_)
+static void batch_quad_trimat_eval_multab_gf256( unsigned char *y, const unsigned char *trimat, const unsigned char *multab_x, unsigned dim, unsigned size_batch );
+
+void batch_quad_trimat_eval_gf256( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
+    #define MAX_V      (148)
+    uint8_t multabs[(MAX_V) * 32] __attribute__((aligned(32)));
+    #undef MAX_V
+    gf256v_generate_multabs( multabs, x, dim );
+    batch_quad_trimat_eval_multab_gf256( y , trimat , multabs , dim , size_batch );
+}
+
+#else
+
 void batch_quad_trimat_eval_gf256( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
 ///
 ///    assert( dim <= 256 );
@@ -438,6 +466,7 @@ void batch_quad_trimat_eval_gf256( unsigned char *y, const unsigned char *trimat
     gf256mat_prod( tmp, trimat, size_batch, 120, quad_terms );      // 1 + 2 + ... + 15 = 120
     gf256v_add( y, tmp, size_batch );
 }
+#endif
 
 #if defined(_MUL_WITH_MULTAB_)
 
@@ -545,7 +574,7 @@ void batch_upper_matTr_x_mat_multab_gf256( unsigned char *bC, const unsigned cha
     }
 }
 
-
+static
 void batch_quad_trimat_eval_multab_gf256( unsigned char *y, const unsigned char *trimat, const unsigned char *multab_x, unsigned dim, unsigned size_batch ) {
 ///
 ///    assert( dim <= 256 );

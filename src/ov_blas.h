@@ -49,7 +49,6 @@
 #define batch_2trimat_madd_multab   batch_2trimat_madd_multab_gf16
 #define batch_matTr_madd_multab     batch_matTr_madd_multab_gf16
 #define batch_upper_matTr_x_mat_multab     batch_upper_matTr_x_mat_multab_gf16
-#define batch_quad_trimat_eval_multab batch_quad_trimat_eval_multab_gf16
 #endif
 
 #else
@@ -75,7 +74,6 @@
 #define batch_2trimat_madd_multab   batch_2trimat_madd_multab_gf256
 #define batch_matTr_madd_multab     batch_matTr_madd_multab_gf256
 #define batch_upper_matTr_x_mat_multab     batch_upper_matTr_x_mat_multab_gf256
-#define batch_quad_trimat_eval_multab batch_quad_trimat_eval_multab_gf256
 #endif
 
 // TODO: this should be cleaner
