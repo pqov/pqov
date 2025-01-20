@@ -219,7 +219,7 @@ void gf16mat_prod_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte,
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#define BLOCKLENYMM (5)
+#define BLOCKLENYMM (7)
 
 static
 void gf256mat_blockmat_madd_avx2( uint8_t *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_st_idx, unsigned blk_vec_byte,
