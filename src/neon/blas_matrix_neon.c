@@ -81,56 +81,55 @@ void gf16mat_prod_96x_multab_neon(uint8_t *c, const uint8_t *matA, unsigned widt
 
 
 static
-void gf16mat_blockmat_prod_multab_neon( uint8_t *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_vec_byte,
+void gf16mat_remblockmat_prod_multab_neon( uint8_t *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_vec_byte,
                                         const uint8x16_t *multab_vec_ele, unsigned n_vec_ele ) {
     unsigned n_full_xmm = blk_vec_byte >> 4;
-    unsigned n_rem_byte = blk_vec_byte & 15;
+    unsigned rem_byte = blk_vec_byte & 15;
     uint8x16_t mask_f = vdupq_n_u8(0xf);
 
     uint8x16_t tmp[BLOCK_LEN];
     for (int i = 0; i < BLOCK_LEN; i++) {
         tmp[i] = vdupq_n_u8(0);
     }
+    for (unsigned i = 0; i < n_vec_ele; i++ ) {
+        uint8x16_t tab = multab_vec_ele[0];
+        multab_vec_ele += 1;
 
-    if ( !n_rem_byte ) {
-        for (unsigned i = 0; i < n_vec_ele; i++ ) {
-            uint8x16_t tab = multab_vec_ele[0];
-            multab_vec_ele += 1;
+        tmp[0] ^= _gf16_tbl_x2( vld1q_u8( org_mat ), tab, mask_f );
+        for (unsigned j = 0; j < n_full_xmm; j++) {
+            uint8x16_t mj = vld1q_u8( org_mat + rem_byte + j * 16 );
+            tmp[1+j] ^= _gf16_tbl_x2( mj, tab, mask_f );
+        }
+        org_mat += mat_vec_byte;
+    }
+    vst1q_u8( dest , tmp[0] );
+    for (unsigned i = 0; i < n_full_xmm; i++) {
+        vst1q_u8(dest + rem_byte + i * 16, tmp[i+1]);
+    }
+}
 
-            for (unsigned j = 0; j < n_full_xmm; j++) {
-                uint8x16_t mj = vld1q_u8( org_mat + j * 16 );
-                tmp[j] ^= _gf16_tbl_x2( mj, tab, mask_f );
-            }
-            org_mat += mat_vec_byte;
-        }
-        for (unsigned i = 0; i < n_full_xmm; i++) {
-            vst1q_u8(dest + i * 16, tmp[i]);
-        }
-    } else { // n_rem_byte
-        for (unsigned i = 0; i < n_vec_ele - 1; i++ ) {
-            uint8x16_t tab = multab_vec_ele[0];
-            multab_vec_ele += 1;
+static
+void gf16mat_blockmat_prod_multab_neon( uint8_t *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_vec_byte,
+                                        const uint8x16_t *multab_vec_ele, unsigned n_vec_ele ) {
+    unsigned n_full_xmm = blk_vec_byte >> 4;
+    uint8x16_t mask_f = vdupq_n_u8(0xf);
 
-            for (unsigned j = 0; j <= n_full_xmm; j++) { // note : <=
-                uint8x16_t mj = vld1q_u8( org_mat + j * 16 );
-                tmp[j] ^= _gf16_tbl_x2( mj, tab, mask_f );
-            }
-            org_mat += mat_vec_byte;
-        } { //unsigned i = n_vec_ele-1;
-            uint8x16_t tab = multab_vec_ele[0];
-            for (unsigned j = 0; j < n_full_xmm; j++) {
-                uint8x16_t mj = vld1q_u8( org_mat + j * 16 );
-                tmp[j] ^= _gf16_tbl_x2( mj, tab, mask_f );
-            } {
-                //unsigned j=n_full_xmm;
-                uint8x16_t mj = _load_Qreg( org_mat + (n_full_xmm * 16), n_rem_byte );
-                tmp[n_full_xmm] ^= _gf16_tbl_x2( mj, tab, mask_f );
-            }
+    uint8x16_t tmp[BLOCK_LEN];
+    for (int i = 0; i < BLOCK_LEN; i++) {
+        tmp[i] = vdupq_n_u8(0);
+    }
+    for (unsigned i = 0; i < n_vec_ele; i++ ) {
+        uint8x16_t tab = multab_vec_ele[0];
+        multab_vec_ele += 1;
+
+        for (unsigned j = 0; j < n_full_xmm; j++) {
+            uint8x16_t mj = vld1q_u8( org_mat + j * 16 );
+            tmp[j] ^= _gf16_tbl_x2( mj, tab, mask_f );
         }
-        for (unsigned i = 0; i < n_full_xmm + 1; i++) {
-            vst1q_u8(dest + i * 16, tmp[i]);
-        }
-        _store_Qreg( dest + n_full_xmm, n_rem_byte, tmp[n_full_xmm] );
+        org_mat += mat_vec_byte;
+    }
+    for (unsigned i = 0; i < n_full_xmm; i++) {
+        vst1q_u8(dest + i * 16, tmp[i]);
     }
 }
 
@@ -154,6 +153,13 @@ void gf16mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned matA_ve
     while (matA_n_vec) {
         unsigned n_ele = matA_n_vec;
         unsigned vec_len_to_go = matA_vec_byte;
+        if (vec_len_to_go&15) {
+            unsigned rem = vec_len_to_go&15;
+            unsigned vec_len_fullreg = vec_len_to_go - rem;
+            unsigned block_len = (vec_len_fullreg >= (BLOCK_LEN-1)*16) ? (BLOCK_LEN-1)*16 : vec_len_fullreg;
+            gf16mat_remblockmat_prod_multab_neon( c , matA, matA_vec_byte, block_len+rem, multabs, n_ele);
+            vec_len_to_go -= (rem + block_len);
+        }
         while ( vec_len_to_go ) {
             unsigned block_len = (vec_len_to_go >= BLOCK_LEN * 16) ? BLOCK_LEN * 16 : vec_len_to_go;
             unsigned block_st_idx = matA_vec_byte - vec_len_to_go;
@@ -174,82 +180,82 @@ void gf16mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned matA_ve
 
 
 
-
 static inline
 void gf16mat_prod_32x_neon(uint8_t *c, const uint8_t *matA, unsigned width_A, const uint8_t *b) {
-    uint8_t multabs[32 * 16];
-    uint8x16_t r = vdupq_n_u8(0);
-    uint8x16_t tmp;
-    while ( width_A >= 32 ) {
-        gf16v_generate_multabs_neon( multabs, b, 32 );
-        gf16mat_prod_32x_multab_neon( (uint8_t *)&tmp, matA, 32, multabs);
-        r ^= tmp;
-        b += 16;
-        width_A -= 32;
-        matA += 16 * 32;
+    uint8x16_t r0 = vdupq_n_u8(0);
+    uint8x16_t r1 = vdupq_n_u8(0);
+    uint8x16_t mask_f = vdupq_n_u8( 0xf );
+    for(unsigned i=0;i<width_A;i++) {
+        uint8x16_t bb = vdupq_n_u8( gf16v_get_ele(b,i) );
+        uint8x16_t tmp = vld1q_u8( matA );
+        r0 ^= clmul_8x8( tmp&mask_f , bb );
+        r1 ^= clmul_8x8( vshrq_n_u8(tmp,4) , bb );
+        matA += 16;
     }
-    if ( width_A ) {
-        gf16v_generate_multabs_neon( multabs, b, width_A );
-        gf16mat_prod_32x_multab_neon( (uint8_t *)&tmp, matA, width_A, multabs);
-        r ^= tmp;
-    }
-    vst1q_u8(c, r);
+    uint8x16_t tab_reduce = vld1q_u8(__gf16_reduce);
+    r0 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r0, 4) );
+    r1 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r1, 4) );
+    vst1q_u8(c, vsliq_n_u8(r0,r1,4));
 }
 
 static inline
 void gf16mat_prod_64x_neon(uint8_t *c, const uint8_t *matA, unsigned width_A, const uint8_t *b) {
-    uint8_t multabs[64 * 16];
-    uint8x16_t r[2];
-    r[0] = vdupq_n_u8(0);
-    r[1] = vdupq_n_u8(0);
-    uint8x16_t tmp[2];
-    while ( width_A >= 64 ) {
-        gf16v_generate_multabs_neon( multabs, b, 64 );
-        gf16mat_prod_64x_multab_neon( (uint8_t *)tmp, matA, 64, multabs);
-        r[0] ^= tmp[0];
-        r[1] ^= tmp[1];
-        b += 32;
-        width_A -= 64;
-        matA += 16 * 64 * 2;
+    uint8x16_t r0 = vdupq_n_u8(0);
+    uint8x16_t r1 = vdupq_n_u8(0);
+    uint8x16_t r2 = vdupq_n_u8(0);
+    uint8x16_t r3 = vdupq_n_u8(0);
+    uint8x16_t mask_f = vdupq_n_u8( 0xf );
+    for(unsigned i=0;i<width_A;i++) {
+        uint8x16_t bb = vdupq_n_u8( gf16v_get_ele(b,i) );
+        uint8x16_t tmp0 = vld1q_u8( matA );
+        uint8x16_t tmp1 = vld1q_u8( matA+16 );
+        r0 ^= clmul_8x8( tmp0&mask_f , bb );
+        r1 ^= clmul_8x8( vshrq_n_u8(tmp0,4) , bb );
+        r2 ^= clmul_8x8( tmp1&mask_f , bb );
+        r3 ^= clmul_8x8( vshrq_n_u8(tmp1,4) , bb );
+        matA += 32;
     }
-    if ( width_A ) {
-        gf16v_generate_multabs_neon( multabs, b, width_A );
-        gf16mat_prod_64x_multab_neon( (uint8_t *)tmp, matA, width_A, multabs);
-        r[0] ^= tmp[0];
-        r[1] ^= tmp[1];
-    }
-    vst1q_u8(c, r[0]);
-    vst1q_u8(c + 16, r[1]);
+    uint8x16_t tab_reduce = vld1q_u8(__gf16_reduce);
+    r0 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r0, 4) );
+    r1 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r1, 4) );
+    r2 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r2, 4) );
+    r3 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r3, 4) );
+    vst1q_u8(c, vsliq_n_u8(r0,r1,4));
+    vst1q_u8(c+16, vsliq_n_u8(r2,r3,4));
 }
 
 static inline
 void gf16mat_prod_96x_neon(uint8_t *c, const uint8_t *matA, unsigned width_A, const uint8_t *b) {
-    uint8_t multabs[64 * 16];
-    uint8x16_t r[3];
-    r[0] = vdupq_n_u8(0);
-    r[1] = vdupq_n_u8(0);
-    r[2] = vdupq_n_u8(0);
-    uint8x16_t tmp[3];
-    while ( width_A >= 64 ) {
-        gf16v_generate_multabs_neon( multabs, b, 64 );
-        gf16mat_prod_96x_multab_neon( (uint8_t *)tmp, matA, 64, multabs);
-        r[0] ^= tmp[0];
-        r[1] ^= tmp[1];
-        r[2] ^= tmp[2];
-        b += 32;
-        width_A -= 64;
-        matA += 16 * 64 * 3;
+    uint8x16_t r0 = vdupq_n_u8(0);
+    uint8x16_t r1 = vdupq_n_u8(0);
+    uint8x16_t r2 = vdupq_n_u8(0);
+    uint8x16_t r3 = vdupq_n_u8(0);
+    uint8x16_t r4 = vdupq_n_u8(0);
+    uint8x16_t r5 = vdupq_n_u8(0);
+    uint8x16_t mask_f = vdupq_n_u8( 0xf );
+    for(unsigned i=0;i<width_A;i++) {
+        uint8x16_t bb = vdupq_n_u8( gf16v_get_ele(b,i) );
+        uint8x16_t tmp0 = vld1q_u8( matA );
+        uint8x16_t tmp1 = vld1q_u8( matA+16 );
+        uint8x16_t tmp2 = vld1q_u8( matA+32 );
+        r0 ^= clmul_8x8( tmp0&mask_f , bb );
+        r1 ^= clmul_8x8( vshrq_n_u8(tmp0,4) , bb );
+        r2 ^= clmul_8x8( tmp1&mask_f , bb );
+        r3 ^= clmul_8x8( vshrq_n_u8(tmp1,4) , bb );
+        r4 ^= clmul_8x8( tmp2&mask_f , bb );
+        r5 ^= clmul_8x8( vshrq_n_u8(tmp2,4) , bb );
+        matA += 48;
     }
-    if ( width_A ) {
-        gf16v_generate_multabs_neon( multabs, b, width_A );
-        gf16mat_prod_96x_multab_neon( (uint8_t *)tmp, matA, width_A, multabs);
-        r[0] ^= tmp[0];
-        r[1] ^= tmp[1];
-        r[2] ^= tmp[2];
-    }
-    vst1q_u8(c, r[0]);
-    vst1q_u8(c + 16, r[1]);
-    vst1q_u8(c + 32, r[2]);
+    uint8x16_t tab_reduce = vld1q_u8(__gf16_reduce);
+    r0 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r0, 4) );
+    r1 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r1, 4) );
+    r2 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r2, 4) );
+    r3 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r3, 4) );
+    r4 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r4, 4) );
+    r5 ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(r5, 4) );
+    vst1q_u8(c, vsliq_n_u8(r0,r1,4));
+    vst1q_u8(c+16, vsliq_n_u8(r2,r3,4));
+    vst1q_u8(c+32, vsliq_n_u8(r4,r5,4));
 }
 
 
@@ -259,6 +265,67 @@ void gf16mat_prod_96x_neon(uint8_t *c, const uint8_t *matA, unsigned width_A, co
 
 #define BLOCK_LEN 4
 
+
+static
+void gf16mat_remblockmat_prod_neon( uint8_t *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_vec_byte, const uint8_t *b, unsigned n_vec_ele ) {
+    unsigned n_full_xmm = blk_vec_byte >> 4;
+    unsigned rem_byte = blk_vec_byte & 15;
+    uint8x16_t mask_f = vdupq_n_u8(0xf);
+
+    uint8x16_t tmp0[BLOCK_LEN];
+    uint8x16_t tmp1[BLOCK_LEN];
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp0[i] = vdupq_n_u8(0); }
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp1[i] = vdupq_n_u8(0); }
+
+    for (unsigned i = 0; i < n_vec_ele; i++ ) {
+        uint8x16_t bb = vdupq_n_u8( gf16v_get_ele(b,i) );
+        uint8x16_t tt = vld1q_u8(org_mat);
+        tmp0[0] ^= clmul_8x8( tt&mask_f, bb );
+        tmp1[0] ^= clmul_8x8( vshrq_n_u8(tt,4), bb );
+        for (unsigned j = 0; j < n_full_xmm; j++) {
+            uint8x16_t mj = vld1q_u8( org_mat + rem_byte + j * 16 );
+            tmp0[1+j] ^= clmul_8x8( mj&mask_f, bb );
+            tmp1[1+j] ^= clmul_8x8( vshrq_n_u8(mj,4), bb );
+        }
+        org_mat += mat_vec_byte;
+    }
+    uint8x16_t tab_reduce = vld1q_u8(__gf16_reduce);
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp0[i] ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(tmp0[i], 4) ); }
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp1[i] ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(tmp1[i], 4) ); }
+
+    vst1q_u8( dest , vsliq_n_u8(tmp0[0],tmp1[0],4) );
+    for (unsigned i = 0; i < n_full_xmm; i++) {
+        vst1q_u8( dest + rem_byte +i * 16 , vsliq_n_u8(tmp0[1+i],tmp1[1+i],4) );
+    }
+}
+
+static
+void gf16mat_blockmat_prod_neon( uint8_t *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_vec_byte, const uint8_t *b, unsigned n_vec_ele ) {
+    unsigned n_full_xmm = blk_vec_byte >> 4;
+    uint8x16_t mask_f = vdupq_n_u8(0xf);
+
+    uint8x16_t tmp0[BLOCK_LEN];
+    uint8x16_t tmp1[BLOCK_LEN];
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp0[i] = vdupq_n_u8(0); }
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp1[i] = vdupq_n_u8(0); }
+
+    for (unsigned i = 0; i < n_vec_ele; i++ ) {
+        uint8x16_t bb = vdupq_n_u8( gf16v_get_ele(b,i) );
+        for (unsigned j = 0; j < n_full_xmm; j++) {
+            uint8x16_t mj = vld1q_u8( org_mat + j * 16 );
+            tmp0[j] ^= clmul_8x8( mj&mask_f, bb );
+            tmp1[j] ^= clmul_8x8( vshrq_n_u8(mj,4), bb );
+        }
+        org_mat += mat_vec_byte;
+    }
+    uint8x16_t tab_reduce = vld1q_u8(__gf16_reduce);
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp0[i] ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(tmp0[i], 4) ); }
+    for (int i = 0; i < BLOCK_LEN; i++) { tmp1[i] ^= vqtbl1q_u8( tab_reduce, vshrq_n_u8(tmp1[i], 4) ); }
+
+    for (unsigned i = 0; i < n_full_xmm; i++) {
+        vst1q_u8( dest + i * 16 , vsliq_n_u8(tmp0[i],tmp1[i],4) );
+    }
+}
 
 void gf16mat_prod_neon( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
     if ( (32 == matA_vec_byte) ) {
@@ -274,26 +341,23 @@ void gf16mat_prod_neon( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte,
         return;
     }
 
-    uint8_t multabs[16 * 64];
-    gf256v_set_zero_neon( c, matA_vec_byte );
-
-    uint8_t blockmat_vec[BLOCK_LEN * 16];
     while (matA_n_vec) {
-
-        unsigned n_ele = (matA_n_vec >= 64) ? 64 : matA_n_vec;
-        gf16v_generate_multabs_neon( multabs, b, n_ele );
+        unsigned n_ele = matA_n_vec;
 
         unsigned vec_len_to_go = matA_vec_byte;
+        if (vec_len_to_go&15) {
+            unsigned rem = vec_len_to_go&15;
+            unsigned vec_len_fullreg = vec_len_to_go - rem;
+            unsigned block_len = (vec_len_fullreg >= (BLOCK_LEN-1)*16) ? (BLOCK_LEN-1)*16 : vec_len_fullreg;
+            gf16mat_remblockmat_prod_neon( c , matA, matA_vec_byte, block_len+rem, b, n_ele);
+            vec_len_to_go -= (rem + block_len);
+        }
         while ( vec_len_to_go ) {
             unsigned block_len = (vec_len_to_go >= BLOCK_LEN * 16) ? BLOCK_LEN * 16 : vec_len_to_go;
             unsigned block_st_idx = matA_vec_byte - vec_len_to_go;
-
-            gf16mat_blockmat_prod_multab_neon( blockmat_vec, matA + block_st_idx, matA_vec_byte, block_len, (uint8x16_t *)multabs, n_ele );
-            gf256v_add_neon( c + block_st_idx, blockmat_vec, block_len );
-
+            gf16mat_blockmat_prod_neon( c + block_st_idx, matA + block_st_idx, matA_vec_byte, block_len, b, n_ele );
             vec_len_to_go -= block_len;
         }
-
         matA_n_vec -= n_ele;
         b += (n_ele + 1) >> 1;
         matA += n_ele * matA_vec_byte;
@@ -306,58 +370,66 @@ void gf16mat_prod_neon( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte,
 
 ///////////////////  matrix transpose ///////////////////
 
+static inline uint8x16_t _vtrn1q_u64( uint8x16_t a, uint8x16_t b) { return vreinterpretq_u8_u64(vtrn1q_u64(vreinterpretq_u64_u8(a),vreinterpretq_u64_u8(b))); }
+static inline uint8x16_t _vtrn2q_u64( uint8x16_t a, uint8x16_t b) { return vreinterpretq_u8_u64(vtrn2q_u64(vreinterpretq_u64_u8(a),vreinterpretq_u64_u8(b))); }
+static inline uint8x16_t _vtrn1q_u32( uint8x16_t a, uint8x16_t b) { return vreinterpretq_u8_u32(vtrn1q_u32(vreinterpretq_u32_u8(a),vreinterpretq_u32_u8(b))); }
+static inline uint8x16_t _vtrn2q_u32( uint8x16_t a, uint8x16_t b) { return vreinterpretq_u8_u32(vtrn2q_u32(vreinterpretq_u32_u8(a),vreinterpretq_u32_u8(b))); }
+static inline uint8x16_t _vtrn1q_u16( uint8x16_t a, uint8x16_t b) { return vreinterpretq_u8_u16(vtrn1q_u16(vreinterpretq_u16_u8(a),vreinterpretq_u16_u8(b))); }
+static inline uint8x16_t _vtrn2q_u16( uint8x16_t a, uint8x16_t b) { return vreinterpretq_u8_u16(vtrn2q_u16(vreinterpretq_u16_u8(a),vreinterpretq_u16_u8(b))); }
+
+
 static
 void byte_transpose_16x16_neon( uint8_t *dest, unsigned dest_vec_len, const uint8_t *src, unsigned src_vec_len ) {
-    uint8x16_t r0 = vtrn1q_u64( vld1q_u8( src + 0 * src_vec_len), vld1q_u8( src + 8 * src_vec_len) );
-    uint8x16_t r8 = vtrn2q_u64( vld1q_u8( src + 0 * src_vec_len), vld1q_u8( src + 8 * src_vec_len) );
-    uint8x16_t r1 = vtrn1q_u64( vld1q_u8( src + 1 * src_vec_len), vld1q_u8( src + 9 * src_vec_len) );
-    uint8x16_t r9 = vtrn2q_u64( vld1q_u8( src + 1 * src_vec_len), vld1q_u8( src + 9 * src_vec_len) );
-    uint8x16_t r2 = vtrn1q_u64( vld1q_u8( src + 2 * src_vec_len), vld1q_u8( src + 10 * src_vec_len) );
-    uint8x16_t r10 = vtrn2q_u64( vld1q_u8( src + 2 * src_vec_len), vld1q_u8( src + 10 * src_vec_len) );
-    uint8x16_t r3 = vtrn1q_u64( vld1q_u8( src + 3 * src_vec_len), vld1q_u8( src + 11 * src_vec_len) );
-    uint8x16_t r11 = vtrn2q_u64( vld1q_u8( src + 3 * src_vec_len), vld1q_u8( src + 11 * src_vec_len) );
-    uint8x16_t r4 = vtrn1q_u64( vld1q_u8( src + 4 * src_vec_len), vld1q_u8( src + 12 * src_vec_len) );
-    uint8x16_t r12 = vtrn2q_u64( vld1q_u8( src + 4 * src_vec_len), vld1q_u8( src + 12 * src_vec_len) );
-    uint8x16_t r5 = vtrn1q_u64( vld1q_u8( src + 5 * src_vec_len), vld1q_u8( src + 13 * src_vec_len) );
-    uint8x16_t r13 = vtrn2q_u64( vld1q_u8( src + 5 * src_vec_len), vld1q_u8( src + 13 * src_vec_len) );
-    uint8x16_t r6 = vtrn1q_u64( vld1q_u8( src + 6 * src_vec_len), vld1q_u8( src + 14 * src_vec_len) );
-    uint8x16_t r14 = vtrn2q_u64( vld1q_u8( src + 6 * src_vec_len), vld1q_u8( src + 14 * src_vec_len) );
-    uint8x16_t r7 = vtrn1q_u64( vld1q_u8( src + 7 * src_vec_len), vld1q_u8( src + 15 * src_vec_len) );
-    uint8x16_t r15 = vtrn2q_u64( vld1q_u8( src + 7 * src_vec_len), vld1q_u8( src + 15 * src_vec_len) );
+    uint8x16_t r0 = _vtrn1q_u64( vld1q_u8( src + 0 * src_vec_len), vld1q_u8( src + 8 * src_vec_len) );
+    uint8x16_t r8 = _vtrn2q_u64( vld1q_u8( src + 0 * src_vec_len), vld1q_u8( src + 8 * src_vec_len) );
+    uint8x16_t r1 = _vtrn1q_u64( vld1q_u8( src + 1 * src_vec_len), vld1q_u8( src + 9 * src_vec_len) );
+    uint8x16_t r9 = _vtrn2q_u64( vld1q_u8( src + 1 * src_vec_len), vld1q_u8( src + 9 * src_vec_len) );
+    uint8x16_t r2 = _vtrn1q_u64( vld1q_u8( src + 2 * src_vec_len), vld1q_u8( src + 10 * src_vec_len) );
+    uint8x16_t r10 = _vtrn2q_u64( vld1q_u8( src + 2 * src_vec_len), vld1q_u8( src + 10 * src_vec_len) );
+    uint8x16_t r3 = _vtrn1q_u64( vld1q_u8( src + 3 * src_vec_len), vld1q_u8( src + 11 * src_vec_len) );
+    uint8x16_t r11 = _vtrn2q_u64( vld1q_u8( src + 3 * src_vec_len), vld1q_u8( src + 11 * src_vec_len) );
+    uint8x16_t r4 = _vtrn1q_u64( vld1q_u8( src + 4 * src_vec_len), vld1q_u8( src + 12 * src_vec_len) );
+    uint8x16_t r12 = _vtrn2q_u64( vld1q_u8( src + 4 * src_vec_len), vld1q_u8( src + 12 * src_vec_len) );
+    uint8x16_t r5 = _vtrn1q_u64( vld1q_u8( src + 5 * src_vec_len), vld1q_u8( src + 13 * src_vec_len) );
+    uint8x16_t r13 = _vtrn2q_u64( vld1q_u8( src + 5 * src_vec_len), vld1q_u8( src + 13 * src_vec_len) );
+    uint8x16_t r6 = _vtrn1q_u64( vld1q_u8( src + 6 * src_vec_len), vld1q_u8( src + 14 * src_vec_len) );
+    uint8x16_t r14 = _vtrn2q_u64( vld1q_u8( src + 6 * src_vec_len), vld1q_u8( src + 14 * src_vec_len) );
+    uint8x16_t r7 = _vtrn1q_u64( vld1q_u8( src + 7 * src_vec_len), vld1q_u8( src + 15 * src_vec_len) );
+    uint8x16_t r15 = _vtrn2q_u64( vld1q_u8( src + 7 * src_vec_len), vld1q_u8( src + 15 * src_vec_len) );
 
-    uint8x16_t s0 = vtrn1q_u32( r0, r4 );
-    uint8x16_t s4 = vtrn2q_u32( r0, r4 );
-    uint8x16_t s1 = vtrn1q_u32( r1, r5 );
-    uint8x16_t s5 = vtrn2q_u32( r1, r5 );
-    uint8x16_t s2 = vtrn1q_u32( r2, r6 );
-    uint8x16_t s6 = vtrn2q_u32( r2, r6 );
-    uint8x16_t s3 = vtrn1q_u32( r3, r7 );
-    uint8x16_t s7 = vtrn2q_u32( r3, r7 );
-    uint8x16_t s8 = vtrn1q_u32( r8, r12 );
-    uint8x16_t s12 = vtrn2q_u32( r8, r12 );
-    uint8x16_t s9 = vtrn1q_u32( r9, r13 );
-    uint8x16_t s13 = vtrn2q_u32( r9, r13 );
-    uint8x16_t s10 = vtrn1q_u32( r10, r14 );
-    uint8x16_t s14 = vtrn2q_u32( r10, r14 );
-    uint8x16_t s11 = vtrn1q_u32( r11, r15 );
-    uint8x16_t s15 = vtrn2q_u32( r11, r15 );
+    uint8x16_t s0 = _vtrn1q_u32( r0, r4 );
+    uint8x16_t s4 = _vtrn2q_u32( r0, r4 );
+    uint8x16_t s1 = _vtrn1q_u32( r1, r5 );
+    uint8x16_t s5 = _vtrn2q_u32( r1, r5 );
+    uint8x16_t s2 = _vtrn1q_u32( r2, r6 );
+    uint8x16_t s6 = _vtrn2q_u32( r2, r6 );
+    uint8x16_t s3 = _vtrn1q_u32( r3, r7 );
+    uint8x16_t s7 = _vtrn2q_u32( r3, r7 );
+    uint8x16_t s8 = _vtrn1q_u32( r8, r12 );
+    uint8x16_t s12 = _vtrn2q_u32( r8, r12 );
+    uint8x16_t s9 = _vtrn1q_u32( r9, r13 );
+    uint8x16_t s13 = _vtrn2q_u32( r9, r13 );
+    uint8x16_t s10 = _vtrn1q_u32( r10, r14 );
+    uint8x16_t s14 = _vtrn2q_u32( r10, r14 );
+    uint8x16_t s11 = _vtrn1q_u32( r11, r15 );
+    uint8x16_t s15 = _vtrn2q_u32( r11, r15 );
 
-    r0 = vtrn1q_u16( s0, s2 );
-    r2 = vtrn2q_u16( s0, s2 );
-    r1 = vtrn1q_u16( s1, s3 );
-    r3 = vtrn2q_u16( s1, s3 );
-    r4 = vtrn1q_u16( s4, s6 );
-    r6 = vtrn2q_u16( s4, s6 );
-    r5 = vtrn1q_u16( s5, s7 );
-    r7 = vtrn2q_u16( s5, s7 );
-    r8 = vtrn1q_u16( s8, s10 );
-    r10 = vtrn2q_u16( s8, s10 );
-    r9 = vtrn1q_u16( s9, s11 );
-    r11 = vtrn2q_u16( s9, s11 );
-    r12 = vtrn1q_u16( s12, s14 );
-    r14 = vtrn2q_u16( s12, s14 );
-    r13 = vtrn1q_u16( s13, s15 );
-    r15 = vtrn2q_u16( s13, s15 );
+    r0 = _vtrn1q_u16( s0, s2 );
+    r2 = _vtrn2q_u16( s0, s2 );
+    r1 = _vtrn1q_u16( s1, s3 );
+    r3 = _vtrn2q_u16( s1, s3 );
+    r4 = _vtrn1q_u16( s4, s6 );
+    r6 = _vtrn2q_u16( s4, s6 );
+    r5 = _vtrn1q_u16( s5, s7 );
+    r7 = _vtrn2q_u16( s5, s7 );
+    r8 = _vtrn1q_u16( s8, s10 );
+    r10 = _vtrn2q_u16( s8, s10 );
+    r9 = _vtrn1q_u16( s9, s11 );
+    r11 = _vtrn2q_u16( s9, s11 );
+    r12 = _vtrn1q_u16( s12, s14 );
+    r14 = _vtrn2q_u16( s12, s14 );
+    r13 = _vtrn1q_u16( s13, s15 );
+    r15 = _vtrn2q_u16( s13, s15 );
 
     vst1q_u8( dest + 0 * dest_vec_len, vtrn1q_u8( r0, r1 ) );
     vst1q_u8( dest + 1 * dest_vec_len, vtrn2q_u8( r0, r1 ) );
