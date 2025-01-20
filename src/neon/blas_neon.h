@@ -115,12 +115,10 @@ void gf256v_add_neon( uint8_t *accu_b, const uint8_t *a, unsigned _num_byte ) {
     }
     //for(unsigned j=0;j<_num_byte;j++) { accu_b[j] ^= a[j]; }
 #if !defined(_MW_)
-    if (_num_byte < 16 ) {
-        while ( _num_byte-- ) {
-            *accu_b ^= *a;
-            accu_b++;
-            a++;
-        }
+    while ( _num_byte-- ) {
+        *accu_b ^= *a;
+        accu_b++;
+        a++;
     }
 #endif
 }
