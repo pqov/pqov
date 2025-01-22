@@ -19,6 +19,8 @@
 
 ///////////////////////   basic functions   /////////////////////////////////////
 
+#define _MW1_
+
 static inline
 void gf256v_mul_scalar_avx2_gfni( uint8_t *a, uint8_t _b, unsigned _num_byte ) {
     __m256i bb = _mm256_set1_epi8(_b);
@@ -29,12 +31,20 @@ void gf256v_mul_scalar_avx2_gfni( uint8_t *a, uint8_t _b, unsigned _num_byte ) {
             __m256i cc = _mm256_gf2p8mul_epi8( aa, bb );
             _store_ymm( a, rem, cc );
         } else {
+#if defined(_MW1_)
+        __m256i aa = _mm256_loadu_si256((__m256i *)a);
+        __m256i a1 = _mm256_loadu_si256((__m256i *)(a+rem));
+        __m256i cc = _mm256_gf2p8mul_epi8( aa, bb );
+        _mm256_storeu_si256( (__m256i *)a, cc );
+        _mm256_storeu_si256( (__m256i *)(a+rem), a1 );
+#else
             __m256i indices = _mm256_set_epi32( 0x1f1e1d1c, 0x1b1a1918, 0x17161514, 0x13121110, 0x0f0e0d0c, 0x0b0a0908, 0x07060504, 0x03020100 );
             __m256i mask = _mm256_cmpgt_epi8( indices, _mm256_set1_epi8(rem - 1) );
             __m256i aa = _mm256_loadu_si256((__m256i *)a);
             __m256i mb = _mm256_andnot_si256( mask, bb ) ^ _mm256_sign_epi8( mask, mask );  // b, b, ..., 1, 1, 1,...
             __m256i cc = _mm256_gf2p8mul_epi8( aa, mb );
             _mm256_storeu_si256( (__m256i *)a, cc );
+#endif
         }
         a += rem;
         _num_byte -= rem;
@@ -60,12 +70,21 @@ void gf256v_madd_avx2_gfni( uint8_t *accu_c, const uint8_t *a, uint8_t _b, unsig
             __m256i cc = _mm256_gf2p8mul_epi8( aa, bb );
             _store_ymm( accu_c, rem, ac ^ cc );
         } else {
+#if defined(_MW1_)
+            __m256i aa = _mm256_loadu_si256((__m256i *)a);
+            __m256i ac = _mm256_loadu_si256((__m256i *)accu_c);
+            __m256i ac1 = _mm256_loadu_si256((__m256i *)(accu_c+rem));
+            __m256i cc = _mm256_gf2p8mul_epi8( aa, bb )^ac;
+            _mm256_storeu_si256( (__m256i *)accu_c, cc );
+            _mm256_storeu_si256( (__m256i *)(accu_c+rem), ac1 );
+#else
             __m256i indices = _mm256_set_epi32( 0x1f1e1d1c, 0x1b1a1918, 0x17161514, 0x13121110, 0x0f0e0d0c, 0x0b0a0908, 0x07060504, 0x03020100 );
             __m256i mask = _mm256_cmpgt_epi8( _mm256_set1_epi8(rem), indices );
             __m256i aa = _mm256_loadu_si256((__m256i *)a);
             __m256i ac = _mm256_loadu_si256((__m256i *)accu_c);
             __m256i cc = _mm256_gf2p8mul_epi8( aa, bb )&mask;
             _mm256_storeu_si256( (__m256i *)accu_c, ac ^ cc );
+#endif
         }
         a += rem;
         accu_c += rem;
