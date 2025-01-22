@@ -92,7 +92,8 @@ make PARAM=5
 ### **Options for Variants:**
 
 For compiling different variants, we use the macros ( **_OV_CLASSIC** / **_OV_PKC** / **_OV_PKC_SKC** ) to control the C source code.  
-The default setting is **_OV_CLASSIC** defined in **src/params.h**.  
+We use 4-rounds AES (macro: **\_4ROUND_AES_** ) as our alternative PRNG functions.  
+The default setting is **_OV_CLASSIC** and _NO_ **\_4ROUND_AES_** defined in **src/params.h**.  
 
 The other option is to use our makefile:  
 1. **_OV_CLASSIC** :
@@ -111,10 +112,28 @@ make VARIANT=2
 ```
 make VARIANT=3
 ```
-4. **_OV256_244_96** and **_OV_PKC** :
+4. **_OV_CLASSIC** and **\_4ROUND_AES_** :
+```
+make VARIANT=4
+```
+5. **_OV_PKC** and **\_4ROUND_AES_** :
+```
+make VARIANT=5
+```
+6. **_OV_PKC_SKC** and **\_4ROUND_AES_** :
+```
+make VARIANT=6
+```
+7. **_OV256_244_96** and **_OV_PKC** :
 ```
 make VARIANT=2 PARAM=5
 ```
+8. **_OV256_244_96** and **_OV_PKC_SKC** and **\_4ROUND_AES_**:
+```
+make VARIANT=6 PARAM=5
+```
+
+
 
 ### **Optimizations for Architectures:**
 
