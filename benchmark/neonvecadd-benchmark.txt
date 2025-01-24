@@ -1,3 +1,5 @@
+apple M1
+
 mschen@mingshingdeMacBook-Air pqov % sudo ./neonvecadd-benchmark 
 Password:
 Benchmark vector add of length 32:
@@ -51,3 +53,58 @@ Benchmark vector madd of length 144:
 benchmark: neon vec madd 0: 152 (cycles, avg. of 10000): 151 153 153 153 150 150
 benchmark: neon vec madd 1: 154 (cycles, avg. of 10000): 155 155 152 155 153 153
 benchmark: neon vec madd 2: 142 (cycles, avg. of 10000): 141 141 141 141 141 141
+
+Cortex a-72
+
+mschen@raspberrypi:~/github/pqov $ ./neonvecadd-benchmark 
+Benchmark vector add of length 32:
+benchmark: neon vec add 0: 12 (cycles, avg. of 10000): 12 10 12 10 12 10
+benchmark: neon vec add 1: 9 (cycles, avg. of 10000): 9 9 9 9 9 9
+benchmark: neon vec add 0: 13 (cycles, avg. of 10000): 13 13 13 13 13 13
+Benchmark vector add of length 40:
+benchmark: neon vec add 0: 19 (cycles, avg. of 10000): 9 23 16 17 19 20
+benchmark: neon vec add 1: 9 (cycles, avg. of 10000): 13 9 9 9 9 9
+benchmark: neon vec add 0: 19 (cycles, avg. of 10000): 12 17 16 21 20 16
+Benchmark vector add of length 60:
+benchmark: neon vec add 0: 24 (cycles, avg. of 10000): 12 19 19 18 17 20
+benchmark: neon vec add 1: 12 (cycles, avg. of 10000): 18 11 11 12 13 10
+benchmark: neon vec add 0: 17 (cycles, avg. of 10000): 16 17 18 17 17 16
+Benchmark vector add of length 80:
+benchmark: neon vec add 0: 15 (cycles, avg. of 10000): 14 17 13 17 14 17
+benchmark: neon vec add 1: 17 (cycles, avg. of 10000): 20 15 21 13 20 13
+benchmark: neon vec add 0: 29 (cycles, avg. of 10000): 18 30 30 31 29 29
+Benchmark vector add of length 96:
+benchmark: neon vec add 0: 20 (cycles, avg. of 10000): 18 20 18 20 21 25
+benchmark: neon vec add 1: 19 (cycles, avg. of 10000): 20 18 20 17 18 15
+benchmark: neon vec add 0: 21 (cycles, avg. of 10000): 21 21 21 21 21 22
+Benchmark vector add of length 144:
+benchmark: neon vec add 0: 32 (cycles, avg. of 10000): 32 32 32 32 32 32
+benchmark: neon vec add 1: 31 (cycles, avg. of 10000): 31 31 31 31 31 31
+benchmark: neon vec add 0: 39 (cycles, avg. of 10000): 28 39 40 39 39 39
+
+mschen@raspberrypi:~/github/pqov $ ./neonvecmadd-benchmark 
+Benchmark vector madd of length 32:
+benchmark: neon vec madd 0: 48 (cycles, avg. of 10000): 50 47 50 51 51 48
+benchmark: neon vec madd 1: 54 (cycles, avg. of 10000): 54 55 54 53 53 57
+benchmark: neon vec madd 2: 40 (cycles, avg. of 10000): 40 40 40 40 40 40
+Benchmark vector madd of length 40:
+benchmark: neon vec madd 0: 180 (cycles, avg. of 10000): 156 170 167 170 184 169
+benchmark: neon vec madd 1: 48 (cycles, avg. of 10000): 47 47 47 48 47 50
+benchmark: neon vec madd 2: 51 (cycles, avg. of 10000): 50 50 50 49 51 58
+Benchmark vector madd of length 60:
+benchmark: neon vec madd 0: 172 (cycles, avg. of 10000): 162 172 172 171 172 171
+benchmark: neon vec madd 1: 56 (cycles, avg. of 10000): 56 56 56 56 56 58
+benchmark: neon vec madd 2: 56 (cycles, avg. of 10000): 56 56 56 56 56 56
+Benchmark vector madd of length 80:
+benchmark: neon vec madd 0: 85 (cycles, avg. of 10000): 74 112 81 86 83 83
+benchmark: neon vec madd 1: 90 (cycles, avg. of 10000): 95 92 87 89 91 89
+benchmark: neon vec madd 2: 66 (cycles, avg. of 10000): 66 65 65 65 66 66
+Benchmark vector madd of length 96:
+benchmark: neon vec madd 0: 83 (cycles, avg. of 10000): 77 85 83 85 84 91
+benchmark: neon vec madd 1: 95 (cycles, avg. of 10000): 92 93 91 93 97 95
+benchmark: neon vec madd 2: 71 (cycles, avg. of 10000): 71 70 71 70 71 72
+Benchmark vector madd of length 144:
+benchmark: neon vec madd 0: 121 (cycles, avg. of 10000): 110 157 120 120 119 119
+benchmark: neon vec madd 1: 124 (cycles, avg. of 10000): 126 125 122 124 125 125
+benchmark: neon vec madd 2: 105 (cycles, avg. of 10000): 92 90 90 92 90 90
+
