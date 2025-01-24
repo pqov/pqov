@@ -1,0 +1,102 @@
+daven@angel0:~/pqov$ ./avx2vecadd-benchmark 
+Benchmark vector add of length 32:
+benchmark: avx2 vec add 0: 29 (cycles, avg. of 10000): 32 32 24 32 28 28
+benchmark: avx2 vec add 1: 26 (cycles, avg. of 10000): 24 24 24 24 24 24
+benchmark: avx2 vec add 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector add of length 40:
+benchmark: avx2 vec add 0: 33 (cycles, avg. of 10000): 24 32 36 32 36 128
+benchmark: avx2 vec add 1: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+benchmark: avx2 vec add 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector add of length 60:
+benchmark: avx2 vec add 0: 45 (cycles, avg. of 10000): 40 40 36 44 40 44
+benchmark: avx2 vec add 1: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+benchmark: avx2 vec add 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector add of length 80:
+benchmark: avx2 vec add 0: 35 (cycles, avg. of 10000): 32 36 36 36 36 36
+benchmark: avx2 vec add 1: 26 (cycles, avg. of 10000): 24 28 28 28 24 24
+benchmark: avx2 vec add 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector add of length 96:
+benchmark: avx2 vec add 0: 33 (cycles, avg. of 10000): 24 28 40 28 40 28
+benchmark: avx2 vec add 1: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+benchmark: avx2 vec add 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector add of length 144:
+benchmark: avx2 vec add 0: 37 (cycles, avg. of 10000): 40 36 40 28 40 40
+benchmark: avx2 vec add 1: 28 (cycles, avg. of 10000): 24 24 28 28 28 28
+benchmark: avx2 vec add 2: 25 (cycles, avg. of 10000): 24 24 24 24 24 24
+
+daven@angel0:~/pqov$ ./avx2vecmadd-benchmark 
+Benchmark vector madd of length 32:
+benchmark: avx2 vec madd 0: 33 (cycles, avg. of 10000): 32 40 28 32 32 32
+benchmark: avx2 vec madd 1: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+benchmark: avx2 vec madd 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector madd of length 40:
+benchmark: avx2 vec madd 0: 44 (cycles, avg. of 10000): 44 44 44 44 40 124
+benchmark: avx2 vec madd 1: 26 (cycles, avg. of 10000): 24 24 28 28 24 24
+benchmark: avx2 vec madd 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector madd of length 60:
+benchmark: avx2 vec madd 0: 55 (cycles, avg. of 10000): 52 56 48 52 56 52
+benchmark: avx2 vec madd 1: 28 (cycles, avg. of 10000): 28 28 24 28 24 28
+benchmark: avx2 vec madd 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector madd of length 80:
+benchmark: avx2 vec madd 0: 50 (cycles, avg. of 10000): 52 52 44 52 52 44
+benchmark: avx2 vec madd 1: 27 (cycles, avg. of 10000): 28 28 24 28 28 24
+benchmark: avx2 vec madd 2: 24 (cycles, avg. of 10000): 24 24 24 24 24 24
+Benchmark vector madd of length 96:
+benchmark: avx2 vec madd 0: 34 (cycles, avg. of 10000): 36 32 40 36 36 36
+benchmark: avx2 vec madd 1: 25 (cycles, avg. of 10000): 24 24 24 24 24 24
+benchmark: avx2 vec madd 2: 25 (cycles, avg. of 10000): 24 24 24 24 28 24
+Benchmark vector madd of length 144:
+benchmark: avx2 vec madd 0: 59 (cycles, avg. of 10000): 56 60 60 56 60 48
+benchmark: avx2 vec madd 1: 30 (cycles, avg. of 10000): 28 32 32 32 32 28
+benchmark: avx2 vec madd 2: 30 (cycles, avg. of 10000): 32 28 24 32 28 28
+
+daven@angel1:~/pqov$ ./avx2vecadd-benchmark 
+Benchmark vector add of length 32:
+benchmark: avx2 vec add 0: 131 (cycles, avg. of 10000): 128 126 118 134 116 130
+benchmark: avx2 vec add 1: 103 (cycles, avg. of 10000): 102 102 110 112 102 104
+benchmark: avx2 vec add 2: 101 (cycles, avg. of 10000): 114 108 90 104 96 112
+Benchmark vector add of length 40:
+benchmark: avx2 vec add 0: 56 (cycles, avg. of 10000): 38 46 40 44 46 66
+benchmark: avx2 vec add 1: 45 (cycles, avg. of 10000): 32 28 28 32 34 30
+benchmark: avx2 vec add 2: 44 (cycles, avg. of 10000): 32 34 30 26 34 30
+Benchmark vector add of length 60:
+benchmark: avx2 vec add 0: 60 (cycles, avg. of 10000): 52 56 62 62 60 60
+benchmark: avx2 vec add 1: 31 (cycles, avg. of 10000): 32 30 30 34 34 28
+benchmark: avx2 vec add 2: 30 (cycles, avg. of 10000): 30 34 32 24 24 32
+Benchmark vector add of length 80:
+benchmark: avx2 vec add 0: 41 (cycles, avg. of 10000): 46 30 38 40 34 44
+benchmark: avx2 vec add 1: 30 (cycles, avg. of 10000): 28 28 30 30 30 28
+benchmark: avx2 vec add 2: 31 (cycles, avg. of 10000): 28 30 34 30 28 28
+Benchmark vector add of length 96:
+benchmark: avx2 vec add 0: 39 (cycles, avg. of 10000): 28 40 42 42 38 40
+benchmark: avx2 vec add 1: 30 (cycles, avg. of 10000): 24 28 32 30 30 26
+benchmark: avx2 vec add 2: 30 (cycles, avg. of 10000): 30 26 28 28 30 30
+Benchmark vector add of length 144:
+benchmark: avx2 vec add 0: 40 (cycles, avg. of 10000): 40 40 36 40 44 42
+benchmark: avx2 vec add 1: 30 (cycles, avg. of 10000): 28 30 28 32 30 26
+
+daven@angel1:~/pqov$ ./avx2vecmadd-benchmark 
+Benchmark vector madd of length 32:
+benchmark: avx2 vec madd 0: 139 (cycles, avg. of 10000): 50 42 44 46 50 44
+benchmark: avx2 vec madd 1: 102 (cycles, avg. of 10000): 32 36 34 34 36 34
+benchmark: avx2 vec madd 2: 99 (cycles, avg. of 10000): 34 34 34 34 32 38
+Benchmark vector madd of length 40:
+benchmark: avx2 vec madd 0: 69 (cycles, avg. of 10000): 58 66 66 68 70 66
+benchmark: avx2 vec madd 1: 37 (cycles, avg. of 10000): 34 34 36 34 36 32
+benchmark: avx2 vec madd 2: 33 (cycles, avg. of 10000): 30 34 32 34 32 36
+Benchmark vector madd of length 60:
+benchmark: avx2 vec madd 0: 83 (cycles, avg. of 10000): 80 76 82 86 84 86
+benchmark: avx2 vec madd 1: 36 (cycles, avg. of 10000): 34 30 34 34 36 36
+benchmark: avx2 vec madd 2: 33 (cycles, avg. of 10000): 32 34 36 34 34 34
+Benchmark vector madd of length 80:
+benchmark: avx2 vec madd 0: 81 (cycles, avg. of 10000): 74 78 82 78 74 78
+benchmark: avx2 vec madd 1: 36 (cycles, avg. of 10000): 34 36 40 40 38 34
+benchmark: avx2 vec madd 2: 36 (cycles, avg. of 10000): 36 36 36 34 36 34
+Benchmark vector madd of length 96:
+benchmark: avx2 vec madd 0: 50 (cycles, avg. of 10000): 42 56 56 32 58 40
+benchmark: avx2 vec madd 1: 36 (cycles, avg. of 10000): 36 38 38 40 38 36
+benchmark: avx2 vec madd 2: 35 (cycles, avg. of 10000): 34 32 36 34 34 36
+Benchmark vector madd of length 144:
+benchmark: avx2 vec madd 0: 87 (cycles, avg. of 10000): 80 86 78 88 76 86
+benchmark: avx2 vec madd 1: 40 (cycles, avg. of 10000): 42 36 38 42 44 44
+benchmark: avx2 vec madd 2: 42 (cycles, avg. of 10000): 44 40 44 46 38 40
