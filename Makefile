@@ -62,17 +62,21 @@ SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesinst
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesinst
 CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions -march=armv8-a+crypto+aes
 CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions -march=armv8-a+crypto+aes
+ifeq ($(CPU),m1)
+CFLAGS    += -mcpu=apple-m1 -mtune=apple-m1
+CXXFLAGS  += -mcpu=apple-m1 -mtune=apple-m1
+endif
 else
 SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesffs
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesffs
 CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONBSAES_
 CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONBSAES_
-ifeq ($(CC),clang)
-CFLAGS    += -flax-vector-conversions
-CXXFLAGS  += -flax-vector-conversions
+ifeq ($(CPU),a72)
+CFLAGS    += -march=armv8-a+crc -mcpu=cortex-a72 -mtune=cortex-a72 -flax-vector-conversions
+CXXFLAGS  += -march=armv8-a+crc -mcpu=cortex-a72 -mtune=cortex-a72 -flax-vector-conversions
 else
-CFLAGS    += march=armv7-a -mfpu=neon -flax-vector-conversions
-CXXFLAGS  += march=armv7-a -mfpu=neon -flax-vector-conversions
+CFLAGS    += -march=armv8-a -flax-vector-conversions
+CXXFLAGS  += -march=armv8-a -flax-vector-conversions
 endif
 endif
 
