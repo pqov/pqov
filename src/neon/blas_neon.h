@@ -336,7 +336,7 @@ void _gf256v_mul_scalar_multab_neon( uint8_t *c, uint8x16_t tbl0, uint8x16_t tbl
 
 static inline
 void gf256v_mul_scalar_neon( uint8_t *a, uint8_t b, unsigned _num_byte ) {
-    if ( _num_byte <= 16 ) {
+    if ( _num_byte < 16 ) {
         uint8x16_t aa = _load_Qreg( a , _num_byte );
         uint8x16_t rr = gf256v_mul_neon( aa , b );
         _store_Qreg( a , _num_byte , rr );
@@ -351,7 +351,7 @@ void gf256v_mul_scalar_neon( uint8_t *a, uint8_t b, unsigned _num_byte ) {
 
 static inline
 void gf256v_madd_neon( uint8_t *accu_c, const uint8_t *a, uint8_t b, unsigned _num_byte ) {
-    if ( _num_byte <= 16 ) {
+    if ( _num_byte < 16 ) {
         uint8x16_t aa = _load_Qreg( a , _num_byte );
         uint8x16_t cc = _load_Qreg( accu_c , _num_byte );
         uint8x16_t rr = cc ^ gf256v_mul_neon( aa , b );
