@@ -18,18 +18,17 @@
 #define _BLAS_UNIT_LEN_ 32
 
 #include "blas_avx2.h"
-
-#define gf16v_mul_scalar    gf16v_mul_scalar_avx2
-#define gf16v_madd          gf16v_madd_avx2
-
 #include "blas_avx2_gfni.h"
+
+#define gf16v_mul_scalar    gf16v_mul_scalar_gfni
+#define gf16v_madd          gf16v_madd_gfni
 
 #define gf256v_add          gf256v_add_avx2
 #define gf256v_mul_scalar   gf256v_mul_scalar_avx2_gfni
 #define gf256v_madd         gf256v_madd_avx2_gfni
 
 #define gf16v_madd_multab   gf16v_madd_multab_avx2
-#define gf16v_generate_multabs  gf16v_generate_multabs_avx2
+#define gf16v_generate_multabs  gf16v_generate_multabs_gfni
 
 #include "blas_u32.h"
 #define gf256v_conditional_add      _gf256v_conditional_add_u32
