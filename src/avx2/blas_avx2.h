@@ -77,24 +77,17 @@ void storeu_ymm( uint8_t *a, unsigned _num_byte, __m256i *ymm_a ) {
 
 
 
-
-
-
-
-
-
-
 static inline
 void linearmap_8x8_ymm( uint8_t *a, __m256i ml, __m256i mh, __m256i mask, unsigned _num_byte ) {
     unsigned n_32 = _num_byte >> 5;
     unsigned rem = _num_byte & 31;
     if ( rem ) {
         if ( n_32 ) {
-            __m256i indices = _mm256_set_epi32( 0x1f1e1d1c, 0x1b1a1918, 0x17161514, 0x13121110, 0x0f0e0d0c, 0x0b0a0908, 0x07060504, 0x03020100 );
-            __m256i meff = _mm256_cmpgt_epi8( _mm256_set1_epi8(rem), indices );
-            __m256i inp = _mm256_loadu_si256((__m256i *)a);
-            __m256i bb = (linear_transform_8x8_256b( ml, mh, inp, mask )&meff) ^ _mm256_andnot_si256(meff,inp);
-            _mm256_storeu_si256( (__m256i *)a, bb );
+            __m256i inp = _mm256_loadu_si256( (__m256i *)a );
+            __m256i in1 = _mm256_loadu_si256( (__m256i *)(a+rem) );
+            __m256i r0 = linear_transform_8x8_256b( ml, mh, inp, mask );
+            _mm256_storeu_si256( (__m256i *)a, r0 );
+            _mm256_storeu_si256( (__m256i *)(a+rem), in1 );
         } else {
             linearmap_8x8_sse( a, _mm256_castsi256_si128(ml), _mm256_castsi256_si128(mh), _mm256_castsi256_si128(mask), rem );
         }
@@ -115,12 +108,12 @@ void linearmap_8x8_accu_ymm( uint8_t *accu_c, const uint8_t *a,  __m256i ml, __m
     unsigned rem = _num_byte & 31;
     if ( rem ) {
         if (n_32 ) {
-            __m256i indices = _mm256_set_epi32( 0x1f1e1d1c, 0x1b1a1918, 0x17161514, 0x13121110, 0x0f0e0d0c, 0x0b0a0908, 0x07060504, 0x03020100 );
-            __m256i meff = _mm256_cmpgt_epi8( _mm256_set1_epi8(rem), indices );
-            __m256i inp = _mm256_loadu_si256((__m256i *)a);
+            __m256i inp = _mm256_loadu_si256( (__m256i *)a );
             __m256i out = _mm256_loadu_si256( (__m256i *)accu_c );
-            __m256i r0 = out ^ (linear_transform_8x8_256b( ml, mh, inp, mask )&meff);
+            __m256i ou1 = _mm256_loadu_si256( (__m256i *)(accu_c+rem) );
+            __m256i r0 = out ^ linear_transform_8x8_256b( ml, mh, inp, mask );
             _mm256_storeu_si256( (__m256i *)accu_c, r0 );
+            _mm256_storeu_si256( (__m256i *)(accu_c+rem), ou1 );
         } else {
             linearmap_8x8_accu_sse( accu_c, a, _mm256_castsi256_si128(ml), _mm256_castsi256_si128(mh), _mm256_castsi256_si128(mask), rem );
         }
@@ -150,12 +143,11 @@ void gf256v_add_avx2( uint8_t *accu_b, const uint8_t *a, unsigned _num_byte ) {
         if ( _num_byte < 32 ) {
             gf256v_add_sse( accu_b, a, _num_byte );
         } else {
-            __m256i indices = _mm256_set_epi32( 0x1f1e1d1c, 0x1b1a1918, 0x17161514, 0x13121110, 0x0f0e0d0c, 0x0b0a0908, 0x07060504, 0x03020100 );
-            __m256i mask = _mm256_cmpgt_epi8( _mm256_set1_epi8(rem), indices );
             __m256i aa = _mm256_loadu_si256((__m256i *)a);
             __m256i ab = _mm256_loadu_si256((__m256i *)accu_b);
-            __m256i bb = ab ^ (aa&mask);
-            _mm256_storeu_si256( (__m256i *)accu_b, bb );
+            __m256i ab1 = _mm256_loadu_si256((__m256i *)(accu_b+rem));
+            _mm256_storeu_si256( (__m256i *)accu_b, aa^ab );
+            _mm256_storeu_si256( (__m256i *)(accu_b+rem), ab1 );
         }
         a += rem;
         accu_b += rem;
