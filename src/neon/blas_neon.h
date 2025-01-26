@@ -19,7 +19,8 @@
 
 static inline
 uint8x16_t _load_Qreg( const uint8_t *v, unsigned n ) {
-    uint8_t temp[16];
+    //uint8_t temp[16];
+    uint8_t temp[16] = {0}; // XXX: for gcc-12 warning: 'temp' may be used uninitialized
     for (unsigned i = 0; i < n; i++) {
         temp[i] = v[i];
     }
