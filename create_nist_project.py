@@ -11,20 +11,22 @@ if 2 == len(sys.argv) :
   base_dir_name = sys.argv[1]
   print ( "base_dir_name: " + base_dir_name )
 
-imple_names = [ 'ref' , 'amd64' , 'avx2' , 'neon' ]
+imple_names = [ 'ref' , 'amd64' , 'avx2' , 'neon' , 'gfni' ]
 
 imple_dirs = {
  'ref'   : 'Reference_Implementation' ,
  'amd64' : 'Optimized_Implementation/amd64' ,
  'avx2'  : 'Optimized_Implementation/avx2' ,
- 'neon'  : 'Optimized_Implementation/neon'
+ 'neon'  : 'Optimized_Implementation/neon' ,
+ 'gfni'  : 'Optimized_Implementation/gfni' ,
 }
 
 imple_srcs = {
     'ref'   : ['src','src/ref','utils'] ,
     'amd64' : ['src','src/ref','src/amd64','utils'] ,
     'avx2'  : ['src','src/ref','src/amd64','src/ssse3','src/avx2','utils','utils/x86aesni'],
-    'neon'  : ['src','src/ref','src/amd64','src/neon','utils','utils/neon_aesinst']
+    'neon'  : ['src','src/ref','src/amd64','src/neon','utils','utils/neon_aesinst'],
+    'gfni'  : ['src','src/ref','src/amd64','src/ssse3','src/avx2','src/gfni','utils','utils/x86aesni'],
 }
 
 extra_files = {
@@ -37,9 +39,12 @@ extra_files = {
   'avx2'  : [ ('README.md',f'{file_dir}/README.md.nist'), ('Makefile',f'{file_dir}/Makefile.nist.avx2') , ('generate_KAT.sh',f'{file_dir}/generate_KAT.sh.nist') ,
               ('sign_api-test.c','unit_tests/sign_api-test.c') ,
               ('nistkat','utils/nistkat') , ('nistkat',f'{file_dir}/PQCgenKAT_sign.c') ] ,
+  'gfni'  : [ ('README.md',f'{file_dir}/README.md.nist'), ('Makefile',f'{file_dir}/Makefile.nist.gfni') , ('generate_KAT.sh',f'{file_dir}/generate_KAT.sh.nist') ,
+              ('sign_api-test.c','unit_tests/sign_api-test.c') ,
+              ('nistkat','utils/nistkat') , ('nistkat',f'{file_dir}/PQCgenKAT_sign.c') ] ,
   'neon'  : [ ('README.md',f'{file_dir}/README.md.nist'), ('Makefile',f'{file_dir}/Makefile.nist.neon') , ('generate_KAT.sh',f'{file_dir}/generate_KAT.sh.nist') ,
               ('sign_api-test.c','unit_tests/sign_api-test.c') ,
-              ('nistkat','utils/nistkat') , ('nistkat',f'{file_dir}/PQCgenKAT_sign.c') ]
+              ('nistkat','utils/nistkat') , ('nistkat',f'{file_dir}/PQCgenKAT_sign.c') ] ,
 }
 
 
@@ -58,21 +63,25 @@ modify_paramname = {
   'III_pkc_skc': [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_184_72" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
   'V'          : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ) ] ,
   'V_pkc'      : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
-  'V_pkc_skc'  : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )]
+  'V_pkc_skc'  : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
 }
 
 
 modify_projname = {
   'amd64'  : [ ( 'config.h' , "//#define _BLAS_UINT64_" , "#define _BLAS_UINT64_" ) ] ,
   'neon'   : [ ( 'config.h' , "//#define _BLAS_NEON_"   , "#define _BLAS_NEON_" ) , ('config.h' , "//#define _UTILS_NEONAES_" , "#define _UTILS_NEONAES_" )] ,
-  'avx2'   : [ ( 'config.h' , "//#define _BLAS_AVX2_"   , "#define _BLAS_AVX2_" ) , ('config.h' , "//#define _UTILS_AESNI_" , "#define _UTILS_AESNI_" )    , ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ]
+  'avx2'   : [ ( 'config.h' , "//#define _BLAS_AVX2_"   , "#define _BLAS_AVX2_" ) , ('config.h' , "//#define _UTILS_AESNI_" , "#define _UTILS_AESNI_" )    , ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'gfni'   : [ ( 'config.h' , "//#define _BLAS_AVX2_"   , "#define _BLAS_AVX2_\n#define _BLAS_GFNI_" ) , ('config.h' , "//#define _UTILS_AESNI_" , "#define _UTILS_AESNI_" ) ] ,
 }
 
 
 modify_dirname = {
   'neon/Is'         : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
   'neon/Is_pkc'     : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
-  'neon/Is_pkc_skc' : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ]
+  'neon/Is_pkc_skc' : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'gfni/Is'         : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'gfni/Is_pkc'     : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'gfni/Is_pkc_skc' : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
 }
 
 
