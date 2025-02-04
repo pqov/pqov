@@ -44,10 +44,6 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, size_t 
     uint8_t y[_PUB_N_BYTE];
     uint8_t x_o1[_O_BYTE];
 
-    #if defined(_MUL_WITH_MULTAB_)
-    uint8_t multabs[(_V) * 32] __attribute__((aligned(32)));
-    #endif
-
     hash_ctx h_m_salt_secret;
     hash_ctx h_vinegar_copy;
     // The computation:  H(M||salt)  -->   y  --C-map-->   x   --T-->   w
@@ -73,21 +69,11 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, size_t 
         #endif
 
 // generate linear system:
-        #if !defined(_MUL_WITH_MULTAB_)
 // matrix
         gfmat_prod( mat_l1, sk->S, _O * _O_BYTE, _V, vinegar );
 // constant
         // Given vinegars, evaluate P1 with the vinegars
         batch_quad_trimat_eval( r_l1_F1, sk->P1, vinegar, _V, _O_BYTE );
-        #else
-// generate mul-tables of vinegars
-        gfv_generate_multabs( multabs, vinegar, _V );
-// matrix
-        gfmat_prod_multab( mat_l1, sk->S, _O * _O_BYTE, _V, multabs );
-// constant
-        // Given vinegars, evaluate P1 with the vinegars
-        batch_quad_trimat_eval_multab( r_l1_F1, sk->P1, multabs, _V, _O_BYTE );
-        #endif
         gf256v_add( r_l1_F1, y, _O_BYTE );      // substract the contribution from vinegar variables
 
 // solve linear system:
@@ -174,7 +160,7 @@ int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, co
 int ov_expand_and_sign( uint8_t *signature, const csk_t *csk, const uint8_t *message, size_t mlen ) {
     sk_t _sk;
     sk_t *sk = &_sk;
-    expand_sk( sk, csk->pk_seed, csk->sk_seed );    // generating classic secret key.
+    expand_sk( sk, csk->sk_seed );    // generating classic secret key.
 
     int r = ov_sign( signature, sk, message, mlen );
     return r;

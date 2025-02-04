@@ -8,6 +8,17 @@
  *   params.h contains other options.
  */
 
+
+//
+// This macro set the max steps for conditional row-swaps in the constant time
+// Gaussian Elimination algorithm.
+// Default value : OFF
+//
+//#define _GE_CONST_TIME_CADD_EARLY_STOP_
+#define _GE_EARLY_STOP_STEPS_GF16_    16
+#define _GE_EARLY_STOP_STEPS_GF256_   8
+
+
 //
 // The following macros choose optimizations for basic linear algebra functions.
 // It is currently defined from the makefile

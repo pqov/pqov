@@ -16,7 +16,7 @@ LDFLAGS  := $(LDFLAGS)
 LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
 LIBS     = -lcrypto
 
-CFLAGS += -mavx2 -maes
+CFLAGS += -mavx2 -mgfni -maes
 
 SRCS           :=  $(wildcard $(SRC_DIR)/*.c)
 SRCS_O         :=  $(SRCS:.c=.o)

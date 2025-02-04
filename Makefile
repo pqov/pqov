@@ -8,6 +8,7 @@ PROJ = ref
 #PROJ = amd64
 #PROJ = ssse3
 #PROJ = avx2
+#PROJ = gfni
 endif
 
 
@@ -59,19 +60,23 @@ else ifeq ($(PROJ),neon)
 ifeq ($(OS), Darwin)
 SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesinst
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesinst
-CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONAES_
-CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONAES_
+CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions -march=armv8-a+crypto+aes
+CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONAES_ -flax-vector-conversions -march=armv8-a+crypto+aes
+ifeq ($(CPU),m1)
+CFLAGS    += -mcpu=apple-m1 -mtune=apple-m1
+CXXFLAGS  += -mcpu=apple-m1 -mtune=apple-m1
+endif
 else
 SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/neon  ./utils/neon_aesffs
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/neon  -I./utils/neon_aesffs
 CFLAGS    += -D_BLAS_NEON_ -D_UTILS_NEONBSAES_
 CXXFLAGS  += -D_BLAS_NEON_ -D_UTILS_NEONBSAES_
-ifeq ($(CC),clang)
-CFLAGS    += -flax-vector-conversions
-CXXFLAGS  += -flax-vector-conversions
+ifeq ($(CPU),a72)
+CFLAGS    += -march=armv8-a+crc -mcpu=cortex-a72 -mtune=cortex-a72 -flax-vector-conversions
+CXXFLAGS  += -march=armv8-a+crc -mcpu=cortex-a72 -mtune=cortex-a72 -flax-vector-conversions
 else
-CFLAGS    += march=armv7-a -mfpu=neon -flax-vector-conversions
-CXXFLAGS  += march=armv7-a -mfpu=neon -flax-vector-conversions
+CFLAGS    += -march=armv8-a -flax-vector-conversions
+CXXFLAGS  += -march=armv8-a -flax-vector-conversions
 endif
 endif
 
@@ -94,6 +99,18 @@ SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/ssse3 ./src/avx2 ./utils/x86aesni
 INCPATH      += -I./src/ref -I./src/amd64 -I./src/ssse3 -I./src/avx2 -I./utils/x86aesni
 CFLAGS       += -mavx2 -maes -D_BLAS_AVX2_ -D_MUL_WITH_MULTAB_ -D_UTILS_AESNI_
 CXXFLAGS     += -mavx2 -maes -D_BLAS_AVX2_ -D_MUL_WITH_MULTAB_ -D_UTILS_AESNI_
+
+else ifeq ($(PROJ),gfni)
+
+SRC_EXT_DIRS  = ./src/ref ./src/amd64 ./src/ssse3 ./src/avx2 ./src/gfni ./utils/x86aesni
+INCPATH      += -I./src/ref -I./src/amd64 -I./src/ssse3 -I./src/avx2 -I./src/gfni -I./utils/x86aesni
+CFLAGS       += -mavx2 -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
+CXXFLAGS     += -mavx2 -mgfni -maes -D_BLAS_AVX2_ -D_BLAS_GFNI_ -D_UTILS_AESNI_
+
+ifeq ($(PARAM),1)
+CFLAGS    += -D_MUL_WITH_MULTAB_
+CXXFLAGS  += -D_MUL_WITH_MULTAB_
+endif
 
 endif
 
@@ -131,6 +148,15 @@ CXXFLAGS += -D_OV_PKC
 else ifeq ($(VARIANT),3)
 CFLAGS += -D_OV_PKC_SKC
 CXXFLAGS += -D_OV_PKC_SKC
+else ifeq ($(VARIANT),4)
+CFLAGS += -D_OV_CLASSIC -D_4ROUND_AES_
+CXXFLAGS += -D_OV_CLASSIC -D_4ROUND_AES_
+else ifeq ($(VARIANT),5)
+CFLAGS += -D_OV_PKC -D_4ROUND_AES_
+CXXFLAGS += -D_OV_PKC -D_4ROUND_AES_
+else ifeq ($(VARIANT),6)
+CFLAGS += -D_OV_PKC_SKC -D_4ROUND_AES_
+CXXFLAGS += -D_OV_PKC_SKC -D_4ROUND_AES_
 else
 CFLAGS += -D_OV_CLASSIC
 CXXFLAGS += -D_OV_CLASSIC
@@ -150,7 +176,7 @@ endif
 endif
 
 
-EXE= format sign_api-test sign_api-benchmark rec-sign-benchmark
+EXE= sign_api-test sign_api-benchmark rec-sign-benchmark
 
 ifdef DEBUG
         CFLAGS+=  -D_DEBUG_ -g

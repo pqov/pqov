@@ -11,7 +11,7 @@
 
 #include "gf16_neon.h"
 
-
+#include <arm_neon.h>
 //#include "assert.h"
 
 
@@ -19,8 +19,8 @@
 
 static inline
 uint8x16_t _load_Qreg( const uint8_t *v, unsigned n ) {
-    uint8_t temp[16];
-    //n &= 15;
+    //uint8_t temp[16];
+    uint8_t temp[16] = {0}; // XXX: for gcc-12 warning: 'temp' may be used uninitialized
     for (unsigned i = 0; i < n; i++) {
         temp[i] = v[i];
     }
@@ -43,7 +43,6 @@ void load_Qregs( uint8x16_t *r, const uint8_t *v, unsigned n ) {
 static inline
 void _store_Qreg( uint8_t *v, unsigned n, uint8x16_t a ) {
     uint8_t temp[16];
-    //n &= 15;
     vst1q_u8( temp, a );
     for (unsigned i = 0; i < n; i++) {
         v[i] = temp[i];
@@ -67,11 +66,27 @@ void store_Qregs( uint8_t *v, unsigned n, const uint8x16_t *r ) {
 
 //////////////////////   basic functions  ///////////////////////////////////////////////
 
-
-
-
 static inline
 void gf256v_add_neon( uint8_t *accu_b, const uint8_t *a, unsigned _num_byte ) {
+    if( _num_byte & 15 ) {
+        unsigned len = _num_byte & 15;
+        if (_num_byte < 16 ) {
+            while ( _num_byte-- ) {
+                *accu_b ^= *a;
+                accu_b++;
+                a++;
+            }
+            return;
+        } else {
+            uint8x16_t b0 = vld1q_u8(accu_b);
+            uint8x16_t b1 = vld1q_u8(accu_b+len);
+            vst1q_u8( accu_b, vld1q_u8(a)^b0 );
+            vst1q_u8( accu_b+len, b1 );
+            _num_byte -= len;
+            a += len;
+            accu_b += len;
+        }
+    }
     while ( _num_byte >= 48 ) {
         uint8x16_t a0 = vld1q_u8(a);
         uint8x16_t a1 = vld1q_u8(a + 16);
@@ -91,12 +106,6 @@ void gf256v_add_neon( uint8_t *accu_b, const uint8_t *a, unsigned _num_byte ) {
         _num_byte -= 16;
         a += 16;
         accu_b += 16;
-    }
-    //for(unsigned j=0;j<_num_byte;j++) { accu_b[j] ^= a[j]; }
-    while ( _num_byte-- ) {
-        *accu_b ^= *a;
-        accu_b++;
-        a++;
     }
 }
 
@@ -144,23 +153,28 @@ void gf16v_mul_scalar_neon( uint8_t *a, uint8_t gf16_b, unsigned _num_byte ) {
     #else
     uint8x16_t mask_3 = vdupq_n_u8( 3 );
     #endif
-
-    while ( _num_byte >= 16 ) {
+    if (_num_byte&15) {
+        unsigned len = _num_byte & 15;
+        if ( _num_byte < 16 ){
+            uint8x16_t aa = _load_Qreg(a,len);
+            uint8x16_t ab = _gf16v_mul_neon(aa,bp,mask_f,mask_3);
+            _store_Qreg(a, len, ab);
+            return;
+        } else {
+            uint8x16_t a0 = vld1q_u8(a);
+            uint8x16_t a1 = vld1q_u8(a+len);
+            uint8x16_t ab = _gf16v_mul_neon(a0,bp,mask_f,mask_3);
+            vst1q_u8(a,ab);
+            vst1q_u8(a+len,a1);
+            _num_byte -= len;
+            a += len;
+        }
+    }
+    while ( _num_byte ) {
         uint8x16_t aa = vld1q_u8(a);
         vst1q_u8( a, _gf16v_mul_neon(aa, bp, mask_f, mask_3) );
         _num_byte -= 16;
         a += 16;
-    }
-    if (_num_byte) {
-        uint8_t temp[16];
-        for (unsigned j = 0; j < _num_byte; j++) {
-            temp[j] = a[j];
-        }
-        uint8x16_t aa = vld1q_u8(temp);
-        vst1q_u8( temp, _gf16v_mul_neon(aa, bp, mask_f, mask_3) );
-        for (unsigned j = 0; j < _num_byte; j++) {
-            a[j] = temp[j];
-        }
     }
 }
 
@@ -175,24 +189,33 @@ void gf16v_madd_neon( uint8_t *accu_c, const uint8_t *a, uint8_t gf16_b, unsigne
     #else
     uint8x16_t mask_3 = vdupq_n_u8( 3 );
     #endif
-    while ( _num_byte >= 16 ) {
+    if (_num_byte&15) {
+        unsigned len = _num_byte & 15;
+        if ( _num_byte < 16 ){
+            uint8x16_t aa = _load_Qreg(a,len);
+            uint8x16_t cc = _load_Qreg(accu_c,len);
+            uint8x16_t ab = cc ^ _gf16v_mul_neon(aa,bp,mask_f,mask_3);
+            _store_Qreg(accu_c, len, ab);
+            return;
+        } else {
+            uint8x16_t a0 = vld1q_u8(a);
+            uint8x16_t c0 = vld1q_u8(accu_c);
+            uint8x16_t c1 = vld1q_u8(accu_c+len);
+            uint8x16_t ab = c0 ^ _gf16v_mul_neon(a0,bp,mask_f,mask_3);
+            vst1q_u8(accu_c,ab);
+            vst1q_u8(accu_c+len,c1);
+            _num_byte -= len;
+            a += len;
+            accu_c += len;
+        }
+    }
+    while ( _num_byte ) {
         uint8x16_t aa = vld1q_u8(a);
         uint8x16_t cc = vld1q_u8(accu_c);
         vst1q_u8( accu_c, cc ^ _gf16v_mul_neon(aa, bp, mask_f, mask_3) );
         _num_byte -= 16;
         a += 16;
         accu_c += 16;
-    }
-    if (_num_byte) {
-        uint8_t temp[16];
-        for (unsigned j = 0; j < _num_byte; j++) {
-            temp[j] = a[j];
-        }
-        uint8x16_t aa = vld1q_u8(temp);
-        vst1q_u8( temp, _gf16v_mul_neon(aa, bp, mask_f, mask_3) );
-        for (unsigned j = 0; j < _num_byte; j++) {
-            accu_c[j] ^= temp[j];
-        }
     }
 }
 
@@ -203,7 +226,25 @@ void gf16v_madd_multab_neon( uint8_t *accu_c, const uint8_t *a, const uint8_t *m
     uint8x16_t mask_f = vdupq_n_u8( 0xf );
     uint8x16_t tbl = vld1q_u8( multab );
 
-    while ( _num_byte >= 16 ) {
+    if (_num_byte&15) {
+        unsigned len = _num_byte & 15;
+        if ( _num_byte < 16 ){
+            uint8x16_t aa = _load_Qreg( a, _num_byte );
+            uint8x16_t cc = _load_Qreg( accu_c, _num_byte );
+            _store_Qreg( accu_c, _num_byte, cc ^ _gf16_tbl_x2(aa, tbl, mask_f) );
+            return;
+        } else {
+            uint8x16_t aa = vld1q_u8(a);
+            uint8x16_t cc = vld1q_u8(accu_c);
+            uint8x16_t c1 = vld1q_u8(accu_c+len);
+            vst1q_u8(accu_c, cc ^ _gf16_tbl_x2(aa, tbl, mask_f) );
+            vst1q_u8(accu_c+len,c1);
+            _num_byte -= len;
+            a += len;
+            accu_c += len;
+        }
+    }
+    while ( _num_byte ) {
         uint8x16_t aa = vld1q_u8(a);
         uint8x16_t cc = vld1q_u8(accu_c);
         vst1q_u8( accu_c, cc ^ _gf16_tbl_x2(aa, tbl, mask_f) );
@@ -211,34 +252,28 @@ void gf16v_madd_multab_neon( uint8_t *accu_c, const uint8_t *a, const uint8_t *m
         a += 16;
         accu_c += 16;
     }
-    if (_num_byte) {
-        uint8x16_t aa = _load_Qreg( a, _num_byte );
-        uint8x16_t cc = _load_Qreg( accu_c, _num_byte );
-        _store_Qreg( accu_c, _num_byte, cc ^ _gf16_tbl_x2(aa, tbl, mask_f) );
-    }
 }
 
 
 
 /////////////////////   GF(256)  ///////////////////
 
-
-
 static inline
 uint8x16_t _gf256_tbl( uint8x16_t a, uint8x16_t tbl0, uint8x16_t tbl1, uint8x16_t mask_f ) {
     return vqtbl1q_u8( tbl0, a & mask_f ) ^ vqtbl1q_u8( tbl1, vshrq_n_u8( a, 4 ));
 }
-
 
 // WARNING: Assuming _num_byte >= 16
 static inline
 void _gf256v_madd_multab_neon( uint8_t *accu_c, const uint8_t *a,
                                uint8x16_t tbl0, uint8x16_t tbl1, unsigned _num_byte, uint8x16_t mask_f ) {
     if (15 & _num_byte) {
+        unsigned len = 15 & _num_byte;
         uint8x16_t aa = vld1q_u8(a);
         uint8x16_t cc = vld1q_u8(accu_c);
-        unsigned len = 15 & _num_byte;
-        _store_Qreg( accu_c, len, cc ^ _gf256_tbl(aa, tbl0, tbl1, mask_f) );
+        uint8x16_t c1 = vld1q_u8(accu_c+len);
+        vst1q_u8( accu_c, cc ^ _gf256_tbl(aa, tbl0, tbl1, mask_f) );
+        vst1q_u8( accu_c + len , c1 );
         _num_byte -= len;
         accu_c += len;
         a += len;
@@ -267,30 +302,30 @@ void _gf256v_madd_multab_neon( uint8_t *accu_c, const uint8_t *a,
     }
 }
 
-static inline
-void gf256v_madd_multab_neon( uint8_t *accu_c, const uint8_t *a, const uint8_t *multab, unsigned _num_byte ) {
-    uint8x16_t mask_f = vdupq_n_u8( 0xf );
-    uint8x16_t tbl0 = vld1q_u8( multab );
-    uint8x16_t tbl1 = vld1q_u8( multab + 16 );
-    if (16 > _num_byte) {
-        uint8x16_t aa = _load_Qreg(a, _num_byte);
-        uint8x16_t cc = _load_Qreg(accu_c, _num_byte);
-        _store_Qreg( accu_c, _num_byte, cc ^ _gf256_tbl(aa, tbl0, tbl1, mask_f) );
-    } else {
-        _gf256v_madd_multab_neon( accu_c, a, tbl0, tbl1, _num_byte, mask_f );
-    }
-}
-
-
 // WARNING: Assuming _num_byte >= 16
 static inline
 void _gf256v_mul_scalar_multab_neon( uint8_t *c, uint8x16_t tbl0, uint8x16_t tbl1, unsigned _num_byte, uint8x16_t mask_f ) {
     if (15 & _num_byte) {
         unsigned len = 15 & _num_byte;
         uint8x16_t cc = vld1q_u8( c );
-        _store_Qreg( c, len, _gf256_tbl(cc, tbl0, tbl1, mask_f) );
-        c += len;
+        uint8x16_t c1 = vld1q_u8( c+len );
+        vst1q_u8( c, _gf256_tbl(cc, tbl0, tbl1, mask_f) );
+        vst1q_u8( c + len , c1 );
         _num_byte -= len;
+        c += len;
+    }
+    while ( _num_byte >= 48 ) {
+        uint8x16_t c0 = vld1q_u8(c);
+        uint8x16_t c1 = vld1q_u8(c + 16);
+        uint8x16_t c2 = vld1q_u8(c + 32);
+        uint8x16_t r0 = _gf256_tbl(c0, tbl0, tbl1, mask_f);
+        uint8x16_t r1 = _gf256_tbl(c1, tbl0, tbl1, mask_f);
+        uint8x16_t r2 = _gf256_tbl(c2, tbl0, tbl1, mask_f);
+        vst1q_u8( c, r0 );
+        vst1q_u8( c + 16, r1 );
+        vst1q_u8( c + 32, r2 );
+        _num_byte -= 48;
+        c += 48;
     }
     while ( _num_byte ) {
         uint8x16_t cc = vld1q_u8(c);
@@ -300,120 +335,34 @@ void _gf256v_mul_scalar_multab_neon( uint8_t *c, uint8x16_t tbl0, uint8x16_t tbl
     }
 }
 
-
-static inline
-void gf256v_mul_scalar_multab_neon( uint8_t *c, const uint8_t *multab, unsigned _num_byte ) {
-    uint8x16_t mask_f = vdupq_n_u8( 0xf );
-    uint8x16_t tbl0 = vld1q_u8( multab );
-    uint8x16_t tbl1 = vld1q_u8( multab + 16 );
-    if (16 > _num_byte) {
-        uint8x16_t cc = _load_Qreg( c, _num_byte );
-        _store_Qreg( c, _num_byte, _gf256_tbl(cc, tbl0, tbl1, mask_f) );
-    } else {
-        _gf256v_mul_scalar_multab_neon( c, tbl0, tbl1, _num_byte, mask_f );
-    }
-}
-
-
-
-static inline
-void gf256v_mul_scalar_pmul_neon( uint8_t *a, uint8_t b, unsigned _num_byte ) {
-    uint8x16_t bp = vdupq_n_u8(b);
-    #if defined(_GF256_REDUCE_WITH_TBL_)
-    uint8x16_t mask_f = vdupq_n_u8( 0xf );
-    uint8x16_t tab_rd0 = vld1q_u8(__gf256_bit8_11_reduce);
-    uint8x16_t tab_rd1 = vld1q_u8(__gf256_bit12_15_reduce);
-    #else
-    uint8x16_t mask_0x1b = vdupq_n_u8( 0x1b );
-    uint8x16_t mask_3 = vdupq_n_u8( 3 );
-    #endif
-    while ( _num_byte >= 16 ) {
-        uint8x16_t aa = vld1q_u8(a);
-        #if defined(_GF256_REDUCE_WITH_TBL_)
-        vst1q_u8( a, _gf256v_mul_neon(aa, bp, mask_f, tab_rd0, tab_rd1) );
-        #else
-        vst1q_u8( a, _gf256v_mul_neon(aa, bp, mask_3, mask_0x1b) );
-        #endif
-        _num_byte -= 16;
-        a += 16;
-    }
-    if (_num_byte) {
-        uint8x16_t aa = _load_Qreg(a, _num_byte);
-        #if defined(_GF256_REDUCE_WITH_TBL_)
-        uint8x16_t bb = _gf256v_mul_neon(aa, bp, mask_f, tab_rd0, tab_rd1);
-        #else
-        uint8x16_t bb = _gf256v_mul_neon(aa, bp, mask_3, mask_0x1b);
-        #endif
-        _store_Qreg( a, _num_byte, bb );
-    }
-}
-
-
-static inline
-void gf256v_madd_pmul_neon( uint8_t *accu_c, const uint8_t *a, uint8_t b, unsigned _num_byte ) {
-    uint8x16_t bp = vdupq_n_u8(b);
-    #if defined(_GF256_REDUCE_WITH_TBL_)
-    uint8x16_t mask_f = vdupq_n_u8( 0xf );
-    uint8x16_t tab_rd0 = vld1q_u8(__gf256_bit8_11_reduce);
-    uint8x16_t tab_rd1 = vld1q_u8(__gf256_bit12_15_reduce);
-    #else
-    uint8x16_t mask_0x1b = vdupq_n_u8( 0x1b );
-    uint8x16_t mask_3 = vdupq_n_u8( 3 );
-    #endif
-
-    while ( _num_byte >= 16 ) {
-        uint8x16_t aa = vld1q_u8(a);
-        uint8x16_t cc = vld1q_u8(accu_c);
-        #if defined(_GF256_REDUCE_WITH_TBL_)
-        vst1q_u8( accu_c, cc ^ _gf256v_mul_neon(aa, bp, mask_f, tab_rd0, tab_rd1) );
-        #else
-        vst1q_u8( accu_c, cc ^ _gf256v_mul_neon(aa, bp, mask_3, mask_0x1b) );
-        #endif
-        _num_byte -= 16;
-        a += 16;
-        accu_c += 16;
-    }
-    if (_num_byte) {
-        uint8x16_t aa = _load_Qreg(a, _num_byte);
-        uint8x16_t cc = _load_Qreg(accu_c, _num_byte);
-        #if defined(_GF256_REDUCE_WITH_TBL_)
-        uint8x16_t bb = _gf256v_mul_neon(aa, bp, mask_f, tab_rd0, tab_rd1);
-        #else
-        uint8x16_t bb = _gf256v_mul_neon(aa, bp, mask_3, mask_0x1b);
-        #endif
-        _store_Qreg( accu_c, _num_byte, bb ^ cc );
-    }
-
-}
-
-
-
-
-
 static inline
 void gf256v_mul_scalar_neon( uint8_t *a, uint8_t b, unsigned _num_byte ) {
-    // run unit_tests/neon-vecmul-test for decide the number
-    if ( 48 <= _num_byte  ) {
+    if ( _num_byte < 16 ) {
+        uint8x16_t aa = _load_Qreg( a , _num_byte );
+        uint8x16_t rr = gf256v_mul_neon( aa , b );
+        _store_Qreg( a , _num_byte , rr );
+    } else {
         uint8x16_t mask_f = vdupq_n_u8( 0xf );
         uint8x16x2_t t = gf256v_get_multab_neon(b);
-        _gf256v_mul_scalar_multab_neon( a, t.val[0], t.val[1], _num_byte, mask_f );
-    } else {
-        gf256v_mul_scalar_pmul_neon( a, b, _num_byte );
+        uint8x16_t tbl0 = t.val[0];
+        uint8x16_t tbl1 = t.val[1];
+        _gf256v_mul_scalar_multab_neon( a, tbl0, tbl1, _num_byte, mask_f );
     }
 }
-
-
-
 
 static inline
 void gf256v_madd_neon( uint8_t *accu_c, const uint8_t *a, uint8_t b, unsigned _num_byte ) {
-    // run unit_tests/neon-vecmul-test for decide the number
-    if ( 48 <= _num_byte  ) {
+    if ( _num_byte < 16 ) {
+        uint8x16_t aa = _load_Qreg( a , _num_byte );
+        uint8x16_t cc = _load_Qreg( accu_c , _num_byte );
+        uint8x16_t rr = cc ^ gf256v_mul_neon( aa , b );
+        _store_Qreg( accu_c , _num_byte , rr );
+    } else {
         uint8x16_t mask_f = vdupq_n_u8( 0xf );
         uint8x16x2_t t = gf256v_get_multab_neon(b);
-        _gf256v_madd_multab_neon( accu_c, a, t.val[0], t.val[1], _num_byte, mask_f );
-    } else {
-        gf256v_madd_pmul_neon( accu_c, a, b, _num_byte );
+        uint8x16_t tbl0 = t.val[0];
+        uint8x16_t tbl1 = t.val[1];
+        _gf256v_madd_multab_neon( accu_c, a, tbl0, tbl1, _num_byte, mask_f );
     }
 }
 
