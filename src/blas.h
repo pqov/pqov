@@ -27,7 +27,7 @@
 #define gf256v_mul_scalar   gf256v_mul_scalar_avx2_gfni
 #define gf256v_madd         gf256v_madd_avx2_gfni
 
-#define gf16v_madd_multab   gf16v_madd_multab_avx2
+#define gf16v_madd_multab   gf16v_madd_multab_gfni
 #define gf16v_generate_multabs  gf16v_generate_multabs_gfni
 
 #include "blas_u32.h"

@@ -80,6 +80,14 @@ void gf16v_generate_multabs_gfni( uint8_t *_multabs, const uint8_t *v, unsigned 
     }
 }
 
+static inline
+void gf16v_madd_multab_gfni( uint8_t *accu_c, const uint8_t *a, const uint8_t *multab, unsigned _num_byte ) {
+    __m256i ml = _mm256_load_si256( (__m256i *) (multab) );
+    __m256i mh = _mm256_slli_epi16( ml, 4 );
+    __m256i mask = _mm256_set1_epi8(0xf);
+
+    linearmap_8x8_accu_ymm( accu_c, a, ml, mh, mask, _num_byte );
+}
 
 static inline
 void gf16v_mul_scalar_gfni( uint8_t *a, uint8_t gf16_b, unsigned _num_byte ) {
@@ -88,8 +96,6 @@ void gf16v_mul_scalar_gfni( uint8_t *a, uint8_t gf16_b, unsigned _num_byte ) {
     __m256i mh = _mm256_slli_epi16( ml, 4 );
     linearmap_8x8_ymm( a, ml, mh, mask, _num_byte );
 }
-
-
 
 static inline
 void gf16v_madd_gfni( uint8_t *accu_c, const uint8_t *a, uint8_t gf16_b, unsigned _num_byte ) {

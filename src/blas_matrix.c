@@ -22,10 +22,10 @@
 #include "blas_matrix_avx2_gfni.h"
 #include "blas_matrix_avx2.h"
 
-#define gf16mat_prod_impl             gf16mat_prod_avx2
+#define gf16mat_prod_impl             gf16mat_prod_gfni
 #define gf256mat_prod_impl            gf256mat_prod_avx2_gfni
 
-#define gf16mat_prod_multab_impl      gf16mat_prod_multab_avx2
+#define gf16mat_prod_multab_impl      gf16mat_prod_multab_gfni
 
 #define gf256mat_gaussian_elim_impl   gf256mat_gaussian_elim_avx2_gfni
 #define gf256mat_back_substitute_impl gf256mat_back_substitute_avx2_gfni

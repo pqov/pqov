@@ -11,6 +11,29 @@
 extern  "C" {
 #endif
 
+///////////////////////////////  GF( 16 ) ////////////////////////////////////////////////////
+
+/// @brief  c = matA * b , GF(16)
+///
+/// @param[out]   c         - the output vector c
+/// @param[in]   matA          - the matrix A.
+/// @param[in]   n_A_vec_byte    - the size of column vectors in A.
+/// @param[in]   n_A_width       - the width of matrix A.
+/// @param[in]   b_multab        - the vector b, in multiplication tables.
+///
+void gf16mat_prod_multab_gfni( uint8_t *c, const uint8_t *matA, unsigned n_A_vec_byte, unsigned n_A_width, const uint8_t *b_multab );
+
+/// @brief  c = mat_a * b , GF(16)
+///
+/// @param[out]   c         - the output vector c
+/// @param[in]   mat_a       - the matrix a.
+/// @param[in]   a_h_byte    - the size of column vectors in a.
+/// @param[in]   a_w        - the width of matrix a.
+/// @param[in]   b           - the vector b.
+///
+void gf16mat_prod_gfni( uint8_t *c, const uint8_t *mat_a, unsigned a_h_byte, unsigned a_w, const uint8_t *b );
+
+
 ///////////////////////////////  GF( 256 ) ////////////////////////////////////////////////////
 
 /// @brief  c = matA * b , GF(256)
