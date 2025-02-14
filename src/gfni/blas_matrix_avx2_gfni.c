@@ -454,7 +454,7 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2_gfni( uint8_t *mat, unsigned h, u
             pivots[j] = mat[j * w + idx];
         }
         rr8 &= gf256_is_nonzero( pivots[i] );
-        pivots[i] = gf256_inv_sse( pivots[i] );
+        pivots[i] = gf256_inv_gfni( pivots[i] );
 
         // pivot row
         gf256v_mul_scalar_avx2_gfni( mi + i_d32 * 32, pivots[i], (n_ymm - i_d32) << 5 );

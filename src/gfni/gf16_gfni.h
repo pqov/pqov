@@ -52,5 +52,13 @@ __m256i gf16v_mul_gfni( __m256i a, uint8_t b ) {
 }
 
 
+static inline uint8_t gf256_inv_gfni(uint8_t a) {
+    __m128i tmp0 = _mm_insert_epi16(_mm_setzero_si128(), a, 0);
+    __m128i tmp1 = _mm_gf2p8affineinv_epi64_epi8( tmp0 , _mm_load_si128((const __m128i *)__gf16_mulbit) , 0 ); // use first identity matirx only
+    return _mm_extract_epi16(tmp1, 0);
+}
+
+
+
 
 #endif // _GF16_GFNI_H_
