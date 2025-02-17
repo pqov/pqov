@@ -110,7 +110,7 @@ void gf16mat_madd_multab_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_ve
     const __m256i *multabs = (const __m256i *)multab_b;
     __m256i blockmat_vec[_VEC_YMM_BUF_];
     while (matA_n_vec) {
-        unsigned n_ele = (matA_n_vec >= _V) ? _V : matA_n_vec; // _V = 96 in current param for GF(16)
+        unsigned n_ele = matA_n_vec;
         unsigned vec_len_to_go = matA_vec_byte;
         if ( vec_len_to_go&31 ) {
             unsigned rem = vec_len_to_go&31;
