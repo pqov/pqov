@@ -23,6 +23,158 @@
 
 #include "params.h"  // for macro _USE_GF16
 
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////  matrix-vector multiplication, GF( 16 ) ////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#if defined(_USE_GF16)
+
+
+static inline
+void gf16mat_prod_multab_64x_gfni( uint8_t *c, const uint8_t *matA, unsigned n_ele, const __m256i *multab_b ) {
+    __m256i a0;
+    __m256i r0 = _mm256_setzero_si256();
+
+    while ( n_ele ) {
+        a0 = _mm256_loadu_si256((const __m256i *) (matA) );
+        __m256i tab0_l = multab_b[0];
+        r0 ^= _mm256_gf2p8affine_epi64_epi8( a0 , tab0_l , 0 );
+        matA += 32;
+        multab_b += 1;
+        n_ele -= 1;
+    }
+    _mm256_storeu_si256( (__m256i *)c, r0 );
+}
+
+static inline
+void gf16mat_prod_multab_96x_gfni( uint8_t *c, const uint8_t *matA, unsigned n_ele, const __m256i *multab_b ) {
+    __m256i a0;
+    __m256i a1;
+    __m256i r0 = _mm256_setzero_si256();
+    __m256i r1 = _mm256_setzero_si256();
+
+    while ( n_ele ) {
+        a0 = _mm256_loadu_si256((const __m256i *) (matA) );
+        a1 = _mm256_castsi128_si256( _mm_loadu_si128((const __m128i *) (matA+32) ));
+        __m256i tab0_l = multab_b[0];
+        r0 ^= _mm256_gf2p8affine_epi64_epi8( a0 , tab0_l , 0 );
+        r1 ^= _mm256_gf2p8affine_epi64_epi8( a1 , tab0_l , 0 );
+        matA += 48;
+        multab_b += 1;
+        n_ele -= 1;
+    }
+    _mm256_storeu_si256( (__m256i *)c, r0 );
+    _mm_storeu_si128( (__m128i *)(c+32), _mm256_castsi256_si128(r1) );
+}
+
+// this function is slow. It's for the completeness of blas libs and sould not be reached in the UOV implementation.
+static inline
+void gf16mat_remaining_madd_gfni( uint8_t *dest, const uint8_t *mat, unsigned mat_vec_byte, unsigned rem_byte,
+                                  const __m256i *multab_vec_ele, unsigned n_vec_ele ) {
+    __m256i dd = _load_ymm(dest,rem_byte);
+
+    for (unsigned i = 0; i < n_vec_ele; i++ ) {
+        __m256i tab_l = multab_vec_ele[0];
+        multab_vec_ele ++;
+        __m256i mi = _load_ymm( mat , rem_byte );
+        dd ^= _mm256_gf2p8affine_epi64_epi8( mi , tab_l , 0 );
+        mat += mat_vec_byte;
+    }
+    _store_ymm( dest, rem_byte , dd );
+}
+
+static inline
+void gf16mat_blockmat_madd_gfni( __m256i *dest, const uint8_t *org_mat, unsigned mat_vec_byte, unsigned blk_st_idx, unsigned blk_vec_ymm,
+                                 const __m256i *multab_vec_ele, unsigned n_vec_ele ) {
+    org_mat += blk_st_idx;
+    for (unsigned i = 0; i < n_vec_ele; i++ ) {
+        __m256i tab_l = multab_vec_ele[0];
+        multab_vec_ele ++;
+
+        for (unsigned j = 0; j < blk_vec_ymm; j++) {
+            __m256i mj = _mm256_loadu_si256( (__m256i *)(org_mat + j * 32) );
+            dest[j] ^= _mm256_gf2p8affine_epi64_epi8( mj, tab_l , 0 );
+        }
+        org_mat += mat_vec_byte;
+    }
+}
+
+#define _VEC_YMM_BUF_  (8)
+
+static
+void gf16mat_madd_multab_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *multab_b ) {
+    const __m256i *multabs = (const __m256i *)multab_b;
+    __m256i blockmat_vec[_VEC_YMM_BUF_];
+    while (matA_n_vec) {
+        unsigned n_ele = matA_n_vec;
+        unsigned vec_len_to_go = matA_vec_byte;
+        if ( vec_len_to_go&31 ) {
+            unsigned rem = vec_len_to_go&31;
+            gf16mat_remaining_madd_gfni( c, matA, matA_vec_byte, rem, multabs, n_ele );
+            vec_len_to_go -= rem;
+        }
+
+        while ( vec_len_to_go ) {
+            unsigned block_len = (vec_len_to_go >= _VEC_YMM_BUF_ * 32) ? _VEC_YMM_BUF_ * 32 : vec_len_to_go;
+            unsigned block_st_idx = matA_vec_byte - vec_len_to_go;
+
+            loadu_ymm( blockmat_vec, c + block_st_idx, block_len );
+            gf16mat_blockmat_madd_gfni( blockmat_vec, matA, matA_vec_byte, block_st_idx, block_len>>5, multabs, n_ele );
+            storeu_ymm( c + block_st_idx, block_len, blockmat_vec );
+
+            vec_len_to_go -= block_len;
+        }
+
+        matA_n_vec -= n_ele;
+        multabs += n_ele;
+        matA += n_ele * matA_vec_byte;
+    }
+}
+
+#undef _VEC_YMM_BUF_
+
+// public functions
+
+void gf16mat_prod_multab_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *multab_b ) {
+    if (32 == matA_vec_byte) {
+        gf16mat_prod_multab_64x_gfni(c, matA, matA_n_vec, (const __m256i *)multab_b);
+    } else if (48 == matA_vec_byte) {
+        gf16mat_prod_multab_96x_gfni(c, matA, matA_n_vec, (const __m256i *)multab_b);
+    } else {
+        gf256v_set_zero(c, matA_vec_byte);
+        gf16mat_madd_multab_gfni(c, matA, matA_vec_byte, matA_n_vec, multab_b);
+    }
+}
+
+void gf16mat_prod_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte, unsigned matA_n_vec, const uint8_t *b ) {
+    __m256i multabs[_V]; // _V = 96 in current param for GF(16)
+    if (32 == matA_vec_byte && matA_n_vec <= _V) {
+        gf16v_generate_multabs_gfni( (uint8_t*)multabs, b, matA_n_vec );
+        gf16mat_prod_multab_64x_gfni(c, matA, matA_n_vec, multabs);
+    } else if (48 == matA_vec_byte && matA_n_vec <= _V) {
+        gf16v_generate_multabs_gfni( (uint8_t*)multabs, b, matA_n_vec );
+        gf16mat_prod_multab_96x_gfni(c, matA, matA_n_vec, multabs);
+    } else {
+        gf256v_set_zero( c, matA_vec_byte );
+        while( matA_n_vec ) {
+            unsigned n_ele = ( matA_n_vec >= _V)? _V : matA_n_vec;
+            gf16v_generate_multabs_gfni( (uint8_t*)multabs, b, n_ele );
+            gf16mat_madd_multab_gfni(c, matA, matA_vec_byte, matA_n_vec, (const uint8_t *)multabs);
+            b += (n_ele >> 1);
+            matA += matA_vec_byte * n_ele;
+            matA_n_vec -= n_ele;
+        }
+    }
+}
+
+
+#else  // defined(_USE_GF16)
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////  matrix-vector multiplication, GF( 256 ) ///////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +396,9 @@ void gf256mat_prod_avx2_gfni( uint8_t *c, const uint8_t *matA, unsigned matA_vec
 }
 
 
+#endif // defined(_USE_GF16)
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 ///////////////////  code for solving linear equations,  GF(256) /////////////////////
@@ -299,7 +454,7 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2_gfni( uint8_t *mat, unsigned h, u
             pivots[j] = mat[j * w + idx];
         }
         rr8 &= gf256_is_nonzero( pivots[i] );
-        pivots[i] = gf256_inv_sse( pivots[i] );
+        pivots[i] = gf256_inv_gfni( pivots[i] );
 
         // pivot row
         gf256v_mul_scalar_avx2_gfni( mi + i_d32 * 32, pivots[i], (n_ymm - i_d32) << 5 );
