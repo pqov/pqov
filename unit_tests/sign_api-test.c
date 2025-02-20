@@ -64,6 +64,44 @@ int main(void) {
         }
     }
     printf("all (%d,%d) tests passed.\n\n", TEST_RUN, TEST_GENKEY );
+    printf("===========  test crypto_sign_keypair(), crypto_sign_signature(), and crypto_sign_verify()  ================\n\n");
+
+    mlen = 53;
+    unsigned long long siglen;
+    unsigned char sig[CRYPTO_BYTES];
+    for (unsigned i = 0; i < TEST_RUN; i++) {
+        int rc;
+        rc = crypto_sign_keypair( pk, sk);
+        if ( 0 != rc ) {
+            printf("generating key returned %d.\n", rc);
+            ret = -1;
+            goto clean_exit;
+        }
+
+
+        for (unsigned j = 3; j < 53; j++) {
+            m[j] = (i * j) & 0xff;
+        }
+
+        rc = crypto_sign_signature( sig, &siglen, m, mlen, sk );
+
+        if ( 0 != rc ) {
+            printf("crypto_sign_signature() returned %d.\n", rc);
+            ret = -1;
+            goto clean_exit;
+        }
+
+        rc = crypto_sign_verify( sig, siglen,  m, mlen, pk );
+        if ( 0 != rc ) {
+            printf("crypto_sign_verify() return %d.\n", rc);
+            ret = -1;
+            goto clean_exit;
+        }
+
+    }
+
+    printf("all (%d) tests passed.\n\n", TEST_RUN );
+
 
 clean_exit:
     free( pk );
