@@ -29,9 +29,19 @@ crypto_sign(unsigned char *sm, size_t *smlen,
             const unsigned char *sk);
 
 int
+crypto_sign_signature(unsigned char  *sig, size_t *siglen,
+                      const unsigned char  *m, size_t mlen,
+                      const unsigned char  *sk);
+
+int
 crypto_sign_open(unsigned char *m, size_t *mlen,
                  const unsigned char *sm, size_t smlen,
                  const unsigned char *pk);
+
+int
+crypto_sign_verify(const unsigned char  *sig, size_t siglen,
+                      const unsigned char  *m, size_t mlen,
+                      const unsigned char  *pk);
 
 #ifdef  __cplusplus
 }
@@ -39,7 +49,6 @@ crypto_sign_open(unsigned char *m, size_t *mlen,
 
 
 #elif defined(_SUPERCOP_)
-
 #include "crypto_sign.h"
 
 #else
@@ -58,9 +67,19 @@ crypto_sign(unsigned char *sm, unsigned long long *smlen,
             const unsigned char *sk);
 
 int
+crypto_sign_signature(unsigned char *sig, unsigned long long *siglen,
+                      const unsigned char *m, unsigned long long mlen,
+                      const unsigned char *sk);
+
+int
 crypto_sign_open(unsigned char *m, unsigned long long *mlen,
                  const unsigned char *sm, unsigned long long smlen,
                  const unsigned char *pk);
+
+int
+crypto_sign_verify(const unsigned char *sig, unsigned long long siglen,
+                   const unsigned char *m, unsigned long long mlen,
+                   const unsigned char *pk);
 
 #ifdef  __cplusplus
 }
