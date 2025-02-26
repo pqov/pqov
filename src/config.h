@@ -2,7 +2,9 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 
 /*
  *   This file contains all implementation options that do not affect testvectors
@@ -37,7 +39,7 @@
 //
 // choose implementations for SHAKE256, AES128CTR, and randombytes() functions
 //
-#if !(defined(_UTILS_OPENSSL_)||defined(_UTILS_SUPERCOP_)||defined(_UTILS_PQM4_))
+#if !(defined(_UTILS_OPENSSL_)||defined(_UTILS_SUPERCOP_)||defined(_UTILS_PQM4_)||defined(_UTILS_OQS_))
 // default:
 #define _UTILS_OPENSSL_
 

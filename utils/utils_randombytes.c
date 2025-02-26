@@ -6,7 +6,15 @@
 #include "utils_randombytes.h"
 
 
-#if defined(_UTILS_SUPERCOP_)||defined(_UTILS_PQM4_)
+#if defined (_UTILS_OQS_)
+#include <oqs/rand.h>
+
+void randombytes(unsigned char *x, unsigned long long xlen) {
+    OQS_randombytes(x, xlen);
+}
+
+
+#elif defined(_UTILS_SUPERCOP_)|| defined(_UTILS_PQM4_)
 
 // nothing to do.
 
@@ -35,7 +43,7 @@ void randombytes(unsigned char *x, unsigned long long xlen) {
 
 #else
 
-ERROR -- no implementaiton for randombytes()
+ERROR -- no implementation for randombytes()
 
 #endif
 
