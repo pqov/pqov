@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 #ifndef _API_H_
 #define _API_H_
 

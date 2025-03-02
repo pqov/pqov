@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_neon.h
 /// @brief Inlined functions for implementing basic linear algebra functions for NEON.
 ///

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file ov_keypair_computation.h
 /// @brief Functions for calculating pk/sk while generating keys.
 ///

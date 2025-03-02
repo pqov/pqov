@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_matrix_sse.c
 /// @brief Implementations for blas_matrix_sse.h
 ///

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file ov_keypair.h
 /// @brief Formats of key pairs and functions for generating key pairs.
 /// Formats of key pairs and functions for generating key pairs.

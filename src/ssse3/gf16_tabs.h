@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file gf16_tabs.h
 /// @brief Defining the constant tables for performing GF arithmetics.
 ///

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 ///  @file  sign.c
 ///  @brief the implementations for functions in api.h
 ///

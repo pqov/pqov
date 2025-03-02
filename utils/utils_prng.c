@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file utils_prng.c
 /// @brief The implementation of PRNG related functions.
 ///
