@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file ov_blas.h
 /// @brief Defining the functions used in ov.c according to the definitions in params.h
 ///

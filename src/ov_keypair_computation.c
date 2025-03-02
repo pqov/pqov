@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file ov_keypair_computation.c
 /// @brief Implementations for functions in ov_keypair_computation.h
 ///

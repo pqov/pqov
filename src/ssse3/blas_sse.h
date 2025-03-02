@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_sse.h
 /// @brief Inlined functions for implementing basic linear algebra functions for SSSE3 arch.
 ///

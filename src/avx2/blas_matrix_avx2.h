@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_matrix_avx2.h
 /// @brief Linear algebra functions for matrix operations, specialized for AVX2 instruction set.
 ///

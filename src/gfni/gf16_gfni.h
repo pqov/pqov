@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file gf16_neon.h
 /// @brief Inlined functions for implementing GF arithmetics for NEON instruction sets.
 ///
