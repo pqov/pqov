@@ -150,7 +150,8 @@ int prng_gen_publicinputs(prng_publicinputs_t *ctx, unsigned char *out, unsigned
 void prng_skip_publicinputs(prng_publicinputs_t *ctx, unsigned long outlen);
 
 
-
+#define prng_release_publicinputs PQOV_NAMESPACE(prng_release_publicinputs)
+void prng_release_publicinputs(prng_publicinputs_t *ctx);
 
 #ifdef  __cplusplus
 }

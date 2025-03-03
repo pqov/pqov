@@ -53,6 +53,7 @@ int generate_keypair( pk_t *rpk, sk_t *sk, const unsigned char *sk_seed ) {
     // P1 and P2
     prng_gen_publicinputs(&prng1, rpk->pk, sizeof(sk->P1) + sizeof(sk->S) );
     memcpy( sk->P1, rpk->pk, sizeof(sk->P1) );
+    prng_release_publicinputs(&prng1);
 
     // S and P3
     unsigned char *rpk_P2 = rpk->pk + sizeof(sk->P1);
@@ -67,6 +68,7 @@ int expand_pk( pk_t *rpk, const cpk_t *cpk ) {
     prng_set_publicinputs(&prng0, cpk->pk_seed);
     // P1 and P2
     prng_gen_publicinputs(&prng0, rpk->pk, _PK_P1_BYTE + _PK_P2_BYTE );
+    prng_release_publicinputs(&prng0);
     // P3
     memcpy( rpk->pk + _PK_P1_BYTE + _PK_P2_BYTE, cpk->P3, sizeof(cpk->P3) );
 
@@ -98,6 +100,7 @@ int expand_pk_predicate( pk_t *rpk, const cpk_t *cpk, const unsigned char *predi
         }
         p1p2 += len_i;
     }
+    prng_release_publicinputs(&prng0);
     // P3
     memcpy( rpk->pk + _PK_P1_BYTE + _PK_P2_BYTE, cpk->P3, sizeof(cpk->P3) );
     return 0;
@@ -132,6 +135,7 @@ int expand_sk( sk_t *sk, const unsigned char *sk_seed ) {
     // P2
     prng_gen_publicinputs(&prng1, sk->S, sizeof(sk->S) );
 
+    prng_release_publicinputs(&prng1);
     // calcuate the parts of sk according to pk.
     #if defined(_BLAS_M4F_)
     ov_pkc_calculate_F_from_Q( sk );
@@ -177,6 +181,7 @@ int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *sk_seed ) {
     prng_gen_publicinputs(&prng1, sk->P1, sizeof(sk->P1) );
     // P2
     prng_gen_publicinputs(&prng1, sk->S, sizeof(sk->S) );
+    prng_release_publicinputs(&prng1);
 
     #if defined(_BLAS_M4F_)
     calculate_P3( pk->P3, sk->P1, sk->S, sk->O );
