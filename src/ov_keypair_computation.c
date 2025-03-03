@@ -29,7 +29,7 @@ void calculate_F2( unsigned char *S, const unsigned char *P1, const unsigned cha
     // F_sk.l1_F2s[i] = ( Q_pk.l1_F1s[i] + Q_pk.l1_F1s[i].transpose() ) * T_sk.t1 + Q_pk.l1_F2s[i]
 
     #if defined(_MUL_WITH_MULTAB_)
-    unsigned char multabs[(_V) * (_O) * 32] __attribute__((aligned(32))); // size of t1
+    PQOV_ALIGN unsigned char multabs[(_V) * (_O) * 32]; // size of t1
     gfv_generate_multabs( multabs, sk_O, (_V) * (_O));
     batch_2trimat_madd_multab( S, P1, multabs, _V, _V_BYTE, _O, _O_BYTE );
     #else
@@ -65,7 +65,7 @@ void calculate_F2_P3( unsigned char *S, unsigned char *P3, const unsigned char *
         memcpy( S, P2, _PK_P2_BYTE );
     }
     #if defined(_MUL_WITH_MULTAB_)
-    unsigned char multabs[(_V) * (_O) * 32] __attribute__((aligned(32))); // size of t1
+    PQOV_ALIGN unsigned char multabs[(_V) * (_O) * 32]; // size of t1
     gfv_generate_multabs( multabs, sk_O, (_V) * (_O));
 
     batch_trimat_madd_multab( S, P1, multabs, _V, _V_BYTE, _O, _O_BYTE );        // F1*T1 + F2
@@ -89,10 +89,10 @@ void calculate_P3( unsigned char *P3, const unsigned char *P1, const unsigned ch
 //  Q_pk.l1_F5s[i] = UT( T1tr* (F1 * T1 + F2) )
 
 #define _SIZE_BUFFER_F2 (_O_BYTE * _V * _O)
-    unsigned char _ALIGN_(32) buffer_F2[_SIZE_BUFFER_F2];
+    PQOV_ALIGN unsigned char buffer_F2[_SIZE_BUFFER_F2];
 
     #if defined(_MUL_WITH_MULTAB_)
-    unsigned char multabs[(_V) * (_O) * 32] __attribute__((aligned(32))); // size of t1
+    PQOV_ALIGN unsigned char multabs[(_V) * (_O) * 32]; // size of t1
     gfv_generate_multabs( multabs, sk_O, (_V) * (_O));
 
     memcpy( buffer_F2, P2, _O_BYTE * _V * _O );

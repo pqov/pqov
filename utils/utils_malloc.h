@@ -11,14 +11,12 @@
 #include <stdlib.h>
 
 
-#if !defined( _ALIGN_ )
 #if defined(__GNUC__) || defined(__clang__)
-#define _ALIGN_(x)  __attribute__((aligned(x)))
+#define PQOV_ALIGN  __attribute__((aligned(32)))
 #elif defined(_MSC_VER)
-#define _ALIGN_(x)  __declspec(align(x))
+#define PQOV_ALIGN  __declspec(align(32))
 #else
-#define _ALIGN_(x)
-#endif
+#define PQOV_ALIGN
 #endif
 
 
