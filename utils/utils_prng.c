@@ -38,6 +38,10 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
     return 0;
 }
 
+void prng_release_publicinputs(prng_publicinputs_t *ctx){
+    //no-op
+    (void) ctx;
+}
 
 #elif defined(_UTILS_AESNI_)
 
@@ -68,6 +72,10 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
     return 0;
 }
 
+void prng_release_publicinputs(prng_publicinputs_t *ctx){
+    //no-op
+    (void) ctx;
+}
 
 #elif defined(_UTILS_NEONAES_)
 
@@ -97,6 +105,11 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
         out += 64;
     }
     return 0;
+}
+
+void prng_release_publicinputs(prng_publicinputs_t *ctx){
+    //no-op
+    (void) ctx;
 }
 
 #elif defined(_UTILS_NEONBSAES_)
@@ -132,6 +145,11 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
     return 0;
 }
 
+void prng_release_publicinputs(prng_publicinputs_t *ctx){
+    //no-op
+    (void) ctx;
+}
+
 //#elif defined(_UTILS_SUPERCOP_)
 // ERROR -- no implementation yet.
 //#include "crypto_stream_aes256ctr.h"
@@ -140,6 +158,10 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
 //#define aes256ctr  crypto_stream_aes256ctr
 //#error "needs to be implemented"
 
+
+void prng_release_publicinputs(prng_publicinputs_t *ctx){
+    OQS_AES128_free_schedule(ctx->ctx);
+}
 
 #else
 
@@ -207,6 +229,10 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
     return 0;
 }
 
+void prng_release_publicinputs(prng_publicinputs_t *ctx){
+    //no-op
+    (void) ctx;
+}
 
 #endif
 
