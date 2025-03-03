@@ -22,6 +22,7 @@ extern  "C" {
 ///
 /// @param[out] Fs       - secret key
 ///
+#define ov_pkc_calculate_F_from_Q PQOV_NAMESPACE(ov_pkc_calculate_F_from_Q)
 void ov_pkc_calculate_F_from_Q( sk_t *Fs);
 
 ///
@@ -31,6 +32,7 @@ void ov_pkc_calculate_F_from_Q( sk_t *Fs);
 /// @param[in]  Fs       - parts of the sk: P1, S
 /// @param[in]  Ts       - parts of the sk: O
 ///
+#define ov_pkc_calculate_Q_from_F PQOV_NAMESPACE(ov_pkc_calculate_Q_from_F)
 void ov_pkc_calculate_Q_from_F( cpk_t *Qs, const sk_t *Fs, const sk_t *Ts );
 
 
@@ -44,6 +46,7 @@ void ov_pkc_calculate_Q_from_F( cpk_t *Qs, const sk_t *Fs, const sk_t *Ts );
 /// @param[in]  P2       - P2 of the pk
 /// @param[in]  sk       - O of the sk
 ///
+#define calculate_F2_P3 PQOV_NAMESPACE(calculate_F2_P3)
 void calculate_F2_P3( unsigned char *S, unsigned char *P3, const unsigned char *P1, const unsigned char *P2, const unsigned char *sk_O );
 
 ///
@@ -54,6 +57,7 @@ void calculate_F2_P3( unsigned char *S, unsigned char *P3, const unsigned char *
 /// @param[in]  P2       - P2 of the pk
 /// @param[in]  sk       - O of the sk
 ///
+#define calculate_F2 PQOV_NAMESPACE(calculate_F2)
 void calculate_F2( unsigned char *S, const unsigned char *P1, const unsigned char *P2, const unsigned char *sk_O );
 
 ///
@@ -64,6 +68,7 @@ void calculate_F2( unsigned char *S, const unsigned char *P1, const unsigned cha
 /// @param[in]  P2       - P2 of the pk
 /// @param[in]  sk       - O of the sk
 ///
+#define calculate_P3 PQOV_NAMESPACE(calculate_P3)
 void calculate_P3( unsigned char *P3, const unsigned char *P1, const unsigned char *P2, const unsigned char *sk_O );
 
 

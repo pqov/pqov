@@ -66,6 +66,7 @@ unsigned idx_of_2trimat( unsigned i_row, unsigned j_col, unsigned n_var ) {
 /// @param[in]   bwidth   - the width of the batched matrix A, i.e., A is a Awidth x Awidth matrix.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define UpperTrianglize PQOV_NAMESPACE(UpperTrianglize)
 void UpperTrianglize( unsigned char *btriC, const unsigned char *bA, unsigned Awidth, unsigned size_batch );
 
 
@@ -86,6 +87,7 @@ void UpperTrianglize( unsigned char *btriC, const unsigned char *bA, unsigned Aw
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimat_madd_gf16 PQOV_NAMESPACE(batch_trimat_madd_gf16)
 void batch_trimat_madd_gf16( unsigned char *bC, const unsigned char *btriA,
                              const unsigned char *B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -100,6 +102,7 @@ void batch_trimat_madd_gf16( unsigned char *bC, const unsigned char *btriA,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimat_madd_gf256 PQOV_NAMESPACE(batch_trimat_madd_gf256)
 void batch_trimat_madd_gf256( unsigned char *bC, const unsigned char *btriA,
                               const unsigned char *B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -115,6 +118,7 @@ void batch_trimat_madd_gf256( unsigned char *bC, const unsigned char *btriA,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimatTr_madd_gf16 PQOV_NAMESPACE(batch_trimatTr_madd_gf16)
 void batch_trimatTr_madd_gf16( unsigned char *bC, const unsigned char *btriA,
                                const unsigned char *B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -129,6 +133,7 @@ void batch_trimatTr_madd_gf16( unsigned char *bC, const unsigned char *btriA,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimatTr_madd_gf256 PQOV_NAMESPACE(batch_trimatTr_madd_gf256)
 void batch_trimatTr_madd_gf256( unsigned char *bC, const unsigned char *btriA,
                                 const unsigned char *B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -145,6 +150,7 @@ void batch_trimatTr_madd_gf256( unsigned char *bC, const unsigned char *btriA,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_2trimat_madd_gf16 PQOV_NAMESPACE(batch_2trimat_madd_gf16)
 void batch_2trimat_madd_gf16( unsigned char *bC, const unsigned char *btriA,
                               const unsigned char *B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -159,6 +165,7 @@ void batch_2trimat_madd_gf16( unsigned char *bC, const unsigned char *btriA,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_2trimat_madd_gf256 PQOV_NAMESPACE(batch_2trimat_madd_gf256)
 void batch_2trimat_madd_gf256( unsigned char *bC, const unsigned char *btriA,
                                const unsigned char *B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -176,6 +183,7 @@ void batch_2trimat_madd_gf256( unsigned char *bC, const unsigned char *btriA,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_matTr_madd_gf16 PQOV_NAMESPACE(batch_matTr_madd_gf16)
 void batch_matTr_madd_gf16( unsigned char *bC,
                             const unsigned char *A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                             const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -192,6 +200,7 @@ void batch_matTr_madd_gf16( unsigned char *bC,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_matTr_madd_gf256 PQOV_NAMESPACE(batch_matTr_madd_gf256)
 void batch_matTr_madd_gf256( unsigned char *bC,
                              const unsigned char *A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                              const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -211,6 +220,7 @@ void batch_matTr_madd_gf256( unsigned char *bC,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_upper_matTr_x_mat_gf16 PQOV_NAMESPACE(batch_upper_matTr_x_mat_gf16)
 void batch_upper_matTr_x_mat_gf16( unsigned char *bC,
                                    const unsigned char *A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                                    const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -227,6 +237,7 @@ void batch_upper_matTr_x_mat_gf16( unsigned char *bC,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_upper_matTr_x_mat_gf256 PQOV_NAMESPACE(batch_upper_matTr_x_mat_gf256)
 void batch_upper_matTr_x_mat_gf256( unsigned char *bC,
                                     const unsigned char *A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                                     const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -246,6 +257,7 @@ void batch_upper_matTr_x_mat_gf256( unsigned char *bC,
 /// @param[in]   dim        - the dimension of matrix trimat (and x).
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_quad_trimat_eval_gf16 PQOV_NAMESPACE(batch_quad_trimat_eval_gf16)
 void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch );
 
 ///
@@ -257,6 +269,7 @@ void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat,
 /// @param[in]   dim        - the dimension of matrix trimat (and x).
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_quad_trimat_eval_gf256 PQOV_NAMESPACE(batch_quad_trimat_eval_gf256)
 void batch_quad_trimat_eval_gf256( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch );
 
 
@@ -283,6 +296,7 @@ void batch_quad_trimat_eval_gf256( unsigned char *y, const unsigned char *trimat
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimat_madd_multab_gf16 PQOV_NAMESPACE(batch_trimat_madd_multab_gf16)
 void batch_trimat_madd_multab_gf16( unsigned char *bC, const unsigned char *btriA,
                                     const unsigned char *multab_B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -297,6 +311,7 @@ void batch_trimat_madd_multab_gf16( unsigned char *bC, const unsigned char *btri
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimat_madd_multab_gf256 PQOV_NAMESPACE(batch_trimat_madd_multab_gf256)
 void batch_trimat_madd_multab_gf256( unsigned char *bC, const unsigned char *btriA,
                                      const unsigned char *multab_B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -312,6 +327,7 @@ void batch_trimat_madd_multab_gf256( unsigned char *bC, const unsigned char *btr
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimatTr_madd_multab_gf16 PQOV_NAMESPACE(batch_trimatTr_madd_multab_gf16)
 void batch_trimatTr_madd_multab_gf16( unsigned char *bC, const unsigned char *btriA,
                                       const unsigned char *multab_B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -326,6 +342,7 @@ void batch_trimatTr_madd_multab_gf16( unsigned char *bC, const unsigned char *bt
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_trimatTr_madd_multab_gf256 PQOV_NAMESPACE(batch_trimatTr_madd_multab_gf256)
 void batch_trimatTr_madd_multab_gf256( unsigned char *bC, const unsigned char *btriA,
                                        const unsigned char *multab_B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -342,6 +359,7 @@ void batch_trimatTr_madd_multab_gf256( unsigned char *bC, const unsigned char *b
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_2trimat_madd_multab_gf16 PQOV_NAMESPACE(batch_2trimat_madd_multab_gf16)
 void batch_2trimat_madd_multab_gf16( unsigned char *bC, const unsigned char *btriA,
                                      const unsigned char *multab_B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -356,6 +374,7 @@ void batch_2trimat_madd_multab_gf16( unsigned char *bC, const unsigned char *btr
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_2trimat_madd_multab_gf256 PQOV_NAMESPACE(batch_2trimat_madd_multab_gf256)
 void batch_2trimat_madd_multab_gf256( unsigned char *bC, const unsigned char *btriA,
                                       const unsigned char *multab_B, unsigned Bheight, unsigned size_Bcolvec, unsigned Bwidth, unsigned size_batch );
 
@@ -373,6 +392,7 @@ void batch_2trimat_madd_multab_gf256( unsigned char *bC, const unsigned char *bt
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_matTr_madd_multab_gf16 PQOV_NAMESPACE(batch_matTr_madd_multab_gf16)
 void batch_matTr_madd_multab_gf16( unsigned char *bC,
                                    const unsigned char *multab_A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                                    const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -389,6 +409,7 @@ void batch_matTr_madd_multab_gf16( unsigned char *bC,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_matTr_madd_multab_gf256 PQOV_NAMESPACE(batch_matTr_madd_multab_gf256)
 void batch_matTr_madd_multab_gf256( unsigned char *bC,
                                     const unsigned char *multab_A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                                     const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -407,6 +428,7 @@ void batch_matTr_madd_multab_gf256( unsigned char *bC,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_upper_matTr_x_mat_multab_gf16 PQOV_NAMESPACE(batch_upper_matTr_x_mat_multab_gf16)
 void batch_upper_matTr_x_mat_multab_gf16( unsigned char *bC,
         const unsigned char *multab_A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
         const unsigned char *bB, unsigned Bwidth, unsigned size_batch );
@@ -423,6 +445,7 @@ void batch_upper_matTr_x_mat_multab_gf16( unsigned char *bC,
 /// @param[in]   Bwidth           - the width of B.
 /// @param[in]   size_batch - number of the batched elements in the corresponding position of the matrix.
 ///
+#define batch_upper_matTr_x_mat_multab_gf256 PQOV_NAMESPACE(batch_upper_matTr_x_mat_multab_gf256)
 void batch_upper_matTr_x_mat_multab_gf256( unsigned char *bC,
         const unsigned char *multab_A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
         const unsigned char *bB, unsigned Bwidth, unsigned size_batch );

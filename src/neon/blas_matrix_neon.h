@@ -8,7 +8,7 @@
 
 
 #include "stdint.h"
-
+#include "params.h"
 
 
 #ifdef  __cplusplus
@@ -29,6 +29,7 @@ extern  "C" {
 /// @param[in]   n_A_width       - the width of matrix A.
 /// @param[in]   b_multab        - the vector b, in multiplication tables.
 ///
+#define gf16mat_prod_multab_neon PQOV_NAMESPACE(gf16mat_prod_multab_neon)
 void gf16mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned n_A_vec_byte, unsigned n_A_width, const uint8_t *b_multab );
 
 /// @brief  c = mat_a * b , GF(16)
@@ -39,6 +40,7 @@ void gf16mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned n_A_vec
 /// @param[in]   a_w        - the width of matrix a.
 /// @param[in]   b           - the vector b.
 ///
+#define gf16mat_prod_neon PQOV_NAMESPACE(gf16mat_prod_neon)
 void gf16mat_prod_neon( uint8_t *c, const uint8_t *mat_a, unsigned a_h_byte, unsigned a_w, const uint8_t *b );
 
 
@@ -49,6 +51,7 @@ void gf16mat_prod_neon( uint8_t *c, const uint8_t *mat_a, unsigned a_h_byte, uns
 /// @param[in]      len              - the dimension of input matrix a.
 /// @return   1(true) if success. 0(false) if the matrix is singular.
 ///
+#define gf16mat_gaussian_elim_neon PQOV_NAMESPACE(gf16mat_gaussian_elim_neon)
 unsigned gf16mat_gaussian_elim_neon(uint8_t *sq_col_mat_a, uint8_t *constant, unsigned len);
 
 /// @brief Performing back-substituion to solve a linear system, in GF(16)
@@ -57,6 +60,7 @@ unsigned gf16mat_gaussian_elim_neon(uint8_t *sq_col_mat_a, uint8_t *constant, un
 /// @param[in]   sq_row_mat_a  - row echelon form of the square row-major matrix a.
 /// @param[in]   len           - the dimension of input matrix a.
 ///
+#define gf16mat_back_substitute_neon PQOV_NAMESPACE(gf16mat_back_substitute_neon)
 void gf16mat_back_substitute_neon( uint8_t *constant, const uint8_t *sq_row_mat_a, unsigned len);
 
 
@@ -71,6 +75,7 @@ void gf16mat_back_substitute_neon( uint8_t *constant, const uint8_t *sq_row_mat_
 /// @param[in]   n_A_width       - the widht of matrix A.
 /// @param[in]   b_multab        - the vector b, in multiplication tables.
 ///
+#define gf256mat_prod_multab_neon PQOV_NAMESPACE(gf256mat_prod_multab_neon)
 void gf256mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned n_A_vec_byte, unsigned n_A_width, const uint8_t *multab );
 
 /// @brief  c = matA * b , GF(256)
@@ -81,6 +86,7 @@ void gf256mat_prod_multab_neon( uint8_t *c, const uint8_t *matA, unsigned n_A_ve
 /// @param[in]   n_A_width    - the width of matrix a.
 /// @param[in]   b           - the vector b.
 ///
+#define gf256mat_prod_neon PQOV_NAMESPACE(gf256mat_prod_neon)
 void gf256mat_prod_neon( uint8_t *c, const uint8_t *matA, unsigned n_A_vec_byte, unsigned n_A_width, const uint8_t *b );
 
 
@@ -91,6 +97,7 @@ void gf256mat_prod_neon( uint8_t *c, const uint8_t *matA, unsigned n_A_vec_byte,
 /// @param[in]      len              - the dimension of input matrix a.
 /// @return   1(true) if success. 0(false) if the matrix is singular.
 ///
+#define gf256mat_gaussian_elim_neon PQOV_NAMESPACE(gf256mat_gaussian_elim_neon)
 unsigned gf256mat_gaussian_elim_neon(uint8_t *sq_col_mat_a, uint8_t *constant, unsigned len);
 
 /// @brief Performing back-substituion to solve a linear system, in GF(256)
@@ -99,6 +106,7 @@ unsigned gf256mat_gaussian_elim_neon(uint8_t *sq_col_mat_a, uint8_t *constant, u
 /// @param[in]   sq_row_mat_a  - row echelon form of the square row-major matrix a.
 /// @param[in]   len           - the dimension of input matrix a.
 ///
+#define gf256mat_back_substitute_neon PQOV_NAMESPACE(gf256mat_back_substitute_neon)
 void gf256mat_back_substitute_neon( uint8_t *constant, const uint8_t *sq_row_mat_a, unsigned len);
 
 
