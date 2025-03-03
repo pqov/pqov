@@ -151,7 +151,7 @@ unsigned gf16mat_gaussian_elim_ref(uint8_t *sqmat_a, uint8_t *constant, unsigned
 void gf16mat_back_substitute_ref( uint8_t *constant, const uint8_t *sq_row_mat_a, unsigned len) {
     #ifdef _GF16_TRANSPOSE_
 #define MAX_H  (64)
-    uint8_t mat[MAX_H * (MAX_H / 2)];
+    uint8_t mat[MAX_H * (MAX_H / 2)] = {0};
 #undef MAX_H
     unsigned width_byte = (len + 1) / 2;
     gf16mat_sqmat_transpose( mat, width_byte, sq_row_mat_a, width_byte, len );
