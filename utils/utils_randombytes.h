@@ -14,6 +14,7 @@ extern  "C" {
 
 
 #include "config.h"
+#include "params.h"
 
 
 #if defined(_UTILS_SUPERCOP_)||defined(_UTILS_PQM4_)
@@ -25,7 +26,7 @@ extern  "C" {
 #include "rng.h"
 
 #else
-
+#define randombytes PQOV_NAMESPACE(randombytes)
 void randombytes(unsigned char *x, unsigned long long xlen);
 
 #endif

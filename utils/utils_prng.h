@@ -140,11 +140,13 @@ typedef struct {
 
 
 ///////////////// end of defination of prng_publicinputs_t  /////////////////////////////////
-
+#define prng_set_publicinputs PQOV_NAMESPACE(prng_set_publicinputs)
 int prng_set_publicinputs(prng_publicinputs_t *ctx, const unsigned char prng_seed[16]);
 
+#define prng_gen_publicinputs PQOV_NAMESPACE(prng_gen_publicinputs)
 int prng_gen_publicinputs(prng_publicinputs_t *ctx, unsigned char *out, unsigned long outlen);
 
+#define prng_skip_publicinputs PQOV_NAMESPACE(prng_skip_publicinputs)
 void prng_skip_publicinputs(prng_publicinputs_t *ctx, unsigned long outlen);
 
 

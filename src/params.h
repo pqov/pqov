@@ -26,7 +26,6 @@
 //#define _OV_PKC_SKC
 #endif
 
-
 // -----------------------------------------------------------------------------
 
 #if defined _OV16_160_64
@@ -35,26 +34,35 @@
 #define _PUB_N 160
 #define _PUB_M 64
 #define _HASH_LEN 32
+#define PQOV_NAMESPACE_PARAM Is
 
 #elif defined _OV256_112_44
 #define _GFSIZE 256
 #define _PUB_N 112
 #define _PUB_M 44
 #define _HASH_LEN 32
+#define PQOV_NAMESPACE_PARAM Ip
 
 #elif defined _OV256_184_72
 #define _GFSIZE 256
 #define _PUB_N 184
 #define _PUB_M 72
 #define _HASH_LEN 48
+#define PQOV_NAMESPACE_PARAM III
 
 #elif defined _OV256_244_96
 #define _GFSIZE 256
 #define _PUB_N 244
 #define _PUB_M 96
 #define _HASH_LEN 64
+#define PQOV_NAMESPACE_PARAM V
 #endif
 
+#define PQOV_NAMESPACE_IMPL ref
+#define PQOV_CONCAT_(x1,x2,x3,x4) x1##_##x2##_##x3##_##x4
+#define PQOV_CONCAT(x1,x2,x3,x4) PQOV_CONCAT_(x1,x2,x3,x4)
+#define PQOV_NAMESPACE(s) \
+  PQOV_CONCAT(pqov_uov,PQOV_NAMESPACE_PARAM,PQOV_NAMESPACE_IMPL,s)
 
 
 

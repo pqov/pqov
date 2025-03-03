@@ -8,6 +8,7 @@
 
 
 #include "config.h"
+#include "params.h"
 
 
 #ifdef  __cplusplus
@@ -42,17 +43,19 @@ typedef keccak_state  hash_ctx;
 
 #endif
 
+#define hash_init PQOV_NAMESPACE(hash_init)
+int hash_init(hash_ctx *ctx);
 
+#define hash_update PQOV_NAMESPACE(hash_update)
+int hash_update(hash_ctx *ctx, const unsigned char *mesg, size_t mlen);
 
+#define hash_ctx_copy PQOV_NAMESPACE(hash_ctx_copy)
+int hash_ctx_copy(hash_ctx *nctx,
+                  const hash_ctx *octx); // nctx needs no hash_init()
 
-int hash_init( hash_ctx *ctx );
-
-int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen );
-
-int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx );     // nctx needs no hash_init()
-
-int hash_final_digest( unsigned char *digest, size_t dlen, hash_ctx *ctx );     // free ctx
-
+#define hash_final_digest PQOV_NAMESPACE(hash_final_digest)
+int hash_final_digest(unsigned char *digest, size_t dlen,
+                      hash_ctx *ctx); // free ctx
 
 #ifdef  __cplusplus
 }
