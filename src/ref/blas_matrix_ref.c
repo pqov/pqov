@@ -115,7 +115,7 @@ unsigned gf16mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w_by
 unsigned gf16mat_gaussian_elim_ref(uint8_t *sqmat_a, uint8_t *constant, unsigned len) {
     //const unsigned MAX_H=64;
 #define MAX_H  (64)
-    uint8_t mat[MAX_H * (MAX_H + 4)];
+    uint8_t mat[MAX_H * (MAX_H + 4)] = {0};
 #undef MAX_H
 
     unsigned height = len;
@@ -224,8 +224,9 @@ unsigned gf256mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w )
 }
 
 unsigned gf256mat_gaussian_elim_ref(uint8_t *sqmat_a, uint8_t *constant, unsigned len) {
-    const unsigned MAX_H = 96;
-    uint8_t mat[MAX_H * (MAX_H + 4)];
+    #define MAX_H 96
+    uint8_t mat[MAX_H * (MAX_H + 4)] = {0};
+    #undef MAX_H
 
     unsigned height = len;
     unsigned width  = len + 4;
