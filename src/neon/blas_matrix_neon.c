@@ -16,6 +16,7 @@
 #include "blas_matrix_neon.h"
 
 #include "string.h"
+#include "utils_malloc.h"
 
 //////////// specialized functions  /////////////////////
 
@@ -511,7 +512,7 @@ void gf16mat_sqmat_transpose(uint8_t *dest_mat, unsigned dest_vec_len, const uin
 
 static
 unsigned gf16mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w_byte, unsigned offset ) {
-    uint8_t pivots[96] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t pivots[96];
     unsigned w_2 = w_byte;
 
     uint8_t r8 = 1;
@@ -1088,7 +1089,7 @@ void gf256mat_prod_neon( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte
 
 static
 unsigned gf256mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w, unsigned offset ) {
-    uint8_t pivots[96] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t pivots[96];
 
     uint8_t r8 = 1;
     for (unsigned i = 0; i < h; i++) {
@@ -1129,7 +1130,7 @@ unsigned gf256mat_gauss_elim_row_echolen( uint8_t *mat, unsigned h, unsigned w, 
 
 unsigned gf256mat_gaussian_elim_neon(uint8_t *sqmat_a, uint8_t *constant, unsigned len) {
 #define MAX_H  96
-    uint8_t mat[MAX_H * (MAX_H + 16)] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t mat[MAX_H * (MAX_H + 16)];
 #undef MAX_H
 
     unsigned height = len;

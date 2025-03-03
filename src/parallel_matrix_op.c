@@ -116,7 +116,7 @@ void batch_upper_matTr_x_mat_gf16( unsigned char *bC, const unsigned char *A_to_
                                    const unsigned char *bB, unsigned Bwidth, unsigned size_batch ) {
 #define MAX_O  (64)
 #define MAX_O_BYTE  (32)
-    uint8_t _ALIGN_(32) row[MAX_O * MAX_O_BYTE]; /// XXX: buffer for maximum row
+    PQOV_ALIGN uint8_t row[MAX_O * MAX_O_BYTE]; /// XXX: buffer for maximum row
 #undef MAX_O_BYTE
 #undef MAX_O
     unsigned Atr_height = Awidth;
@@ -140,7 +140,7 @@ static void batch_quad_trimat_eval_multab_gf16( unsigned char *y, const unsigned
 
 void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
     #define MAX_V      (96)
-    uint8_t multabs[(MAX_V) * 32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t multabs[(MAX_V) * 32];
     #undef MAX_V
     gf16v_generate_multabs( multabs, x, dim );
     batch_quad_trimat_eval_multab_gf16( y , trimat , multabs , dim , size_batch );
@@ -151,8 +151,8 @@ void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat,
 void batch_quad_trimat_eval_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
 #define MAX_O_BYTE      (64/2)
 #define MAX_V_BYTE      (96/2)
-    uint8_t x2[MAX_V_BYTE]  __attribute__((aligned(32)));
-    uint8_t tmp[MAX_O_BYTE] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t x2[MAX_V_BYTE];
+    PQOV_ALIGN uint8_t tmp[MAX_O_BYTE];
 #undef  MAX_O_BYTE
 #undef  MAX_V_BYTE
     for (unsigned j = 0; j < (dim / 2) - 1; j++) {
@@ -281,7 +281,7 @@ void batch_upper_matTr_x_mat_multab_gf16( unsigned char *bC, const unsigned char
         const unsigned char *bB, unsigned Bwidth, unsigned size_batch ) {
 #define MAX_O  (64)
 #define MAX_O_BYTE  (32)
-    uint8_t _ALIGN_(32) row[MAX_O * MAX_O_BYTE]; /// XXX: buffer for maximum row
+    PQOV_ALIGN uint8_t row[MAX_O * MAX_O_BYTE]; /// XXX: buffer for maximum row
 #undef MAX_O_BYTE
 #undef MAX_O
     (void)size_Acolvec; // un-used variable
@@ -308,7 +308,7 @@ static
 void batch_quad_trimat_eval_multab_gf16( unsigned char *y, const unsigned char *trimat, const unsigned char *multab_x, unsigned dim, unsigned size_batch ) {
 ///    assert( dim <= 128 );
 ///    assert( size_batch <= 128 );
-    unsigned char tmp[256] __attribute__((aligned(32)));
+    PQOV_ALIGN unsigned char tmp[256];
 
     gf256v_set_zero( y, size_batch );
     for (unsigned i = 0; i < dim; i++) {
@@ -414,7 +414,7 @@ void batch_2trimat_madd_gf256( unsigned char *bC, const unsigned char *btriA,
 void batch_upper_matTr_x_mat_gf256( unsigned char *bC, const unsigned char *A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
                                     const unsigned char *bB, unsigned Bwidth, unsigned size_batch ) {
 #define MAX_O  (96)
-    uint8_t _ALIGN_(32) row[MAX_O * MAX_O]; /// XXX: buffer for maximum row
+    PQOV_ALIGN uint8_t row[MAX_O * MAX_O]; /// XXX: buffer for maximum row
 #undef MAX_O
 
     unsigned Atr_height = Awidth;
@@ -438,7 +438,7 @@ static void batch_quad_trimat_eval_multab_gf256( unsigned char *y, const unsigne
 
 void batch_quad_trimat_eval_gf256( unsigned char *y, const unsigned char *trimat, const unsigned char *x, unsigned dim, unsigned size_batch ) {
     #define MAX_V      (148)
-    uint8_t multabs[(MAX_V) * 32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t multabs[(MAX_V) * 32];
     #undef MAX_V
     gf256v_generate_multabs( multabs, x, dim );
     batch_quad_trimat_eval_multab_gf256( y , trimat , multabs , dim , size_batch );
@@ -557,7 +557,7 @@ void batch_2trimat_madd_multab_gf256( unsigned char *bC, const unsigned char *bt
 void batch_upper_matTr_x_mat_multab_gf256( unsigned char *bC, const unsigned char *A_to_tr, unsigned Aheight, unsigned size_Acolvec, unsigned Awidth,
         const unsigned char *bB, unsigned Bwidth, unsigned size_batch ) {
 #define MAX_O  (96)
-    uint8_t _ALIGN_(32) row[MAX_O * MAX_O]; /// XXX: buffer for maximum row
+    PQOV_ALIGN uint8_t row[MAX_O * MAX_O]; /// XXX: buffer for maximum row
 #undef MAX_O
     (void)size_Acolvec; // un-used variable
     const unsigned w_multab = 5;
@@ -580,7 +580,7 @@ void batch_quad_trimat_eval_multab_gf256( unsigned char *y, const unsigned char 
 ///
 ///    assert( dim <= 256 );
 ///    assert( size_batch <= 256 );
-    unsigned char tmp[256] __attribute__((aligned(32)));
+    PQOV_ALIGN unsigned char tmp[256];
 
     gf256v_set_zero( y, size_batch );
     for (unsigned i = 0; i < dim; i++) {

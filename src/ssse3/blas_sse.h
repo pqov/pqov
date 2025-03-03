@@ -17,6 +17,7 @@
 #include "gf16_sse.h"
 
 #include "gf16_tabs.h"
+#include "utils_malloc.h"
 
 //#include "assert.h"
 
@@ -29,7 +30,7 @@
 
 static inline
 __m128i _load_xmm( const uint8_t *a, unsigned _num_byte ) {
-    uint8_t temp[32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t temp[32];
     //assert( 16 >= _num_byte );
     //assert( 0 < _num_byte );
     for (unsigned i = 0; i < _num_byte; i++) {
@@ -54,7 +55,7 @@ void loadu_xmm( __m128i *xmm_a, const uint8_t *a, unsigned _num_byte ) {
 
 static inline
 void _store_xmm( uint8_t *a, unsigned _num_byte, __m128i data ) {
-    uint8_t temp[32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t temp[32];
     //assert( 16 >= _num_byte );
     //assert( 0 < _num_byte );
     _mm_store_si128((__m128i *)temp, data);

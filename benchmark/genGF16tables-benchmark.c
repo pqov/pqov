@@ -9,6 +9,7 @@
 
 #include "blas_avx2.h"
 #include "blas_avx2_gfni.h"
+#include "utils_malloc.h"
 
 
 #define N_LARGE    (512)
@@ -16,11 +17,11 @@
 #define MULTAB_BYTE (32)
 
 
-uint8_t largeMULTAB0[N_LARGE*MULTAB_BYTE] __attribute__((aligned(32)));
-uint8_t largeMULTAB1[N_LARGE*MULTAB_BYTE] __attribute__((aligned(32)));
+PQOV_ALIGN uint8_t largeMULTAB0[N_LARGE*MULTAB_BYTE];
+PQOV_ALIGN uint8_t largeMULTAB1[N_LARGE*MULTAB_BYTE];
 
-uint8_t smallMULTAB0[N_SMALL*MULTAB_BYTE] __attribute__((aligned(32)));
-uint8_t smallMULTAB1[N_SMALL*MULTAB_BYTE] __attribute__((aligned(32)));
+PQOV_ALIGN uint8_t smallMULTAB0[N_SMALL*MULTAB_BYTE];
+PQOV_ALIGN uint8_t smallMULTAB1[N_SMALL*MULTAB_BYTE];
 
 
 static

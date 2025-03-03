@@ -15,7 +15,7 @@
 
 
 // gf16 := gf2[x]/(x^4+x+1)
-static const unsigned char __gf16_rdtab_256[32] __attribute__((aligned(32))) = {
+PQOV_ALIGN static const unsigned char __gf16_rdtab_256[32] = {
     0x00, 0x13, 0x26, 0x35, 0x4c, 0x5f, 0x6a, 0x79, 0x8b, 0x98, 0xad, 0xbe, 0xc7, 0xd4, 0xe1, 0xf2,
     0x00, 0x13, 0x26, 0x35, 0x4c, 0x5f, 0x6a, 0x79, 0x8b, 0x98, 0xad, 0xbe, 0xc7, 0xd4, 0xe1, 0xf2,
 };
@@ -27,11 +27,11 @@ __m256i _gf16v_reduce_gfni( __m256i mb, __m256i rdtab, __m256i mask_f ) {
 }
 
 
-static const uint32_t __split_low_4bits[8] __attribute__((aligned(32))) = {
+PQOV_ALIGN static const uint32_t __split_low_4bits[8] = {
     0x01010101, 0x01010101, 0x02020202, 0x02020202, 0x04040404, 0x04040404, 0x08080808, 0x08080808,
 };
 
-static const uint32_t __gf16_mulbit[8] __attribute__((aligned(32))) = {
+PQOV_ALIGN static const uint32_t __gf16_mulbit[8] = {
     0x10204080, 0x01020408, 0x80902040, 0x08090204, 0x40c09020, 0x040c0902, 0x2060c090, 0x02060c09,
 };
 
