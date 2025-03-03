@@ -71,6 +71,13 @@
 #endif
 
 
+#if defined(_UTILS_OQS_)
+#include <oqs/common.h>
+#if defined(OQS_ENABLE_TEST_CONSTANT_TIME)
+#define _VALGRIND_
+#endif
+#endif
+
 //
 // Options for randombytes()
 //
