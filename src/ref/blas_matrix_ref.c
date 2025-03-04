@@ -249,8 +249,9 @@ unsigned gf256mat_gaussian_elim_ref(uint8_t *sqmat_a, uint8_t *constant, unsigne
 }
 
 void gf256mat_back_substitute_ref( uint8_t *constant, const uint8_t *sq_row_mat_a, unsigned len) {
-    const unsigned MAX_H = 96;
+    #define MAX_H 96
     uint8_t column[MAX_H];
+    #undef MAX_H
     for (int i = len - 1; i > 0; i--) {
         for (int j = 0; j < i; j++) {
             column[j] = sq_row_mat_a[j * len + i];    // row-major -> column-major, i.e., transpose

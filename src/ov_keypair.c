@@ -209,7 +209,7 @@ int generate_keypair_pkc_skc( cpk_t *pk, csk_t *rsk, const unsigned char *sk_see
     int r = generate_keypair_pkc( pk, sk, sk_seed );
 
     #if defined(_MALLOC_)
-    ov_free(sk);
+    ov_free(sk, sizeof(sk_t));
     #endif
     return r;
 }

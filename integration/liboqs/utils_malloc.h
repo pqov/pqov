@@ -7,18 +7,9 @@
 #ifndef _UTILS_MALLOC_H_
 #define _UTILS_MALLOC_H_
 
-#include <stdlib.h>
-
-#define ov_malloc malloc
-
-static inline void ov_free(void *ptr, size_t len){
-    (void) len;
-    free(ptr);
-}
-
-#if !defined(PQM4)
-#define _HAS_MEMALIGN_
-#endif
+#include <oqs/common.h>
+#define ov_malloc OQS_MEM_malloc
+#define ov_free OQS_MEM_secure_free
 
 #if defined(__GNUC__) || defined(__clang__)
 #define PQOV_ALIGN  __attribute__((aligned(32)))

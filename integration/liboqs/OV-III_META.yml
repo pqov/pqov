@@ -1,4 +1,4 @@
-name: OV-Is
+name: OV-III
 type: signature
 principal-submitters:
 - Ward Beullens
@@ -12,18 +12,18 @@ principal-submitters:
 - Cheng-Jhih Shih
 - Chengdong Tao
 - Bo-Yin Yang
-claimed-nist-level: 1
-length-public-key: 412160
-length-secret-key: 348704
-length-signature: 96
-nistkat-sha256: dced6dd2c556663d48f579d5ea78e918c4eb46ecdbfcf418d83fbc9d2e6b5273
+claimed-nist-level: 3
+length-public-key: 1225440
+length-secret-key: 1044320
+length-signature: 200
+nistkat-sha256: f8101912d1d2c2eb0a5903b74b4e4c98bd5008be9666dcaaa6f7912918005e5e
 implementations:
 - name: ref
   # TODO: update when integration is completed
   version: https://github.com/pqov/pqov/tree/aeb455466c66503c6235082d9d4ac790b821b5e2
   folder_name: .
-  compile_opts: -D_OV16_160_64 -D_OV_CLASSIC -D_UTILS_OQS_
-  signature_keypair: pqov_uov_Is_ref_keypair
-  signature_signature: pqov_uov_Is_ref_signature
-  signature_verify: pqov_uov_Is_ref_verify
+  compile_opts: -D_OV256_184_72 -D_OV_CLASSIC -D_UTILS_OQS_
+  signature_keypair: pqov_uov_III_ref_keypair
+  signature_signature: pqov_uov_III_ref_signature
+  signature_verify: pqov_uov_III_ref_verify
   sources: src/api.h src/blas.h src/blas_comm.h src/blas_matrix.c src/blas_matrix.h src/config.h src/gf16.h src/ov.c src/ov.h src/ov_blas.h src/ov_keypair.c src/ov_keypair.h src/ov_keypair_computation.c src/ov_keypair_computation.h src/ov_publicmap.c src/parallel_matrix_op.c src/parallel_matrix_op.h src/params.h src/sign.c src/ref/blas_matrix_ref.c src/ref/blas_matrix_ref.h src/ref/blas_u32.h utils/utils_hash.c utils/utils_hash.h utils/utils_prng.c utils/utils_prng.h utils/utils_randombytes.c utils/utils_randombytes.h integration/liboqs/utils_malloc.h
