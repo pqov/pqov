@@ -133,8 +133,12 @@
 #endif
 
 
-
+#if defined(_BLAS_NEON_)
+#define PQOV_NAMESPACE_IMPL neon
+#else
 #define PQOV_NAMESPACE_IMPL ref
+#endif
+
 #define PQOV_CONCAT_(x1,x2,x3,x4,x5) x1##_##x2##x3##_##x4##_##x5
 #define PQOV_CONCAT(x1,x2,x3,x4,x5) PQOV_CONCAT_(x1,x2,x3,x4,x5)
 #define PQOV_NAMESPACE(s) \

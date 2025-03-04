@@ -58,7 +58,7 @@
 // arm neon bitslice aes
 //#define _UTILS_NEONBSAES_
 
-#if ! (defined(_UTILS_PQM4_)||defined(_UTILS_AESNI_)||defined(_UTILS_NEONAES_)||defined(_UTILS_NEONBSAES_))
+#if ! (defined(_UTILS_PQM4_)||defined(_UTILS_AESNI_)||defined(_UTILS_NEONAES_)||defined(_UTILS_NEONBSAES_)||defined(_UTILS_OQS_))
 
 #if defined(_BLAS_AVX2_)
 #define _UTILS_AESNI_
