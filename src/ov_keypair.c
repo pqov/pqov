@@ -19,7 +19,7 @@
 #include "utils_hash.h"
 #include "utils_malloc.h"
 
-#if 96 < _V
+#if !defined(PQM4)
 #define _MALLOC_
 #endif
 

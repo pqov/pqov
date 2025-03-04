@@ -135,6 +135,8 @@
 
 #if defined(_BLAS_NEON_)
 #define PQOV_NAMESPACE_IMPL neon
+#elif defined(_BLAS_AVX2_)
+#define PQOV_NAMESPACE_IMPL avx2
 #else
 #define PQOV_NAMESPACE_IMPL ref
 #endif

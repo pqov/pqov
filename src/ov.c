@@ -159,7 +159,7 @@ int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, co
 
 
 #if defined(_OV_PKC) || defined(_OV_PKC_SKC)
-#if 96 < _V
+#if !defined(PQM4)
 #define _MALLOC_
 #endif
 

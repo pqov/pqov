@@ -205,7 +205,7 @@ void gf16mat_prod_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte,
         gf256v_set_zero( c, matA_vec_byte );
         while( matA_n_vec ) {
             unsigned n_ele = ( matA_n_vec >= _V)? _V : matA_n_vec;
-            gf16v_generate_multabs( (uint8_t*)multabs, b, n_ele );
+            _gf16v_generate_multabs_avx2(multabs, b, n_ele );
             gf16mat_madd_multab_avx2(c, matA, matA_vec_byte, matA_n_vec, (const uint8_t *)multabs);
             b += (n_ele >> 1);
             matA += matA_vec_byte * n_ele;
@@ -568,7 +568,7 @@ unsigned _gf16mat_sol_64x64_avx2( uint8_t *mat, __m256i *vec) {
 
     __m256i mask_f = _mm256_set1_epi8( 0xf );
 
-    PQOV_ALIGN pivots[64];
+    PQOV_ALIGN uint8_t pivots[64];
     __m256i multabs[64];
 
     const unsigned h = 64;
@@ -896,8 +896,8 @@ void gf256mat_back_substitute_avx2( uint8_t *constant, const uint8_t *sq_row_mat
             column[j] = sq_row_mat_a[j * len + i];    // row-major -> column-major, i.e., transpose
         }
         column[i] = 0;
-        unsigned len = ((i + 31) >> 5) << 5;
-        gf256v_madd_avx2( temp, column, temp[i], len );
+        unsigned len2 = ((i + 31) >> 5) << 5;
+        gf256v_madd_avx2( temp, column, temp[i], len2 );
     }
     memcpy( constant, temp, len );
 }

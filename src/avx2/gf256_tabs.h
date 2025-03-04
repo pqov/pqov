@@ -7,13 +7,14 @@
 #define _GF256_TABS_H_
 
 #include <stdint.h>
+#include "params.h"
 
 //IF_CRYPTO_CORE:define CRYPTO_NAMESPACE
 
 #ifdef  __cplusplus
 extern  "C" {
 #endif
-
+#define __gf256_mulbase_avx PQOV_NAMESPACE(__gf256_mulbase_avx)
 extern const unsigned char __gf256_mulbase_avx[];
 
 
