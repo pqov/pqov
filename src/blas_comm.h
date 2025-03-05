@@ -77,10 +77,6 @@ static inline unsigned gf256v_is_zero(const uint8_t *a, unsigned _num_byte) {
     return (0 == r);
 }
 
-#if defined(_VALGRIND_)
-#include "valgrind/memcheck.h"
-#endif
-
 #include "blas.h"
 //
 //  gf256v_add() should be defined in blas.h
@@ -92,10 +88,7 @@ static inline unsigned gf256v_is_zero(const uint8_t *a, unsigned _num_byte) {
 /// @param[in]  _num_byte   - number of bytes for the vector b.
 ///
 static inline void gf256v_set_zero(uint8_t *b, unsigned _num_byte) {
-    #if defined(_VALGRIND_)
-    VALGRIND_MAKE_MEM_DEFINED(b, _num_byte);
-    #endif
-    gf256v_add(b, b, _num_byte);
+    memset(b, 0, _num_byte);
 }
 
 
