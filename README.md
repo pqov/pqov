@@ -5,7 +5,9 @@ This project contains the reference and optimized implementations of the oil and
 
 ## Licence
 
-Public domain unless stated differently at the top of each file.
+Public Domain (https://creativecommons.org/share-your-work/public-domain/cc0/);
+or Apache 2.0 License (https://www.apache.org/licenses/LICENSE-2.0.html)
+unless stated differently at the top of each file. 
 
 ## Parameters
 
