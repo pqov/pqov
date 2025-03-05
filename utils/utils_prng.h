@@ -109,6 +109,17 @@ typedef struct {
     #endif
 } prng_publicinputs_t;
 
+#elif defined(_UTILS_OQS_)
+#define RNG_OUTPUTLEN 16
+
+
+typedef struct {
+    unsigned used;
+    uint32_t ctr;
+    unsigned char   buf[RNG_OUTPUTLEN];
+
+    void *ctx;
+} prng_publicinputs_t;
 
 #else
 

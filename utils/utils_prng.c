@@ -158,6 +158,32 @@ void prng_release_publicinputs(prng_publicinputs_t *ctx){
 //#define aes256ctr  crypto_stream_aes256ctr
 //#error "needs to be implemented"
 
+#elif defined(_UTILS_OQS_)
+
+#include <oqs/aes.h>
+int prng_set_publicinputs(prng_publicinputs_t *ctx, const unsigned char prng_seed[16]) {
+    ctx->ctr =0;
+    ctx->used = RNG_OUTPUTLEN;
+    OQS_AES128_CTR_inc_init(prng_seed, &ctx->ctx);
+    return 0;
+}
+
+
+static inline uint32_t br_swap32(uint32_t x) {
+    x = ((x & (uint32_t)0x00FF00FF) << 8)
+        | ((x >> 8) & (uint32_t)0x00FF00FF);
+    return (x << 16) | (x >> 16);
+}
+
+static
+int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned char *n, uint32_t ctr, const prng_publicinputs_t *pctx ) {
+    uint32_t iv[4];
+    memcpy(iv, n, AES128CTR_NONCELEN);
+    iv[3] = br_swap32(ctr);
+    
+    OQS_AES128_CTR_inc_stream_iv((uint8_t*)iv, 16, pctx->ctx, out, nblocks*16);
+    return 0;
+}
 
 void prng_release_publicinputs(prng_publicinputs_t *ctx){
     OQS_AES128_free_schedule(ctx->ctx);
