@@ -179,8 +179,13 @@ static
 int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned char *n, uint32_t ctr, const prng_publicinputs_t *pctx ) {
     uint32_t iv[4];
     memcpy(iv, n, AES128CTR_NONCELEN);
+
+    #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+    iv[3] = ctr;
+    #else
     iv[3] = br_swap32(ctr);
-    
+    #endif
+
     OQS_AES128_CTR_inc_stream_iv((uint8_t*)iv, 16, pctx->ctx, out, nblocks*16);
     return 0;
 }
@@ -231,8 +236,14 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
     while (nblocks--) {
         uint32_t c0 = ctr;
         uint32_t c1 = ctr + 1;
+
+        #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+        ptext0[3] = c0;
+        ptext1[3] = c1;
+        #else
         ptext0[3] = br_swap32(c0);
         ptext1[3] = br_swap32(c1);
+        #endif
         #ifdef _4ROUND_AES_
         aes128_4r_encrypt_ffs(out, out + 16, p0, p1, pctx->key);
         #else
@@ -242,8 +253,14 @@ int aes128ctr_publicinputs( unsigned char *out, unsigned nblocks, const unsigned
 
         uint32_t c2 = ctr + 2;    // XXX: ctr might overflow 32-bit boundary
         uint32_t c3 = ctr + 3;    // For the usage in OV, this is ok for expanding pk only.
+
+        #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+        ptext0[3] = c2;
+        ptext1[3] = c3;
+        #else
         ptext0[3] = br_swap32(c2);
         ptext1[3] = br_swap32(c3);
+        #endif
         #ifdef _4ROUND_AES_
         aes128_4r_encrypt_ffs(out, out + 16, p0, p1, pctx->key);
         #else
