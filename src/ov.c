@@ -157,18 +157,36 @@ int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, co
 }
 #endif
 
+
+#if defined(_OV_PKC) || defined(_OV_PKC_SKC)
+#if !defined(PQM4)
+#define _MALLOC_
+#endif
+
 #if defined(_OV_PKC_SKC)
 int ov_expand_and_sign( uint8_t *signature, const csk_t *csk, const uint8_t *message, size_t mlen ) {
+    #ifdef _MALLOC_
+    sk_t *sk = ov_malloc(sizeof(sk_t));
+    if (NULL == sk) {
+        return -1;
+    }
+    #else
     sk_t _sk;
     sk_t *sk = &_sk;
+    #endif
+
     expand_sk( sk, csk->sk_seed );    // generating classic secret key.
 
     int r = ov_sign( signature, sk, message, mlen );
+
+    #ifdef _MALLOC_
+    ov_free(sk, sizeof(sk_t));
+    #endif
+
     return r;
 }
 #endif
 
-#if defined(_OV_PKC) || defined(_OV_PKC_SKC)
 int ov_expand_and_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const cpk_t *cpk ) {
 
     #ifdef _SAVE_MEMORY_
@@ -176,8 +194,18 @@ int ov_expand_and_verify( const uint8_t *message, size_t mlen, const uint8_t *si
     ov_publicmap_pkc( digest_ck, cpk, signature );
     return _ov_verify( message, mlen, signature + _PUB_N_BYTE, digest_ck );
     #else
+    int rc;
+
+    #ifdef _MALLOC_
+    pk_t *pk = ov_malloc(sizeof(pk_t));
+    if (NULL == pk) {
+        return -1;
+    }
+    #else
     pk_t _pk;
     pk_t *pk = &_pk;
+    #endif
+
     #if _GFSIZE == 16  && (defined(_BLAS_NEON_) || defined(_BLAS_M4F_))
     uint8_t xi[_PUB_N];
     for (int i = 0; i < _PUB_N; i++) {
@@ -187,7 +215,13 @@ int ov_expand_and_verify( const uint8_t *message, size_t mlen, const uint8_t *si
     #else
     expand_pk( pk, cpk );
     #endif
-    return ov_verify( message, mlen, signature, pk );
+    rc = ov_verify( message, mlen, signature, pk );
+
+
+    #ifdef _MALLOC_
+    ov_free(pk, sizeof(pk_t));
+    #endif
+    return rc;
     #endif
 }
 #endif

@@ -19,7 +19,7 @@
 #include "utils_hash.h"
 #include "utils_malloc.h"
 
-#if 96 < _V
+#if !defined(PQM4)
 #define _MALLOC_
 #endif
 
@@ -198,7 +198,7 @@ int generate_keypair_pkc_skc( cpk_t *pk, csk_t *rsk, const unsigned char *sk_see
     memcpy( rsk->sk_seed, sk_seed, LEN_SKSEED );
 
     #if defined(_MALLOC_)
-    sk_t *sk = malloc(sizeof(sk_t));
+    sk_t *sk = ov_malloc(sizeof(sk_t));
     if (NULL == sk) {
         return -1;
     }
@@ -209,7 +209,7 @@ int generate_keypair_pkc_skc( cpk_t *pk, csk_t *rsk, const unsigned char *sk_see
     int r = generate_keypair_pkc( pk, sk, sk_seed );
 
     #if defined(_MALLOC_)
-    free(sk);
+    ov_free(sk, sizeof(sk_t));
     #endif
     return r;
 }
