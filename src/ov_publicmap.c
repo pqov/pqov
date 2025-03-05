@@ -201,24 +201,6 @@ void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, co
         }
         gfv_mul_scalar( _xixj + i_start, _x[i], v - i_start );
         unsigned j = i;
-        for (; j + 3 < v; j += 4) {
-            unsigned idx0 = _xixj[j];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx0 & 0xf), trimat, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx0 >> 4), trimat, tmpvec_len );
-
-            unsigned idx1 = _xixj[j + 1];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx1 & 0xf), trimat + vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx1 >> 4), trimat + vec_len, tmpvec_len );
-
-            unsigned idx2 = _xixj[j + 2];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx2 & 0xf), trimat + 2 * vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx2 >> 4), trimat + 2 * vec_len, tmpvec_len );
-
-            unsigned idx3 = _xixj[j + 3];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx3 & 0xf), trimat + 3 * vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx3 >> 4), trimat + 3 * vec_len, tmpvec_len );
-            trimat += vec_len * 4;
-        }
         for (; j < v; j++) {
             unsigned idx = _xixj[j];
             gf256v_add( accu_low  + TMPVEC_LEN * (idx & 0xf), trimat, tmpvec_len );
@@ -233,24 +215,6 @@ void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, co
         }
         gfv_mul_scalar( _xixj, _x[i], o );
         unsigned j = 0;
-        for (; j + 3 < o; j += 4) {
-            unsigned idx0 = _xixj[j];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx0 & 0xf), trimat, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx0 >> 4), trimat, tmpvec_len );
-
-            unsigned idx1 = _xixj[j + 1];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx1 & 0xf), trimat + vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx1 >> 4), trimat + vec_len, tmpvec_len );
-
-            unsigned idx2 = _xixj[j + 2];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx2 & 0xf), trimat + 2 * vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx2 >> 4), trimat + 2 * vec_len, tmpvec_len );
-
-            unsigned idx3 = _xixj[j + 3];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx3 & 0xf), trimat + 3 * vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx3 >> 4), trimat + 3 * vec_len, tmpvec_len );
-            trimat += vec_len * 4;
-        }
         for (; j < o; j++) {
             unsigned idx = _xixj[j];
             gf256v_add( accu_low  + TMPVEC_LEN * (idx & 0xf), trimat, tmpvec_len );
@@ -274,24 +238,6 @@ void accu_eval_quad_gf256( unsigned char *accu_low, unsigned char *accu_high, co
         }
         gfv_mul_scalar( _xixj + i_start, _x[i], n - i_start );
         unsigned j = i;
-        for (; j + 3 < n; j += 4) {
-            unsigned idx0 = _xixj[j];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx0 & 0xf), trimat, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx0 >> 4), trimat, tmpvec_len );
-
-            unsigned idx1 = _xixj[j + 1];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx1 & 0xf), trimat + vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx1 >> 4), trimat + vec_len, tmpvec_len );
-
-            unsigned idx2 = _xixj[j + 2];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx2 & 0xf), trimat + 2 * vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx2 >> 4), trimat + 2 * vec_len, tmpvec_len );
-
-            unsigned idx3 = _xixj[j + 3];
-            gf256v_add( accu_low  + TMPVEC_LEN * (idx3 & 0xf), trimat + 3 * vec_len, tmpvec_len );
-            gf256v_add( accu_high + TMPVEC_LEN * (idx3 >> 4), trimat + 3 * vec_len, tmpvec_len );
-            trimat += vec_len * 4;
-        }
         for (; j < n; j++) {
             unsigned idx = _xixj[j];
             gf256v_add( accu_low  + TMPVEC_LEN * (idx & 0xf), trimat, tmpvec_len );
