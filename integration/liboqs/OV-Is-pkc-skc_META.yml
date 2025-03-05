@@ -1,0 +1,58 @@
+name: OV-Is-pkc-skc
+type: signature
+principal-submitters:
+- Ward Beullens
+- Ming-Shing Chen
+- Jintai Ding
+- Boru Gong
+- Matthias J. Kannwischer
+- Jacques Patarin
+- Bo-Yuan Peng
+- Dieter Schmidt
+- Cheng-Jhih Shih
+- Chengdong Tao
+- Bo-Yin Yang
+claimed-nist-level: 1
+length-public-key: 66576
+length-secret-key: 32
+length-signature: 96
+nistkat-sha256: 6fe28b2d1a7186c9d826a33f770eea02976b429219a21f812e5db599f5b71a80
+implementations:
+- name: ref
+  version: Round 2
+  folder_name: .
+  compile_opts: -D_OV16_160_64 -D_OV_PKC_SKC -D_UTILS_OQS_
+  signature_keypair: pqov_uov_Is_pkc_skc_ref_keypair
+  signature_signature: pqov_uov_Is_pkc_skc_ref_signature
+  signature_verify: pqov_uov_Is_pkc_skc_ref_verify
+  sources: src/api.h src/blas.h src/blas_comm.h src/blas_matrix.c src/blas_matrix.h src/config.h src/gf16.h src/ov.c src/ov.h src/ov_blas.h src/ov_keypair.c src/ov_keypair.h src/ov_keypair_computation.c src/ov_keypair_computation.h src/ov_publicmap.c src/parallel_matrix_op.c src/parallel_matrix_op.h src/params.h src/sign.c src/ref/blas_matrix_ref.c src/ref/blas_matrix_ref.h src/ref/blas_u32.h utils/utils_hash.c utils/utils_hash.h utils/utils_prng.c utils/utils_prng.h utils/utils_randombytes.c utils/utils_randombytes.h integration/liboqs/utils_malloc.h
+- name: neon
+  version: Round 2
+  folder_name: .
+  compile_opts: -D_OV16_160_64 -D_OV_PKC_SKC -D_UTILS_OQS_ -D_BLAS_NEON_ -D_MUL_WITH_MULTAB_ 
+  signature_keypair: pqov_uov_Is_pkc_skc_neon_keypair
+  signature_signature: pqov_uov_Is_pkc_skc_neon_signature
+  signature_verify: pqov_uov_Is_pkc_skc_neon_verify
+  sources: src/api.h src/blas.h src/blas_comm.h src/blas_matrix.c src/blas_matrix.h src/config.h src/gf16.h src/ov.c src/ov.h src/ov_blas.h src/ov_keypair.c src/ov_keypair.h src/ov_keypair_computation.c src/ov_keypair_computation.h src/ov_publicmap.c src/parallel_matrix_op.c src/parallel_matrix_op.h src/params.h src/sign.c src/ref/blas_u32.h src/neon/blas_matrix_neon.c src/neon/blas_matrix_neon.h src/neon/blas_neon.h src/neon/gf16_neon.h src/neon/gf16_tabs_neon.c src/neon/gf16_tabs_neon.h utils/utils_hash.c utils/utils_hash.h utils/utils_prng.c utils/utils_prng.h utils/utils_randombytes.c utils/utils_randombytes.h integration/liboqs/utils_malloc.h
+  supported_platforms:
+    - architecture: arm_8
+      operating_systems:
+          - Linux
+          - Darwin
+      required_flags:
+          - asimd
+- name: avx2
+  version: Round 2
+  folder_name: .
+  compile_opts: -D_OV16_160_64 -D_OV_PKC_SKC -D_UTILS_OQS_ -D_BLAS_AVX2_ -D_MUL_WITH_MULTAB_
+  signature_keypair: pqov_uov_Is_pkc_skc_avx2_keypair
+  signature_signature: pqov_uov_Is_pkc_skc_avx2_signature
+  signature_verify: pqov_uov_Is_pkc_skc_avx2_verify
+  sources: src/api.h src/blas.h src/blas_comm.h src/blas_matrix.c src/blas_matrix.h src/config.h src/gf16.h src/ov.c src/ov.h src/ov_blas.h src/ov_keypair.c src/ov_keypair.h src/ov_keypair_computation.c src/ov_keypair_computation.h src/ov_publicmap.c src/parallel_matrix_op.c src/parallel_matrix_op.h src/params.h src/sign.c src/ref/blas_u32.h src/ref/blas_matrix_ref.h src/ref/blas_matrix_ref.c src/avx2/blas_avx2.h src/avx2/blas_matrix_avx2.h src/avx2/blas_matrix_avx2.c src/avx2/gf16_avx2.h src/avx2/gf256_tabs.c src/avx2/gf256_tabs.h src/ssse3/gf16_sse.h src/ssse3/gf16_tabs.h src/ssse3/gf16_tabs.c src/ssse3/blas_sse.h src/ssse3/blas_matrix_sse.h utils/utils_hash.c utils/utils_hash.h utils/utils_prng.c utils/utils_prng.h utils/utils_randombytes.c utils/utils_randombytes.h integration/liboqs/utils_malloc.h
+  supported_platforms:
+    - architecture: x86_64
+      operating_systems:
+          - Linux
+          - Darwin
+      required_flags:
+          - avx2
