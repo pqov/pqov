@@ -29,7 +29,7 @@ implementations:
 - name: neon
   version: Round 2
   folder_name: .
-  compile_opts: -D_OV16_160_64 -D_OV_PKC -D_UTILS_OQS_ -D_BLAS_NEON_
+  compile_opts: -D_OV16_160_64 -D_OV_PKC -D_UTILS_OQS_ -D_BLAS_NEON_ -D_MUL_WITH_MULTAB_ 
   signature_keypair: pqov_uov_Is_pkc_neon_keypair
   signature_signature: pqov_uov_Is_pkc_neon_signature
   signature_verify: pqov_uov_Is_pkc_neon_verify
