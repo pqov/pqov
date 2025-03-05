@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_matrix_sse.h
 /// @brief linear algebra functions for matrix operations, specialized for SSSE3 instruction set.
 ///

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file utils.h
 /// @brief Utilities for IO.
 ///
@@ -22,10 +23,6 @@ unsigned byte_fget( FILE *fp, unsigned char *v, unsigned n_byte );
 int byte_from_file( unsigned char *v, unsigned n_byte, const char *f_name );
 
 int byte_from_binfile( unsigned char *v, unsigned n_byte, const char *f_name );
-
-
-int byte_read_file( unsigned char **msg, unsigned long long *len, const char *f_name );
-
 
 #ifdef  __cplusplus
 }

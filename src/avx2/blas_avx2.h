@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_avx2.h
 /// @brief Inlined functions for implementing basic linear algebra functions for AVX2 arch.
 ///
@@ -15,7 +16,7 @@
 #include "gf16_avx2.h"
 
 #include "blas_sse.h"
-
+#include "utils_malloc.h"
 
 
 
@@ -23,7 +24,7 @@
 
 static inline
 __m256i _load_ymm( const uint8_t *a, unsigned _num_byte ) {
-    uint8_t temp[32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t temp[32];
     //assert( 32 >= _num_byte );
     //assert( 0 < _num_byte );
     for (unsigned i = 0; i < _num_byte; i++) {
@@ -50,7 +51,7 @@ void loadu_ymm( __m256i *ymm_a, const uint8_t *a, unsigned _num_byte ) {
 
 static inline
 void _store_ymm( uint8_t *a, unsigned _num_byte, __m256i data ) {
-    uint8_t temp[32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t temp[32];
     //assert( 32 >= _num_byte );
     //assert( 0 < _num_byte );
     _mm256_store_si256((__m256i *)temp, data);

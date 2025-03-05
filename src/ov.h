@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file ov.h
 /// @brief APIs for ov.
 ///
@@ -30,6 +31,7 @@ extern  "C" {
 /// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
+#define generate_keypair PQOV_NAMESPACE(generate_keypair)
 int generate_keypair( pk_t *pk, sk_t *sk, const unsigned char *sk_seed);
 
 
@@ -45,6 +47,7 @@ int generate_keypair( pk_t *pk, sk_t *sk, const unsigned char *sk_seed);
 /// @param[in]  sk_seed   - seed for generating secret key.
 /// @return 0 for success. -1 otherwise.
 ///
+#define generate_keypair_pkc PQOV_NAMESPACE(generate_keypair_pkc)
 int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *sk_seed );
 
 ///
@@ -55,6 +58,7 @@ int generate_keypair_pkc( cpk_t *pk, sk_t *sk, const unsigned char *sk_seed );
 /// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
+#define generate_keypair_pkc_skc PQOV_NAMESPACE(generate_keypair_pkc_skc)
 int generate_keypair_pkc_skc( cpk_t *pk, csk_t *sk, const unsigned char *sk_seed );
 
 
@@ -70,6 +74,7 @@ int generate_keypair_pkc_skc( cpk_t *pk, csk_t *sk, const unsigned char *sk_seed
 /// @param[out] pk       - the classic public key.
 /// @param[in]  cpk      - the cycli  public key.
 ///
+#define expand_pk PQOV_NAMESPACE(expand_pk)
 int expand_pk( pk_t *pk, const cpk_t *cpk );
 
 ///
@@ -79,6 +84,7 @@ int expand_pk( pk_t *pk, const cpk_t *cpk );
 /// @param[in]  cpk      - the cycli  public key.
 /// @param[in]  predicate - if 0==predicate[i], the public key corresponding to xi will not be generated.
 ///
+#define expand_pk_predicate PQOV_NAMESPACE(expand_pk_predicate)
 int expand_pk_predicate( pk_t *pk, const cpk_t *cpk, const unsigned char *predicate);
 
 
@@ -89,6 +95,7 @@ int expand_pk_predicate( pk_t *pk, const cpk_t *cpk, const unsigned char *predic
 /// @param[in]  sk_seed   - seed for generating the secret key.
 /// @return 0 for success. -1 otherwise.
 ///
+#define expand_sk PQOV_NAMESPACE(expand_sk)
 int expand_sk( sk_t *sk, const unsigned char *sk_seed );
 
 
@@ -102,6 +109,7 @@ int expand_sk( sk_t *sk, const unsigned char *sk_seed );
 /// @param[in]  pk        - the classic public key.
 /// @param[in]  w         - the input vector w.
 ///
+#define ov_publicmap PQOV_NAMESPACE(ov_publicmap)
 void ov_publicmap( unsigned char *z, const unsigned char *pk, const unsigned char *w );
 
 
@@ -113,6 +121,7 @@ void ov_publicmap( unsigned char *z, const unsigned char *pk, const unsigned cha
 /// @param[in]  pk        - the compressed public key.
 /// @param[in]  w         - the input vector w.
 ///
+#define ov_publicmap_pkc PQOV_NAMESPACE(ov_publicmap_pkc)
 void ov_publicmap_pkc( unsigned char *z, const cpk_t *pk, const unsigned char *w );
 
 
@@ -135,6 +144,7 @@ void ov_publicmap_pkc( unsigned char *z, const cpk_t *pk, const unsigned char *w
 /// @param[in]  mlen      - the length of the message.
 /// @return 0 for success. -1 otherwise.
 ///
+#define ov_sign PQOV_NAMESPACE(ov_sign)
 int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, size_t mlen );
 
 ///
@@ -146,6 +156,7 @@ int ov_sign( uint8_t *signature, const sk_t *sk, const uint8_t *message, size_t 
 /// @param[in]  pk        - the public key.
 /// @return 0 for successful verified. -1 for failed verification.
 ///
+#define ov_verify PQOV_NAMESPACE(ov_verify)
 int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const pk_t *pk );
 
 
@@ -161,6 +172,7 @@ int ov_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, co
 /// @param[in]  mlen      - the length of the message.
 /// @return 0 for success. -1 otherwise.
 ///
+#define ov_expand_and_sign PQOV_NAMESPACE(ov_expand_and_sign)
 int ov_expand_and_sign( uint8_t *signature, const csk_t *sk, const uint8_t *message, size_t mlen );
 
 ///
@@ -172,6 +184,7 @@ int ov_expand_and_sign( uint8_t *signature, const csk_t *sk, const uint8_t *mess
 /// @param[in]  pk        - the public key of cyclic OV.
 /// @return 0 for successful verified. -1 for failed verification.
 ///
+#define ov_expand_and_verify PQOV_NAMESPACE(ov_expand_and_verify)
 int ov_expand_and_verify( const uint8_t *message, size_t mlen, const uint8_t *signature, const cpk_t *pk );
 
 

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_comm_avx2.c
 /// @brief Implementations for blas_comm_avx2.h
 ///
@@ -20,6 +21,7 @@
 #include "string.h"
 
 #include "params.h"  // for macro _USE_GF16 and _V
+#include "utils_malloc.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////  matrix-vector multiplication, GF( 16 ) ////////////////////
@@ -203,7 +205,7 @@ void gf16mat_prod_avx2( uint8_t *c, const uint8_t *matA, unsigned matA_vec_byte,
         gf256v_set_zero( c, matA_vec_byte );
         while( matA_n_vec ) {
             unsigned n_ele = ( matA_n_vec >= _V)? _V : matA_n_vec;
-            gf16v_generate_multabs( (uint8_t*)multabs, b, n_ele );
+            _gf16v_generate_multabs_avx2(multabs, b, n_ele );
             gf16mat_madd_multab_avx2(c, matA, matA_vec_byte, matA_n_vec, (const uint8_t *)multabs);
             b += (n_ele >> 1);
             matA += matA_vec_byte * n_ele;
@@ -566,7 +568,7 @@ unsigned _gf16mat_sol_64x64_avx2( uint8_t *mat, __m256i *vec) {
 
     __m256i mask_f = _mm256_set1_epi8( 0xf );
 
-    uint8_t pivots[64] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t pivots[64];
     __m256i multabs[64];
 
     const unsigned h = 64;
@@ -695,7 +697,7 @@ unsigned _gf16mat_sol_64x64_avx2( uint8_t *mat, __m256i *vec) {
 
 static
 unsigned gf16mat_GE_64x64_avx2(uint8_t *sqmat_a, uint8_t *constant) {
-    uint8_t mat[64 * 32] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t mat[64 * 32];
     __m256i vec[64] = {0};
 
     const unsigned height = 64;
@@ -719,7 +721,7 @@ unsigned gf16mat_GE_64x64_avx2(uint8_t *sqmat_a, uint8_t *constant) {
 
 static
 void gf16mat_BS_64x64_avx2(uint8_t *constant, const uint8_t *sq_row_mat_a) {
-    uint8_t mat[64 * 64] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t mat[64 * 64];
 
     const unsigned height = 64;
 
@@ -780,7 +782,7 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2( uint8_t *mat, unsigned h, unsign
 
     // assert( h <= 128 );
 #define MAX_H  96
-    uint8_t pivots[MAX_H] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t pivots[MAX_H];
     __m256i multabs[MAX_H];
 #undef MAX_H
 
@@ -858,7 +860,7 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2( uint8_t *mat, unsigned h, unsign
 
 unsigned gf256mat_gaussian_elim_avx2(uint8_t *sqmat_a, uint8_t *constant, unsigned len) {
 #define MAX_H  96
-    uint8_t mat[MAX_H * (MAX_H + 32)] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t mat[MAX_H * (MAX_H + 32)];
 #undef MAX_H
 
     unsigned height = len;
@@ -885,8 +887,8 @@ unsigned gf256mat_gaussian_elim_avx2(uint8_t *sqmat_a, uint8_t *constant, unsign
 void gf256mat_back_substitute_avx2( uint8_t *constant, const uint8_t *sq_row_mat_a, unsigned len) {
     //const unsigned MAX_H=96;
 #define MAX_H  96
-    uint8_t column[MAX_H] __attribute__((aligned(32))) = {0};
-    uint8_t temp[MAX_H] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t column[MAX_H] = {0};
+    PQOV_ALIGN uint8_t temp[MAX_H];
 #undef MAX_H
     memcpy( temp, constant, len );
     for (int i = len - 1; i > 0; i--) {
@@ -894,8 +896,8 @@ void gf256mat_back_substitute_avx2( uint8_t *constant, const uint8_t *sq_row_mat
             column[j] = sq_row_mat_a[j * len + i];    // row-major -> column-major, i.e., transpose
         }
         column[i] = 0;
-        unsigned len = ((i + 31) >> 5) << 5;
-        gf256v_madd_avx2( temp, column, temp[i], len );
+        unsigned len2 = ((i + 31) >> 5) << 5;
+        gf256v_madd_avx2( temp, column, temp[i], len2 );
     }
     memcpy( constant, temp, len );
 }

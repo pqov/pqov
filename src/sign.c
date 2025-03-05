@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 ///  @file  sign.c
 ///  @brief the implementations for functions in api.h
 ///
@@ -49,7 +50,7 @@ crypto_sign_keypair(unsigned char *pk, unsigned char *sk) {
 }
 
 int
-#if defined(PQM4)
+#if defined(PQM4) || defined(_UTILS_OQS_)
 crypto_sign_signature(unsigned char *sig, size_t *siglen, const unsigned char *m, size_t mlen, const unsigned char *sk)
 #else
 crypto_sign_signature(unsigned char *sig, unsigned long long *siglen, const unsigned char *m, unsigned long long mlen, const unsigned char *sk)
@@ -78,7 +79,7 @@ crypto_sign_signature(unsigned char *sig, unsigned long long *siglen, const unsi
 
 
 int
-#if defined(PQM4)
+#if defined(PQM4) || defined(_UTILS_OQS_)
 crypto_sign(unsigned char *sm, size_t *smlen, const unsigned char *m, size_t mlen, const unsigned char *sk)
 #else
 crypto_sign(unsigned char *sm, unsigned long long *smlen, const unsigned char *m, unsigned long long mlen, const unsigned char *sk)
@@ -96,7 +97,7 @@ crypto_sign(unsigned char *sm, unsigned long long *smlen, const unsigned char *m
 
 
 int
-#if defined(PQM4)
+#if defined(PQM4) || defined(_UTILS_OQS_)
 crypto_sign_verify(const unsigned char *sig, size_t siglen, const unsigned char *m, size_t mlen, const unsigned char *pk)
 #else
 crypto_sign_verify(const unsigned char *sig, unsigned long long siglen, const unsigned char *m, unsigned long long mlen, const unsigned char *pk)
@@ -127,7 +128,7 @@ crypto_sign_verify(const unsigned char *sig, unsigned long long siglen, const un
 }
 
 int
-#if defined(PQM4)
+#if defined(PQM4) || defined(_UTILS_OQS_)
 crypto_sign_open(unsigned char *m, size_t *mlen, const unsigned char *sm, size_t smlen, const unsigned char *pk)
 #else
 crypto_sign_open(unsigned char *m, unsigned long long *mlen, const unsigned char *sm, unsigned long long smlen, const unsigned char *pk)

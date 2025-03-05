@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas.h
 /// @brief Defining the implementations for linear algebra functions depending on the machine architecture.
 ///

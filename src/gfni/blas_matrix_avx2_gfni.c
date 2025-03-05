@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file blas_comm_avx2.c
 /// @brief Implementations for blas_comm_avx2.h
 ///
@@ -417,7 +418,7 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2_gfni( uint8_t *mat, unsigned h, u
 
     // assert( h <= 128 );
 #define MAX_H  96
-    uint8_t pivots[MAX_H] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t pivots[MAX_H];
 #undef MAX_H
 
     uint8_t rr8 = 1;
@@ -470,7 +471,7 @@ unsigned _gf256mat_gauss_elim_row_echelon_avx2_gfni( uint8_t *mat, unsigned h, u
 
 unsigned gf256mat_gaussian_elim_avx2_gfni(uint8_t *sqmat_a, uint8_t *constant, unsigned len) {
 #define MAX_H  96
-    uint8_t mat[MAX_H * (MAX_H + 32)] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t mat[MAX_H * (MAX_H + 32)];
 #undef MAX_H
 
     unsigned height = len;
@@ -497,8 +498,8 @@ unsigned gf256mat_gaussian_elim_avx2_gfni(uint8_t *sqmat_a, uint8_t *constant, u
 void gf256mat_back_substitute_avx2_gfni( uint8_t *constant, const uint8_t *sq_row_mat_a, unsigned len) {
     //const unsigned MAX_H=96;
 #define MAX_H  96
-    uint8_t column[MAX_H] __attribute__((aligned(32))) = {0};
-    uint8_t temp[MAX_H] __attribute__((aligned(32)));
+    PQOV_ALIGN uint8_t column[MAX_H] = {0};
+    PQOV_ALIGN uint8_t temp[MAX_H];
 #undef MAX_H
     memcpy( temp, constant, len );
     for (int i = len - 1; i > 0; i--) {

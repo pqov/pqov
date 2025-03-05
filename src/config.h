@@ -1,7 +1,10 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 
 /*
  *   This file contains all implementation options that do not affect testvectors
@@ -36,7 +39,7 @@
 //
 // choose implementations for SHAKE256, AES128CTR, and randombytes() functions
 //
-#if !(defined(_UTILS_OPENSSL_)||defined(_UTILS_SUPERCOP_)||defined(_UTILS_PQM4_))
+#if !(defined(_UTILS_OPENSSL_)||defined(_UTILS_SUPERCOP_)||defined(_UTILS_PQM4_)||defined(_UTILS_OQS_))
 // default:
 #define _UTILS_OPENSSL_
 
@@ -55,7 +58,7 @@
 // arm neon bitslice aes
 //#define _UTILS_NEONBSAES_
 
-#if ! (defined(_UTILS_PQM4_)||defined(_UTILS_AESNI_)||defined(_UTILS_NEONAES_)||defined(_UTILS_NEONBSAES_))
+#if ! (defined(_UTILS_PQM4_)||defined(_UTILS_AESNI_)||defined(_UTILS_NEONAES_)||defined(_UTILS_NEONBSAES_)||defined(_UTILS_OQS_))
 
 #if defined(_BLAS_AVX2_)
 #define _UTILS_AESNI_
@@ -67,6 +70,13 @@
 
 #endif
 
+
+#if defined(_UTILS_OQS_)
+#include <oqs/common.h>
+#if defined(OQS_ENABLE_TEST_CONSTANT_TIME)
+#define _VALGRIND_
+#endif
+#endif
 
 //
 // Options for randombytes()

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: CC0 OR Apache-2.0
 /// @file utils_prng.h
 /// @brief the interface for adapting PRNG functions.
 ///
@@ -108,6 +109,17 @@ typedef struct {
     #endif
 } prng_publicinputs_t;
 
+#elif defined(_UTILS_OQS_)
+#define RNG_OUTPUTLEN 16
+
+
+typedef struct {
+    unsigned used;
+    uint32_t ctr;
+    unsigned char   buf[RNG_OUTPUTLEN];
+
+    void *ctx;
+} prng_publicinputs_t;
 
 #else
 
@@ -139,15 +151,18 @@ typedef struct {
 
 
 ///////////////// end of defination of prng_publicinputs_t  /////////////////////////////////
-
+#define prng_set_publicinputs PQOV_NAMESPACE(prng_set_publicinputs)
 int prng_set_publicinputs(prng_publicinputs_t *ctx, const unsigned char prng_seed[16]);
 
+#define prng_gen_publicinputs PQOV_NAMESPACE(prng_gen_publicinputs)
 int prng_gen_publicinputs(prng_publicinputs_t *ctx, unsigned char *out, unsigned long outlen);
 
+#define prng_skip_publicinputs PQOV_NAMESPACE(prng_skip_publicinputs)
 void prng_skip_publicinputs(prng_publicinputs_t *ctx, unsigned long outlen);
 
 
-
+#define prng_release_publicinputs PQOV_NAMESPACE(prng_release_publicinputs)
+void prng_release_publicinputs(prng_publicinputs_t *ctx);
 
 #ifdef  __cplusplus
 }
