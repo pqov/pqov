@@ -52,6 +52,8 @@ jobs:
           - amd64
     steps:
     - uses: actions/checkout@v3
+    - name: Update apt
+      run: sudo apt update
     - name: Install Valgrind
       run: sudo apt install valgrind
     - name: valgrind
