@@ -11,9 +11,8 @@
 
 #include <openssl/evp.h>
 
-
 int hash_init( hash_ctx *ctx ) {
-    ctx->x = EVP_MD_CTX_create();
+    ctx->x = EVP_MD_CTX_new();
     if (!ctx->x) {
         return -1;
     }
@@ -32,7 +31,7 @@ int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen ) {
 }
 
 int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx ) {
-    nctx->x = EVP_MD_CTX_create();
+    nctx->x = EVP_MD_CTX_new();
     if (!nctx->x) {
         return -1;
     }
@@ -43,7 +42,7 @@ int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx ) {
 
 int hash_final_digest( unsigned char *out, size_t outlen, hash_ctx *ctx ) {
     int ok = EVP_DigestFinalXOF(ctx->x, out, outlen);
-    EVP_MD_CTX_destroy(ctx->x);
+    EVP_MD_CTX_free(ctx->x);
     return (ok) ? 0 : -1;
 }
 
@@ -90,49 +89,42 @@ int hash_final_digest( unsigned char *out, size_t outlen, hash_ctx *ctx ) {
 }
 
 #elif defined(_UTILS_OQS_)
-#include <oqs/sha3.h>
+#include <openssl/evp.h>
+#include "../src/common/ossl_helpers.h"
 
 int hash_init( hash_ctx *ctx ) {
+    ctx->x = OQS_OSSL_FUNC(EVP_MD_CTX_new)();
+    if (!ctx->x) {
+        return -1;
+    }
+
     #if defined(_HASH_SHAKE128_)
-    OQS_SHA3_shake128_inc_init( ctx );
+    int ok = OQS_OSSL_FUNC(EVP_DigestInit_ex)(ctx->x, OQS_OSSL_FUNC(EVP_shake128)(), NULL);
     #else
-    OQS_SHA3_shake256_inc_init( ctx );
+    int ok = OQS_OSSL_FUNC(EVP_DigestInit_ex)(ctx->x, OQS_OSSL_FUNC(EVP_shake256)(), NULL);
     #endif
-    return 0;
+    return (ok) ? 0 : -1;
 }
 
 int hash_update( hash_ctx *ctx, const unsigned char *mesg, size_t mlen ) {
-    #if defined(_HASH_SHAKE128_)
-    OQS_SHA3_shake128_inc_absorb( ctx, mesg, mlen );
-
-    #else
-    OQS_SHA3_shake256_inc_absorb( ctx, mesg, mlen );
-    #endif
-    return 0;
+    int ok = OQS_OSSL_FUNC(EVP_DigestUpdate)(ctx->x, mesg, mlen);
+    return (ok) ? 0 : -1;
 }
 
 int hash_ctx_copy( hash_ctx *nctx, const hash_ctx *octx ) {
-    #if defined(_HASH_SHAKE128_)
-    OQS_SHA3_shake128_inc_init( nctx );
-    OQS_SHA3_shake128_inc_ctx_clone(nctx, octx);
-    #else
-    OQS_SHA3_shake256_inc_init( nctx );
-    OQS_SHA3_shake256_inc_ctx_clone(nctx, octx);
-    #endif
-    return 0;
+    nctx->x = OQS_OSSL_FUNC(EVP_MD_CTX_new)();
+    if (!nctx->x) {
+        return -1;
+    }
+
+    int ok = OQS_OSSL_FUNC(EVP_MD_CTX_copy)(nctx->x, octx->x);
+    return (ok) ? 0 : -1;
 }
 
 int hash_final_digest( unsigned char *out, size_t outlen, hash_ctx *ctx ) {
-    #if defined(_HASH_SHAKE128_)
-    OQS_SHA3_shake128_inc_finalize(ctx);
-    OQS_SHA3_shake128_inc_squeeze(out, outlen, ctx);
-    OQS_SHA3_shake128_inc_ctx_release(ctx);
-    #else
-    OQS_SHA3_shake256_inc_finalize(ctx);
-    OQS_SHA3_shake256_inc_squeeze(out, outlen, ctx);
-    OQS_SHA3_shake256_inc_ctx_release(ctx);
-    #endif
-    return 0;
+    int ok = OQS_OSSL_FUNC(EVP_DigestFinalXOF)(ctx->x, out, outlen);
+    OQS_OSSL_FUNC(EVP_MD_CTX_free)(ctx->x);
+    return (ok) ? 0 : -1;
 }
 
 #else
