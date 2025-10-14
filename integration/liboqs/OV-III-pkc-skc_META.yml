@@ -24,7 +24,7 @@ implementations:
   compile_opts: -D_OV256_184_72 -D_OV_PKC_SKC -D_UTILS_OQS_
   signature_keypair: pqov_uov_III_pkc_skc_ref_keypair
   signature_signature: pqov_uov_III_pkc_skc_ref_signature
-  signature_verify: pqov_uov_III_pkc_ref_verify
+  signature_verify: pqov_uov_III_pkc_skc_ref_verify
   sources: src/api.h src/blas.h src/blas_comm.h src/blas_matrix.c src/blas_matrix.h src/config.h src/gf16.h src/ov.c src/ov.h src/ov_blas.h src/ov_keypair.c src/ov_keypair.h src/ov_keypair_computation.c src/ov_keypair_computation.h src/ov_publicmap.c src/parallel_matrix_op.c src/parallel_matrix_op.h src/params.h src/sign.c src/ref/blas_matrix_ref.c src/ref/blas_matrix_ref.h src/ref/blas_u32.h utils/utils_hash.c utils/utils_hash.h utils/utils_prng.c utils/utils_prng.h utils/utils_randombytes.c utils/utils_randombytes.h integration/liboqs/utils_malloc.h
 - name: neon
   version: Round 2
