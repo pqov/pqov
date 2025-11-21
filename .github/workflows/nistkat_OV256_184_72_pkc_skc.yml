@@ -32,7 +32,7 @@ jobs:
       matrix:
         cc:
           - clang
-          - gcc-12
+          - gcc-15
         impl:
           - ref
           - neon
