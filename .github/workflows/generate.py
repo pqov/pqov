@@ -66,7 +66,7 @@ jobs:
       matrix:
         cc:
           - clang
-          - gcc-12
+          - gcc-15
         impl: # there is no AVX2 available on the MacOS runners
           - ref
           - neon
@@ -144,7 +144,7 @@ jobs:
       matrix:
         cc:
           - clang
-          - gcc-12
+          - gcc-15
         impl:
           - ref
           - neon
