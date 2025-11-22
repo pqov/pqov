@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 0 1 * *' # monthly
+
+jobs:
+  test-ubuntu:
+    name: Ubuntu ${{ matrix.param_name }}_${{ matrix.variant_name }} ${{ matrix.impl }} ${{ matrix.cc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        param: [1, 3, 4, 5]
+        variant: [1, 2, 3]
+        cc: [gcc, clang]
+        impl: [ref, avx2, ssse3, amd64]
+        include:
+          - param: 1
+            param_name: OV16_160_64
+          - param: 3
+            param_name: OV256_112_44
+          - param: 4
+            param_name: OV256_184_72
+          - param: 5
+            param_name: OV256_244_96
+          - variant: 1
+            variant_name: classic
+          - variant: 2
+            variant_name: pkc
+          - variant: 3
+            variant_name: pkc_skc
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install Valgrind
+      run: sudo apt update && sudo apt install -y valgrind
+    - name: test
+      run: make PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: asan
+      run: |
+        make clean
+        make ASAN=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: ubsan
+      run: |
+        make clean
+        make UBSAN=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+    - name: nistkat
+      run: |
+        make clean
+        make KAT=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} check-NISTKAT
+      env:
+        CC: ${{ matrix.cc }}
+    - name: valgrind
+      run: |
+        make clean
+        make VALGRIND=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} sign_api-test
+        valgrind --error-exitcode=1 --exit-on-first-error=yes --leak-check=yes ./sign_api-test
+
+  test-macos:
+    name: macOS ${{ matrix.param_name }}_${{ matrix.variant_name }} ${{ matrix.impl }} ${{ matrix.cc }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        param: [1, 3, 4, 5]
+        variant: [1, 2, 3]
+        cc: [clang, gcc-15]
+        impl: [ref, neon]
+        include:
+          - param: 1
+            param_name: OV16_160_64
+          - param: 3
+            param_name: OV256_112_44
+          - param: 4
+            param_name: OV256_184_72
+          - param: 5
+            param_name: OV256_244_96
+          - variant: 1
+            variant_name: classic
+          - variant: 2
+            variant_name: pkc
+          - variant: 3
+            variant_name: pkc_skc
+    steps:
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - name: Setup openssl
+      run: brew install openssl
+    - uses: actions/checkout@v3
+    - name: Set up compiler
+      run: |
+        export CC=${{ matrix.cc }}
+        sysctl -a machdep.cpu
+    - name: test
+      run: make PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+    - name: asan
+      if: ${{ matrix.cc == 'clang' }}
+      run: |
+        make clean
+        make ASAN=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+    - name: ubsan
+      if: ${{ matrix.cc == 'clang' }}
+      run: |
+        make clean
+        make UBSAN=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} test
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+    - name: nistkat
+      run: |
+        make clean
+        function sha256sum() { shasum -a 256 "$@" ; } && export -f sha256sum
+        make KAT=1 PARAM=${{ matrix.param }} VARIANT=${{ matrix.variant }} PROJ=${{ matrix.impl }} check-NISTKAT
+      env:
+        CC: ${{ matrix.cc }}
+        LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
+        CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
