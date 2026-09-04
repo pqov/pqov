@@ -1,7 +1,7 @@
 #!/bin/sh
 
 B=$1
-[ -z $B] && B="KAT"
+[ -z "$B" ] && B="KAT"
 
 PARAM="Is"
 TAR="$B/$PARAM"

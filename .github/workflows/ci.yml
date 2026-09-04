@@ -23,11 +23,11 @@ jobs:
           - param: 1
             param_name: OV16_160_64
           - param: 3
-            param_name: OV256_112_44
+            param_name: OV256_119_45
           - param: 4
-            param_name: OV256_184_72
+            param_name: OV256_193_72
           - param: 5
-            param_name: OV256_244_96
+            param_name: OV256_259_96
           - variant: 1
             variant_name: classic
           - variant: 2
@@ -80,11 +80,11 @@ jobs:
           - param: 1
             param_name: OV16_160_64
           - param: 3
-            param_name: OV256_112_44
+            param_name: OV256_119_45
           - param: 4
-            param_name: OV256_184_72
+            param_name: OV256_193_72
           - param: 5
-            param_name: OV256_244_96
+            param_name: OV256_259_96
           - variant: 1
             variant_name: classic
           - variant: 2
@@ -135,3 +135,21 @@ jobs:
         CC: ${{ matrix.cc }}
         LDFLAGS: "-L/opt/homebrew/opt/openssl@3/lib"
         CFLAGS: "-I/opt/homebrew/opt/openssl@3/include"
+
+  crosscheck-uovpy:
+    name: Cross-check KATs vs uov-py
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install pycryptodome
+      run: pip install pycryptodome
+    - name: Check out uov-py
+      run: |
+        git clone https://github.com/mjosaarinen/uov-py
+        git -C uov-py checkout 308f792ba6e074b04985be64008f3089d5a8646e
+    - name: crosscheck
+      run: ./crosscheck-uovpy.py uov-py
