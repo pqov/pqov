@@ -1,20 +1,21 @@
   
-# OV signature
+# UOV signature
 
-This project contains the reference and optimized implementations of the oil and vinegar (OV) signature system.
+This project contains the reference and optimized implementations of the Unbalanced Oil and Vinegar (UOV) signature system.
 
 ## Licence
 
-Public domain unless stated differently at the top of each file.
+Public Domain (https://creativecommons.org/share-your-work/public-domain/cc0/)
+unless stated differently at the top of each file.
 
 ## Parameters
 
-| Parameter    | signature size | pk size  | sk size | pkc size | compressed-sk size |  
-|:-----------: |:--------------:|--------- |---------|------------|--------------------|
-|GF(16),160,64 | 96             |412,160   |348,704  |66,576      | 32                 |
-|GF(256),112,44| 128            |278,432   |237,896  |43,576      | 32                 |
-|GF(256),184,72| 200            |1,225,440 |1,044,320|189,232     | 32                 |
-|GF(256),244,96| 260            |2,869,440 |2,436,704|446,992     | 32                 |
+|         |NIST Sec. Level | Parameter (n,m,GF(q)) | epk size (bytes) | esk size (bytes) | cpk size (bytes)   | csk size (bytes)   | signature size (bytes) |
+|:--------|:--------:|:-------------:|----------:|---------:|---------:|----------|----------:|
+| uov-Ip  |1         |119,45,GF(256) | 321,300   |278,087   |46,591     | 32      |  135      |
+| uov-Is  |1         |160,64,GF(16)  | 412,160   |348,704   |66,576     | 32      |   96      |
+| uov-III |3         |193,72,GF(256) | 1,347,912 |1,167,440 |189,232    | 32      |  209      |
+| uov-V   |5         |259,96,GF(256) | 3,232,320 |2,801,024 |446,992    | 32      |  275      |
 
 
 ## Instructions for testing and generating KATs

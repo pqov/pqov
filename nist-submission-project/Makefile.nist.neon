@@ -16,6 +16,15 @@ LDFLAGS  := $(LDFLAGS)
 LIBPATH  = -L/usr/local/lib -L/opt/local/lib -L/usr/lib
 LIBS     = -lcrypto
 
+# Homebrew keeps OpenSSL keg-only, outside the search paths above.
+ifeq ($(shell uname -s),Darwin)
+SSL_PREFIX := $(firstword $(wildcard /opt/homebrew/opt/openssl@3 /usr/local/opt/openssl@3 /opt/homebrew/opt/openssl /usr/local/opt/openssl))
+ifneq ($(SSL_PREFIX),)
+INCPATH += -I$(SSL_PREFIX)/include
+LIBPATH += -L$(SSL_PREFIX)/lib
+endif
+endif
+
 CFLAGS += -flax-vector-conversions
 
 SRCS           :=  $(wildcard $(SRC_DIR)/*.c)

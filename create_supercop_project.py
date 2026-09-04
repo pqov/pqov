@@ -4,7 +4,7 @@ import sys
 import os, errno, shutil
 from shutil import copyfile
 
-base_dir_name = './crypto_sign'
+base_dir_name = './supercop-project/crypto_sign'
 
 if 2 == len(sys.argv) :
   base_dir_name = sys.argv[1]
@@ -12,60 +12,72 @@ if 2 == len(sys.argv) :
 
 file_dir = './supercop-project'
 
-imple_names = [ 'ref' , 'amd64' , 'avx2' , 'neon' ]
+imple_names = [ 'ref' , 'ssse3' , 'avx2' , 'neon' , 'gfni' ]
 
 imple_dirs = {
  'ref'   : 'ref' ,
- 'amd64' : 'amd64' ,
+ 'ssse3' : 'ssse3' ,
  'avx2'  : 'avx2' ,
- 'neon'  : 'neon'
+ 'neon'  : 'neon' ,
+ 'gfni'  : 'gfni'
 }
 
 imple_srcs = {
     'ref'   : ['src','src/ref','utils'] ,
-    'amd64' : ['src','src/ref','src/amd64','utils'] ,
+    'ssse3' : ['src','src/ref','src/amd64','src/ssse3','utils'] ,
     'avx2'  : ['src','src/ref','src/amd64','src/ssse3','src/avx2','utils','utils/x86aesni'],
-    'neon'  : ['src','src/ref','src/amd64','src/neon','utils','utils/neon_aesinst']
+    'neon'  : ['src','src/ref','src/amd64','src/neon','utils','utils/neon_aesinst'],
+    'gfni'  : ['src','src/ref','src/amd64','src/ssse3','src/avx2','src/gfni','utils','utils/x86aesni']
 }
 
 extra_files = {
   'ref'   : [  ] ,
-  'amd64' : [ ('architectures',f'{file_dir}/architectures.x86') ] ,
+  'ssse3' : [ ('architectures',f'{file_dir}/architectures.x86') ] ,
   'avx2'  : [ ('architectures',f'{file_dir}/architectures.x86') ] ,
-  'neon'  : [ ('architectures',f'{file_dir}/architectures.arm') ]
+  'neon'  : [ ('architectures',f'{file_dir}/architectures.arm') ] ,
+  'gfni'  : [ ('architectures',f'{file_dir}/architectures.x86') ]
 }
 
 
 
-params_variants_names =  [ 'OVIp' , 'OVIppkc' , 'OVIppkcskc' , 'OVIs' , 'OVIspkc' , 'OVIspkc_skc' , 'OVIII' , 'OVIIIpkc' , 'OVIIIpkcskc' , 'OVV' , 'OVVpkc' , 'OVVpkcskc' ]
+params_variants_names =  [ 'uov1p' , 'uov1ppkc' , 'uov1ppkcskc' , 'uov1s' , 'uov1spkc' , 'uov1spkcskc' , 'uov3' , 'uov3pkc' , 'uov3pkcskc' , 'uov5' , 'uov5pkc' , 'uov5pkcskc' ]
 
 modify_paramname = {
-  'OVIp'       : [  ] ,
-  'OVIppkc'    : [ ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
-  'OVIppkcskc' : [ ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
-  'OVIs'       : [ ('params.h' , "#define _OV256_112_44" , "#define _OV16_160_64" ) ] ,
-  'OVIspkc'    : [ ('params.h' , "#define _OV256_112_44" , "#define _OV16_160_64" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
-  'OVIspkcskc' : [ ('params.h' , "#define _OV256_112_44" , "#define _OV16_160_64" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
-  'OVIII'      : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_184_72" ) ] ,
-  'OVIIIpkc'   : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_184_72" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
-  'OVIIIpkcskc': [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_184_72" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
-  'OVV'        : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ) ] ,
-  'OVVpkc'     : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
-  'OVVpkcskc'  : [ ('params.h' , "#define _OV256_112_44" , "#define _OV256_244_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] 
+  'uov1p'       : [  ] ,
+  'uov1ppkc'    : [ ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
+  'uov1ppkcskc' : [ ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
+  'uov1s'       : [ ('params.h' , "#define _OV256_119_45" , "#define _OV16_160_64" ) ] ,
+  'uov1spkc'    : [ ('params.h' , "#define _OV256_119_45" , "#define _OV16_160_64" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
+  'uov1spkcskc' : [ ('params.h' , "#define _OV256_119_45" , "#define _OV16_160_64" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
+  'uov3'      : [ ('params.h' , "#define _OV256_119_45" , "#define _OV256_193_72" ) ] ,
+  'uov3pkc'   : [ ('params.h' , "#define _OV256_119_45" , "#define _OV256_193_72" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
+  'uov3pkcskc': [ ('params.h' , "#define _OV256_119_45" , "#define _OV256_193_72" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] ,
+  'uov5'        : [ ('params.h' , "#define _OV256_119_45" , "#define _OV256_259_96" ) ] ,
+  'uov5pkc'     : [ ('params.h' , "#define _OV256_119_45" , "#define _OV256_259_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC" ) ] ,
+  'uov5pkcskc'  : [ ('params.h' , "#define _OV256_119_45" , "#define _OV256_259_96" ), ('params.h' , "#define _OV_CLASSIC" , "#define _OV_PKC_SKC" )] 
 }
 
+
+# params.h decides PQOV_NAMESPACE_IMPL from the _BLAS_ macros, and several .c
+# files reach it through another header before they include config.h.  Seeding
+# the macro here settles the namespace no matter what that order turns out to be.
+seed_impl = lambda macros : ( 'params.h' , "#define _PARAMS_H_" , "#define _PARAMS_H_\n\n" + '\n'.join( f'#define {m}' for m in macros ) )
 
 modify_projname = {
   'ref'    : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ) ] ,
-  'amd64'  : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_UINT64_" , "#define _BLAS_UINT64_" ) ] ,
-  'neon'   : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_NEON_"   , "#define _BLAS_NEON_" ) , ('config.h' , "//#define _UTILS_NEONAES_" , "#define _UTILS_NEONAES_" )] ,
-  'avx2'   : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_AVX2_"   , "#define _BLAS_AVX2_" ) , ('config.h' , "//#define _UTILS_AESNI_" , "#define _UTILS_AESNI_" )    , ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ]
+  'ssse3'  : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_SSE_"    , "#define _BLAS_SSE_" ) , ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) , seed_impl(['_BLAS_SSE_']) ] ,
+  'neon'   : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_NEON_"   , "#define _BLAS_NEON_" ) , ('config.h' , "//#define _UTILS_NEONAES_" , "#define _UTILS_NEONAES_" ) , seed_impl(['_BLAS_NEON_']) ] ,
+  'avx2'   : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_AVX2_"   , "#define _BLAS_AVX2_" ) , ('config.h' , "//#define _UTILS_AESNI_" , "#define _UTILS_AESNI_" )    , ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) , seed_impl(['_BLAS_AVX2_']) ] ,
+  'gfni'   : [ ('api.h' , '//#define _SUPERCOP_' , '#define _SUPERCOP_' ),('config.h' , '#define _UTILS_OPENSSL_' , '#define _UTILS_SUPERCOP_' ),( 'config.h' , "//#define _BLAS_AVX2_"   , "#define _BLAS_AVX2_\n#define _BLAS_GFNI_" ) , ('config.h' , "//#define _UTILS_AESNI_" , "#define _UTILS_AESNI_" ) , seed_impl(['_BLAS_AVX2_','_BLAS_GFNI_']) ]
 }
 
 modify_dirname = {
-  'OVIs/neon'       : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
-  'OVIspkc/neon'    : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
-  'OVIspkcskc/neon' : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ]
+  'uov1s/neon'       : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'uov1spkc/neon'    : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'uov1spkcskc/neon' : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'uov1s/gfni'       : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'uov1spkc/gfni'    : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ] ,
+  'uov1spkcskc/gfni' : [ ('config.h' , "//#define _MUL_WITH_MULTAB_" , "#define _MUL_WITH_MULTAB_" ) ]
 }
 
 
@@ -179,6 +191,9 @@ for proj in imple_names :
   print( f"\n-----------------\nmodify files for project {proj}\n-----------------" )
   modify_files_for( proj , modify_projname , modify_paramname , modify_dirname )
 
+
+print( f"\n----------------- done -----------------" )
+print( f"SUPERCOP project generated: {base_dir_name}" )
 
 exit()
 

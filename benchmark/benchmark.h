@@ -130,11 +130,14 @@ bm_dump(char *buf, size_t bufsize, const struct benchmark *bm) {
     size_t len;
     #if defined(CONFIG_BENCH_SYSTIME)
     const char *unit = "micro sec.";
+    // Records are whole micro seconds; only the average resolves finer.
+    const int prec = 2;
     #else
     const char *unit = "cycles";
+    const int prec = 0;
     #endif
 
-    len = snprintf(buf, bufsize, "%.0lf (%s, avg. of %d):", bm->acc / bm->count, unit, bm->count);
+    len = snprintf(buf, bufsize, "%.*lf (%s, avg. of %d):", prec, bm->acc / bm->count, unit, bm->count);
     buf += len;
     bufsize -= len;
     for (i = 0; i < RECMAX; ++i) {

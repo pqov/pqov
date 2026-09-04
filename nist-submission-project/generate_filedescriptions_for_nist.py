@@ -6,7 +6,8 @@ from shutil import copyfile
 
 #
 # HOW TO USE:
-# ls -alR | python3 this_file
+#   python3 this_file <project_dir>   # write <project_dir>/README
+#   ls -alR | python3 this_file       # just the listing, on stdout
 #
 
 file_descriptions = {
@@ -52,6 +53,20 @@ file_descriptions = {
 "./Optimized_Implementation/neon/V_pkc_skc:":	"",
 "./Optimized_Implementation/neon/nistkat:":	"",
 "./Optimized_Implementation/neon:":	"",
+"./Optimized_Implementation/gfni/III:":	"",
+"./Optimized_Implementation/gfni/III_pkc:":	"",
+"./Optimized_Implementation/gfni/III_pkc_skc:":	"",
+"./Optimized_Implementation/gfni/Ip:":	"",
+"./Optimized_Implementation/gfni/Ip_pkc:":	"",
+"./Optimized_Implementation/gfni/Ip_pkc_skc:":	"",
+"./Optimized_Implementation/gfni/Is:":	"",
+"./Optimized_Implementation/gfni/Is_pkc:":	"",
+"./Optimized_Implementation/gfni/Is_pkc_skc:":	"",
+"./Optimized_Implementation/gfni/V:":	"",
+"./Optimized_Implementation/gfni/V_pkc:":	"",
+"./Optimized_Implementation/gfni/V_pkc_skc:":	"",
+"./Optimized_Implementation/gfni/nistkat:":	"",
+"./Optimized_Implementation/gfni:":	"",
 "./Optimized_Implementation:":	"",
 "./Reference_Implementation/III:":	"",
 "./Reference_Implementation/III_pkc:":	"",
@@ -68,33 +83,24 @@ file_descriptions = {
 "./Reference_Implementation/nistkat:":	"",
 "./Reference_Implementation:":	"",
 ".:":	"",
-"III":	"",
-"III_pkc":	"",
-"III_pkc_skc":	"",
-"Ip":	"",
-"Ip_pkc":	"",
-"Ip_pkc_skc":	"",
-"Is":	"",
-"Is_pkc":	"",
-"Is_pkc_skc":	"",
-"Makefile":	"",
-"Optimized_Implementation":	"",
+"III":                      "uov-III, classic",
+"III_pkc":                  "uov-III, compressed public key",
+"III_pkc_skc":              "uov-III, compressed public and secret keys",
+"Ip":                       "uov-Ip, classic",
+"Ip_pkc":                   "uov-Ip, compressed public key",
+"Ip_pkc_skc":               "uov-Ip, compressed public and secret keys",
+"Is":                       "uov-Is, classic",
+"Is_pkc":                   "uov-Is, compressed public key",
+"Is_pkc_skc":               "uov-Is, compressed public and secret keys",
+"Makefile":                 "build rules, selecting a parameter set with PROJ",
+"Optimized_Implementation": "optimized implementations, one directory per architecture",
 "PQCgenKAT_sign.c":             "the program for generating KATs from NIST",
-"PQCsignKAT_1044336.req":       "KAT for requests",
-"PQCsignKAT_1044336.rsp":       "KAT with responses",
-"PQCsignKAT_237912.req":        "KAT for requests",
-"PQCsignKAT_237912.rsp":        "KAT with responses",
-"PQCsignKAT_2436720.req":       "KAT for requests",
-"PQCsignKAT_2436720.rsp":       "KAT with responses",
-"PQCsignKAT_348720.req":        "KAT for requests",
-"PQCsignKAT_348720.rsp":        "KAT with responses",
-"PQCsignKAT_48.req":            "KAT for requests",
-"PQCsignKAT_48.rsp":            "KAT with responses",
-"README.md":	"",
-"Reference_Implementation":	"",
-"V":	"",
-"V_pkc":	"",
-"V_pkc_skc":	"",
+"README":	"the file you are reading",
+"README.md":                "parameters and build instructions for this implementation",
+"Reference_Implementation": "portable C reference implementation",
+"V":                        "uov-V, classic",
+"V_pkc":                    "uov-V, compressed public key",
+"V_pkc_skc":                "uov-V, compressed public and secret keys",
 "aes128_4r_ffs.c":                "aes128 ref implementation of ffs method",
 "aes128_4r_ffs.h":                "aes128 ref implementation of ffs method",
 "aes_neonaes.c":                  "aes128 implementation of armv8 aes instruction",
@@ -171,10 +177,62 @@ file_descriptions = {
 
 
 
+def describe( name ):
+  if name in file_descriptions : return file_descriptions[name]
+  if name.startswith("PQCsignKAT_") :
+    if name.endswith(".req") : return "KAT for requests"
+    if name.endswith(".rsp") : return "KAT with responses"
+  return None
 
+
+def emit( name ):
+  d = describe( name )
+  print( name if d is None else '{0: <45}'.format( name ) + d )
+
+
+def tree_lines( root ):
+  """The same sequence of names that "ls -alR" feeds this script from stdin."""
+  for dirpath, dirnames, filenames in os.walk( root ) :
+    dirnames.sort()
+    rel = os.path.relpath( dirpath , root )
+    yield ( "." if rel == "." else "./" + rel ) + ":"
+    for n in sorted( dirnames + filenames , key = str.lower ) : yield n
+    yield ""
+
+
+def listing( root ):
+  import io, contextlib
+  buf = io.StringIO()
+  with contextlib.redirect_stdout( buf ) :
+    for name in tree_lines( root ) :
+      if name == "" : print( "" )
+      else : emit( name )
+  return buf.getvalue()
+
+
+def write_readme( root , out_path , preamble = None ):
+  """Section 2.C.4 of the NIST call: a plain text README listing every file."""
+  open( out_path , "w" ).close()          # so the README lists itself
+  text = listing( root )
+  with open( out_path , "w" ) as fp :
+    if preamble is not None :
+      fp.write( preamble.rstrip( "\n" ) + "\n\n\n## File descriptions\n\n" )
+    fp.write( text )
+
+
+def readme_for( root ):
+  """Write <root>/README: this directory's README.md.nist, then the listing."""
+  here = os.path.dirname( os.path.abspath( __file__ ) )
+  preamble = open( os.path.join( here , 'README.md.nist' ) ).read()
+  write_readme( root , os.path.join( root , 'README' ) , preamble )
 
 
 if __name__ == '__main__' :
+  if 2 == len(sys.argv) :
+    readme_for( sys.argv[1] )
+    print( "wrote " + os.path.join( sys.argv[1] , 'README' ) )
+    sys.exit()
+
   myset = set()
   for line in sys.stdin:
     word_list = line.split()
@@ -184,10 +242,7 @@ if __name__ == '__main__' :
       if( ss == "." ) : continue
       if( ss == ".." ) : continue
       myset.add( ss )
-      if ss in file_descriptions :
-        print( '{0: <45}'.format( ss ) + file_descriptions[ss] )
-      else :
-        print( ss )
+      emit( ss )
     else :
       print("")
 

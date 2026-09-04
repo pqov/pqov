@@ -15,6 +15,7 @@
 #include <stdint.h>
 
 #include "gf16.h"
+#include "config.h"
 
 #include "gf16_u64.h"
 
@@ -27,6 +28,18 @@ extern  "C" {
 
 
 
+
+
+// Unaligned 64-bit access, for the paths the aligned kernels below cannot take.
+static inline uint64_t _load_u64(const uint8_t *a) {
+    uint64_t r;
+    PQOV_MEMCPY(&r, a, 8);
+    return r;
+}
+
+static inline void _store_u64(uint8_t *a, uint64_t r) {
+    PQOV_MEMCPY(a, &r, 8);
+}
 
 
 static inline void _gf256v_add_u64_aligned(uint8_t *accu_b, const uint8_t *a, unsigned _num_byte) {
@@ -52,6 +65,12 @@ void _gf256v_add_u64( uint8_t *accu_b, const uint8_t *a, unsigned _num_byte ) {
     uintptr_t bp = (uintptr_t)(const void *)accu_b;
     uintptr_t ap = (uintptr_t)(const void *)a;
     if ( (bp & 7) || (ap & 7) || (_num_byte < 8) ) {
+        while ( _num_byte >= 8 ) {
+            _store_u64( accu_b, _load_u64(accu_b) ^ _load_u64(a) );
+            a += 8;
+            accu_b += 8;
+            _num_byte -= 8;
+        }
         _gf256v_add_u32(accu_b, a, _num_byte);
     } else {
         _gf256v_add_u64_aligned(accu_b, a, _num_byte);
@@ -91,6 +110,13 @@ void _gf256v_conditional_add_u64( uint8_t *accu_b, uint8_t condition, const uint
     uintptr_t bp = (uintptr_t)(const void *)accu_b;
     uintptr_t ap = (uintptr_t)(const void *)a;
     if ( (bp & 7) || (ap & 7) || (_num_byte < 8) ) {
+        uint64_t pr_u64 = ((uint64_t)0) - ((uint64_t)condition);
+        while ( _num_byte >= 8 ) {
+            _store_u64( accu_b, _load_u64(accu_b) ^ (_load_u64(a) & pr_u64) );
+            a += 8;
+            accu_b += 8;
+            _num_byte -= 8;
+        }
         _gf256v_conditional_add_u32(accu_b, condition, a, _num_byte);
     } else {
         _gf256v_conditional_add_u64_aligned(accu_b, condition, a, _num_byte);
@@ -146,13 +172,7 @@ void _gf16v_mul_scalar_u64( uint8_t *a, uint8_t gf16_b, unsigned _num_byte ) {
     } t;
 
     while ( _num_byte >= 8 ) {
-        for (int i = 0; i < 8; i++) {
-            t.u8[i] = a[i];
-        }
-        t.u64 = gf16v_mul_u64(t.u64, gf16_b);
-        for (int i = 0; i < 8; i++) {
-            a[i] = t.u8[i];
-        }
+        _store_u64( a, gf16v_mul_u64( _load_u64(a), gf16_b ) );
         a += 8;
         _num_byte -= 8;
     }
@@ -221,13 +241,7 @@ void _gf256v_mul_scalar_u64( uint8_t *a, uint8_t gf256_b, unsigned _num_byte ) {
     } t;
 
     while ( _num_byte >= 8 ) {
-        for (int i = 0; i < 8; i++) {
-            t.u8[i] = a[i];
-        }
-        t.u64 = gf256v_mul_u64(t.u64, gf256_b);
-        for (int i = 0; i < 8; i++) {
-            a[i] = t.u8[i];
-        }
+        _store_u64( a, gf256v_mul_u64( _load_u64(a), gf256_b ) );
         a += 8;
         _num_byte -= 8;
     }
@@ -293,13 +307,7 @@ static inline void _gf16v_madd_u64(uint8_t *accu_c, const uint8_t *a, uint8_t gf
     } t;
 
     while ( _num_byte >= 8 ) {
-        for (int i = 0; i < 8; i++) {
-            t.u8[i] = a[i];
-        }
-        t.u64 = gf16v_mul_u64(t.u64, gf16_b);
-        for (int i = 0; i < 8; i++) {
-            accu_c[i] ^= t.u8[i];
-        }
+        _store_u64( accu_c, _load_u64(accu_c) ^ gf16v_mul_u64( _load_u64(a), gf16_b ) );
         a += 8;
         accu_c += 8;
         _num_byte -= 8;
@@ -369,13 +377,7 @@ static inline void _gf256v_madd_u64(uint8_t *accu_c, const uint8_t *a, uint8_t g
     } t;
 
     while ( _num_byte >= 8 ) {
-        for (int i = 0; i < 8; i++) {
-            t.u8[i] = a[i];
-        }
-        t.u64 = gf256v_mul_u64(t.u64, gf256_b);
-        for (int i = 0; i < 8; i++) {
-            accu_c[i] ^= t.u8[i];
-        }
+        _store_u64( accu_c, _load_u64(accu_c) ^ gf256v_mul_u64( _load_u64(a), gf256_b ) );
         a += 8;
         accu_c += 8;
         _num_byte -= 8;
