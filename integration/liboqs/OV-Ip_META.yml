@@ -13,23 +13,23 @@ principal-submitters:
 - Chengdong Tao
 - Bo-Yin Yang
 claimed-nist-level: 1
-length-public-key: 278432
-length-secret-key: 237896
-length-signature: 128
-nistkat-sha256: 2a24530e2dca2d4d4a7b9bf72f987ec6e85915194629c4673b892bdba5f42152
+length-public-key: 321300
+length-secret-key: 278087
+length-signature: 135
+nistkat-sha256: ffe0051c8cd026ee891e0bc51dbf2e023c650d812b92745f34eb1d869e3cacc7
 implementations:
 - name: ref
-  version: Round 2
+  version: Round 3
   folder_name: .
-  compile_opts: -D_OV256_112_44 -D_OV_CLASSIC -D_UTILS_OQS_
+  compile_opts: -D_OV256_119_45 -D_OV_CLASSIC -D_UTILS_OQS_
   signature_keypair: pqov_uov_Ip_ref_keypair
   signature_signature: pqov_uov_Ip_ref_signature
   signature_verify: pqov_uov_Ip_ref_verify
   sources: src/api.h src/blas.h src/blas_comm.h src/blas_matrix.c src/blas_matrix.h src/config.h src/gf16.h src/ov.c src/ov.h src/ov_blas.h src/ov_keypair.c src/ov_keypair.h src/ov_keypair_computation.c src/ov_keypair_computation.h src/ov_publicmap.c src/parallel_matrix_op.c src/parallel_matrix_op.h src/params.h src/sign.c src/ref/blas_matrix_ref.c src/ref/blas_matrix_ref.h src/ref/blas_u32.h utils/utils_hash.c utils/utils_hash.h utils/utils_prng.c utils/utils_prng.h utils/utils_randombytes.c utils/utils_randombytes.h integration/liboqs/utils_malloc.h
 - name: neon
-  version: Round 2
+  version: Round 3
   folder_name: .
-  compile_opts: -D_OV256_112_44 -D_OV_CLASSIC -D_UTILS_OQS_ -D_BLAS_NEON_
+  compile_opts: -D_OV256_119_45 -D_OV_CLASSIC -D_UTILS_OQS_ -D_BLAS_NEON_
   signature_keypair: pqov_uov_Ip_neon_keypair
   signature_signature: pqov_uov_Ip_neon_signature
   signature_verify: pqov_uov_Ip_neon_verify
@@ -42,9 +42,9 @@ implementations:
       required_flags:
           - asimd
 - name: avx2
-  version: Round 2
+  version: Round 3
   folder_name: .
-  compile_opts: -D_OV256_112_44 -D_OV_CLASSIC -D_UTILS_OQS_ -D_BLAS_AVX2_ -D_MUL_WITH_MULTAB_
+  compile_opts: -D_OV256_119_45 -D_OV_CLASSIC -D_UTILS_OQS_ -D_BLAS_AVX2_ -D_MUL_WITH_MULTAB_
   signature_keypair: pqov_uov_Ip_avx2_keypair
   signature_signature: pqov_uov_Ip_avx2_signature
   signature_verify: pqov_uov_Ip_avx2_verify
